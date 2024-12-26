@@ -1,0 +1,106 @@
+<h4 class="text-center mb-4" 
+                            style="font-size: 1.4rem; font-weight: 600; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #99c2ff; padding-bottom: 12px; display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                            <i class="fas fa-gavel" style="color: #99c2ff; margin-right: 12px; font-size: 1.8rem;"></i> 
+                            Adicionar Eletrónico ao Interno
+                            </h4>
+                            <div class="row">
+                                <!-- Formulário à esquerda -->
+                                <div class="col-md-6" style="margin-bottom: 15px;">
+                                    <div class="form-group12" style="margin-bottom: 20px;">
+                                        <label for="tipo" style="font-weight: bold;">Tipo de Eletrônico:</label>
+                                        <div class="radio-group" style="margin-top: 5px;">
+                                            <input type="radio" id="tv" name="tipo" value="tv" style="margin-right: 10px;">
+                                            <label for="tv" style="margin-right: 20px;">Tv</label>
+                                    
+                                            <input type="radio" id="radio" name="tipo" value="radio" style="margin-right: 10px;">
+                                            <label for="radio">Rádio</label>
+                                        </div>
+                                        {% if form.tipo.errors %}
+                                            <div class="invalid-feedback" style="color: red; margin-top: 5px;">
+                                                {% for error in form.tipo.errors %}
+                                                    <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                
+                                    <!-- Campo para data de entrada -->
+                                    <div class="form-group" style="margin-bottom: 20px;">
+                                        <label for="data_entrada" style="font-weight: bold;">Data de Entrada:</label>
+                                        <input type="date" name="data_entrada" id="data_entrada" class="form-control {% if form.data_entrada.errors %}is-invalid{% endif %}" value="{{ form.data_entrada.value }}" style="width: 100%; margin-top: 5px;">
+                                        {% if form.data_entrada.errors %}
+                                            <div class="invalid-feedback" style="color: red; margin-top: 5px;">
+                                                {% for error in form.data_entrada.errors %}
+                                                    <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                
+                                    <!-- Campo para anexar a nota fiscal -->
+                                    <div class="form-group" style="margin-bottom: 20px;">
+                                        <label for="nova_fiscal" style="font-weight: bold;">Anexar Nota Fiscal:</label>
+                                        <input type="file" name="nova_fiscal" id="nova_fiscal" class="form-control {% if form.nova_fiscal.errors %}is-invalid{% endif %}" accept="image/*" style="width: 100%; margin-top: 5px;">
+                                        {% if form.nova_fiscal.errors %}
+                                            <div class="invalid-feedback" style="color: red; margin-top: 5px;">
+                                                {% for error in form.nova_fiscal.errors %}
+                                                    <p>{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                        
+                                <!-- Card à direita para exibir a nota fiscal -->
+                                <div class="col-md-6">
+                                    <div id="nota-fiscal-card" class="card">
+                                        <div class="card-header">
+                                            <h5 style="text-align: center;">Nota Fiscal Selecionada</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="nota-fiscal-preview" class="text-center">
+                                                <p>Nenhuma imagem selecionada.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+                            <script>
+                                // Script para mostrar a imagem da nota fiscal selecionada dentro do card
+                                document.getElementById('nova_fiscal').addEventListener('change', function(event) {
+                                    var preview = document.getElementById('nota-fiscal-preview');
+                                    var file = event.target.files[0];
+                            
+                                    // Limpar o conteúdo anterior
+                                    preview.innerHTML = '';
+                            
+                                    if (file && file.type.startsWith('image/')) {
+                                        var reader = new FileReader();
+                            
+                                        reader.onload = function(e) {
+                                            var img = document.createElement('img');
+                                            img.src = e.target.result;
+                                            img.alt = "Nota Fiscal";
+                                            img.style.maxWidth = "100%";
+                                            img.style.maxHeight = "300px";
+                                            preview.appendChild(img);
+                                        };
+                            
+                                        reader.readAsDataURL(file);
+                                    } else {
+                                        preview.innerHTML = '<p>Nenhuma imagem selecionada.</p>';
+                                    }
+                                });
+                            </script>
+                            

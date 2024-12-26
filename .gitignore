@@ -1,0 +1,31 @@
+# Python/Django
+*.pyc
+__pycache__/
+*.sqlite3
+db.sqlite3
+
+# Configuração do ambiente virtual
+venv/
+.env
+
+# Arquivos estáticos e de mídia gerados
+staticfiles/
+media/
+
+# Logs e arquivos temporários
+*.log
+*.pot
+*.py~
+*.swp
+*.swo
+*.bak
+
+# Configurações específicas do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos do editor de texto/IDE
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
