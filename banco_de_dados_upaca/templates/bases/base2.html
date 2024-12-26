@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- <link rel="icon" href="{% static 'imagens/logoupaca1.ico' %}" type="image/x-icon"> -->
+    <title>{% block title %}Sistema de Inteligência UPACA{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+
+<body>
+
+    <main>
+        {% block content %}     {% endblock %}
+    </main>
+
+</body>

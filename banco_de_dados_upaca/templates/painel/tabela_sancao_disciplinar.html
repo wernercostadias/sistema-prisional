@@ -1,0 +1,343 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Sanções Disciplinares{% endblock %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Scripts Bootstrap -->
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    h2 {
+        color: #fff;
+        margin-bottom: 30px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 8px;
+        letter-spacing: 4px;
+        background: linear-gradient(45deg, #2c3e50, #34495e, #5d6d7e);
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        padding: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .col {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .table {
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table thead {
+        background: linear-gradient(90deg, #000000, #333333); /* De preto para cinza escuro */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center; /* Centraliza o texto (opcional) */
+    padding: 10px; /* Espaçamento interno (opcional) */
+}
+    
+    .table-bordered td {
+        border: 1px solid #ddd;
+    }
+    
+    
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .page-item.active .page-link {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .page-link {
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+    }
+
+    .page-item.disabled .page-link {
+        color: #aaa;
+        border: 1px solid #ddd;
+    }
+
+    .btn-danger {
+        font-size: 0.9rem;
+    }
+
+    
+    /* Estilo minimalista para o tempo restante */
+.tempo-restante {
+    
+    color: black;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Fonte clean e moderna */
+    font-weight: 400; /* Peso regular para uma aparência mais leve */
+    font-size: 1rem; /* Tamanho de fonte mais discreto */
+    text-align: center;
+    display: inline-block;
+    border: 1px solid #455A64; /* Borda suave, no tom escuro do fundo */
+}
+
+/* Estilo minimalista para a sanção finalizada */
+.sancao-finalizada {
+    background-color: #455A64; /* Cor sólida e neutra */
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    text-align: center;
+    display: inline-block;
+    border: 1px solid #607D8B; /* Borda suave, no tom claro do fundo */
+}
+
+.pagination-container {
+    text-align: center;  /* Centraliza os elementos dentro do contêiner */
+    margin-top: 20px;  /* Dá um espaçamento superior para separar da tabela */
+}
+
+.pagination {
+    display: inline-block;  /* Faz com que os links de paginação fiquem em linha */
+}
+
+.pagination .step-links a,
+.pagination .step-links .current {
+    margin: 0 5px;  /* Adiciona espaçamento entre os links */
+    padding: 5px 10px;  /* Tamanho dos botões */
+    background-color: #f1f1f1;  /* Cor de fundo */
+    border: 1px solid #ddd;  /* Borda */
+    color: #333;  /* Cor do texto */
+    text-decoration: none;  /* Remove o sublinhado dos links */
+    border-radius: 5px;  /* Bordas arredondadas */
+}
+
+.pagination .step-links a:hover {
+    background-color: #007bff;  /* Cor ao passar o mouse sobre o link */
+    color: white;  /* Cor do texto ao passar o mouse */
+}
+
+.pagination .current {
+    font-weight: bold;  /* Torna o número da página atual em negrito */
+    background-color: #007bff;  /* Cor de fundo da página atual */
+    color: white;  /* Cor do texto da página atual */
+}
+
+    
+
+</style>
+<br>
+<h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Sanções Disciplinares</h1>
+<div class="container">
+    <!-- Filtros -->
+        {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+    <div class="col mb-3">
+        <form method="get" class="form-inline mb-4" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+                <label for="nome" class="sr-only">Nome</label>
+                <input type="text" id="nome" name="nome" class="form-control" placeholder="Nome do Interno" value="{{ request.GET.nome }}" style="width: 100%;">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+                <label for="tipo" class="sr-only">Tipo</label>
+                <select id="tipo" name="tipo" class="form-control" style="width: 100%;">
+                    <option value="">Todos os Tipos</option>
+                    {% for key, value in sancao_tipo_choices.items %}
+                        <option value="{{ key }}" {% if request.GET.tipo == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+                <label for="data_inicio" class="sr-only">Data Início</label>
+                <input type="date" id="data_inicio" name="data_inicio" class="form-control" value="{{ request.GET.data_inicio }}" style="width: 100%;">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+                <label for="data_fim" class="sr-only">Data Fim</label>
+                <input type="date" id="data_fim" name="data_fim" class="form-control" value="{{ request.GET.data_fim }}" style="width: 100%;">
+            </div>
+            
+            <!-- Checkbox para filtrar sanções finalizadas -->
+            <div class="form-check" style="margin-left: 10px;">
+                <input type="checkbox" id="finalizada" name="finalizada" class="form-check-input" {% if 'finalizada' in request.GET %}checked{% endif %}>
+                <label for="finalizada" class="form-check-label" style="margin-left: 5px;">Sanções Finalizadas</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-left: 10px;">Filtrar</button>
+            <a href="{% url 'ver_tabela_sancoes' %}" class="btn btn-secondary" style="margin-left: 10px;">Limpar Filtros</a>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    
+
+    <div class="container">
+        {% if sancoes_detalhadas %}
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Nome do Interno</th>
+                            <th class="text-center">Tipo de Sanção</th>
+                            <th class="text-center">Descrição</th>
+                            <th class="text-center">Data de Início</th>
+                            <th class="text-center">Data de Fim</th>
+                            <th class="text-center">Dias Aplicados</th>
+                            <th class="text-center">Tempo Restante</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Opções</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sancao in sancoes_detalhadas %}
+                            <tr id="sancao_{{ sancao.sancao.id }}">
+                                <td>{{ sancao.sancao.pessoa.nome_completo }}</td>
+                                <td>{{ sancao.sancao.get_tipo_display }}</td>
+                                <td>{{ sancao.sancao.descricao }}</td>
+                                <td>{{ sancao.sancao.data_inicio|date:"d/m/Y H:i" }}</td>
+                                <td>{{ sancao.sancao.data_fim|date:"d/m/Y H:i" }}</td>
+                                <td style="text-align: center;">{{ sancao.dias_aplicados }}</td>
+                                <td>
+                                    <span id="tempo_restante_{{ sancao.sancao.id }}" 
+                                          class="{% if sancao.tempo_restante == 'Sanção finalizada' %}sancao-finalizada{% else %}tempo-restante{% endif %}">
+                                        {{ sancao.tempo_restante }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if sancao.terminou %}
+                                        <span class="text-danger">Finalizada</span>
+                                    {% else %}
+                                        <span class="text-success">Ativa</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_superuser %}
+                                        <!-- Botão que abre o modal de confirmação -->
+                                        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmModal{{ sancao.sancao.id }}">
+                                            Apagar
+                                        </button>
+                                
+                                        <!-- Modal de confirmação -->
+                                        <div class="modal fade" id="confirmModal{{ sancao.sancao.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel{{ sancao.sancao.id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="confirmModalLabel{{ sancao.sancao.id }}">Confirmar Exclusão</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Você tem certeza que deseja apagar esta sanção?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                        <!-- Link para confirmar a exclusão, redirecionando para a URL de exclusão -->
+                                                        <a href="{% url 'apagar_sancao' sancao.sancao.id %}" class="btn btn-danger">Confirmar</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    {% else %}
+                                        <span class="text-danger">Você não tem permissão</span>
+                                    {% endif %}
+                                </td>
+                                
+                            </tr>
+                            <!-- Modal de Confirmação de Exclusão (sem alteração) -->
+                        {% endfor %}
+                    </tbody>
+                </table>
+    
+                <!-- Paginador -->
+<div class="pagination-container">
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.finalizada %}&finalizada=1{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.finalizada %}&finalizada=1{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">Anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.finalizada %}&finalizada=1{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">Próxima</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.finalizada %}&finalizada=1{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">Última</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+
+            </div>
+        {% else %}
+            <p class="text-center">Nenhuma sanção disciplinar encontrada.</p>
+        {% endif %}
+    </div>
+    
+</div>
+
+
+
+
+<!-- Script para atualização do tempo restante -->
+<script>
+    function atualizarTempoRestante(sancaoId) {
+        fetch(`/atualizar-tempo-restante/${sancaoId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.tempo_restante) {
+                    document.getElementById(`tempo_restante_${sancaoId}`).innerText = data.tempo_restante;
+                }
+            })
+            .catch(error => console.error('Erro ao atualizar tempo restante:', error));
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        {% for sancao in sancoes_detalhadas %}
+            {% if sancao.tempo_restante != "Sanção finalizada" %}
+                setInterval(function() {
+                    atualizarTempoRestante({{ sancao.sancao.id }});
+                }, 1000); 
+            {% endif %}
+        {% endfor %}
+    });
+</script>
+
+<!-- Scripts do Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Boxicons CDN -->
+<link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+
+
+{% endblock %}

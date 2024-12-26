@@ -1,0 +1,557 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema UPACA - Eletrônicos Cadastrados{% endblock %}
+
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<!-- CSS do Choices.js -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
+<div class="container">
+    
+    <br>
+
+    <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Eletrônicos Cadastrados</h1>
+
+
+
+    
+    
+    
+    
+    {% if form_errors %}
+    {% for field, errors in form_errors.items %}
+        {% for error in errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% endif %}
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="col mb-2 p-2 rounded" style="background-color: #f9f9f9; border: 1px solid #ddd;">
+        <!-- Formulário de filtro -->
+        <form method="get" class="d-flex flex-wrap gap-2">
+            <!-- Nome da Pessoa -->
+            <div class="form-group col-md-3">
+                <label for="pessoa" class="font-weight-bold" style="font-size: 0.85rem;">Nome:</label>
+                <input type="text" name="pessoa" id="pessoa" class="form-control form-control-sm" 
+                       value="{{ request.GET.pessoa }}" placeholder="Digite o nome">
+            </div>
+    
+            <!-- Tipo de Eletrônico -->
+            <div class="form-group col-md-3">
+                <label for="tipo" class="font-weight-bold" style="font-size: 0.85rem;">Tipo:</label>
+                <select name="tipo" id="tipo" class="form-control form-control-sm">
+                    <option value="">Selecione</option>
+                    <option value="tv" {% if request.GET.tipo == 'tv' %}selected{% endif %}>TV</option>
+                    <option value="radio" {% if request.GET.tipo == 'radio' %}selected{% endif %}>Rádio</option>
+                    <option value="ventilador" {% if request.GET.tipo == 'ventilador' %}selected{% endif %}>Ventilador</option>
+                </select>
+            </div>
+    
+            <!-- Data de Entrada -->
+            <div class="form-group col-md-3">
+                <label for="data_entrada" class="font-weight-bold" style="font-size: 0.85rem;">Data de Entrada:</label>
+                <input type="date" name="data_entrada" id="data_entrada" class="form-control form-control-sm" 
+                       value="{{ request.GET.data_entrada }}">
+            </div>
+    
+            <!-- ID do Eletrônico -->
+            <div class="form-group col-md-3">
+                <label for="id" class="font-weight-bold" style="font-size: 0.85rem;">ID:</label>
+                <input type="number" name="id" id="id" class="form-control form-control-sm" 
+                       value="{{ request.GET.id }}" placeholder="Digite o ID">
+            </div>
+    
+            <!-- Botões -->
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                <!-- Botão de Filtrar -->
+                <button type="submit" class="btn btn-primary btn-sm px-3">
+                    Filtrar
+                </button>
+    
+                <!-- Botão Cadastrar Eletrônico -->
+                <button type="button" class="btn btn-success btn-sm px-3" data-toggle="modal" 
+                        data-target="#cadastrarEletronicoModal">
+                    Cadastrar
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    <div class="col mb-4">
+        <table class="table tabela">
+            <thead>
+                <tr>
+                    <th>Nome do Interno</th>
+                    <th>ID</th>
+                    <th>Tipo de Eletrônico</th>
+                    <th>Data de Entrada</th>
+                    <th>Nota Fiscal</th>
+                    <th>Opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not eletronicos %}
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">Nenhum eletrônico encontrado com o ID informado.</td>
+                    </tr>
+                {% else %}
+                    {% for eletronico in eletronicos %}
+                    <tr>
+                        <td class="text-center">{{ eletronico.pessoa.nome_completo }}</td>
+                        <td class="text-center">{{ eletronico.id }}</td>
+                        <td class="text-center">
+                            {% if eletronico.tipo == 'tv' %}
+                                <img src="{% static 'imagens/tv.png' %}" alt="TV" style="width: 24px; height: 24px; margin-top:-10px;"> TV
+                            {% elif eletronico.tipo == 'radio' %}
+                                <img src="{% static 'imagens/radio.png' %}" alt="Rádio" style="width: 24px; height: 24px; margin-top:-10px;"> Rádio
+                            {% elif eletronico.tipo == 'ventilador' %}
+                                <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" style="width: 24px; height: 24px; margin-top:-10px;"> Ventilador
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ eletronico.data_entrada|date:"d/m/Y" }}</td>
+                        <td class="text-center">
+                            {% if eletronico.nova_fiscal %}
+                                <a href="{{ eletronico.nova_fiscal.url }}" target="_blank" class="link-fiscal">Ver Nota Fiscal</a>
+                            {% else %}
+                                Não Cadastrado
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn tabela-btn-opcao btn-sm" data-toggle="modal" data-target="#opcoesModal{{ eletronico.id }}">
+                                Opções
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    
+        <div class="pagination-wrapper d-flex justify-content-center mt-4">
+            <div class="pagination">
+                {% if eletronicos.has_previous %}
+                    <!-- Botão "Primeira" -->
+                    <a href="?page=1&{{ request.GET.urlencode }}" class="btn btn-link">Primeira</a>
+                    <!-- Botão "Anterior" -->
+                    <a href="?page={{ eletronicos.previous_page_number }}&{{ request.GET.urlencode }}" class="btn btn-link">Anterior</a>
+                {% endif %}
+        
+                <span class="current mx-3">
+                    Página {{ eletronicos.number }} de {{ eletronicos.paginator.num_pages }}.
+                </span>
+        
+                {% if eletronicos.has_next %}
+                    <!-- Botão "Próxima" -->
+                    <a href="?page={{ eletronicos.next_page_number }}&{{ request.GET.urlencode }}" class="btn btn-link">Próxima</a>
+                    <!-- Botão "Última" -->
+                    <a href="?page={{ eletronicos.paginator.num_pages }}&{{ request.GET.urlencode }}" class="btn btn-link">Última</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    
+    
+    
+    
+</div>
+<!-- Paginação -->
+
+
+
+<!-- MODAL PARA CADASTRAR ELETRÔNICO -->
+<div class="modal fade" id="cadastrarEletronicoModal" tabindex="-1" role="dialog" aria-labelledby="cadastrarEletronicoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content rounded-lg shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title font-weight-bold" style="color: #607D8B;" id="cadastrarEletronicoModalLabel">Cadastrar Eletrônico</h5>
+                <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                
+                                
+                                <div class="form-group">
+                                    <label for="eletronico_id" class="font-weight-bold text-muted">ID do Eletrônico (Será gerado após cadastro):</label>
+                                    <input type="text" id="eletronico_id" name="eletronico_id" class="form-control" value="{{ proximo_id }}" readonly>
+                                </div>
+
+                                <div class="radio-group mt-2">
+                                    <input type="radio" id="tv" name="tipo" value="tv" class="mr-2 custom-radio">
+                                    <label for="tv" class="mr-3 custom-radio-label">
+                                        <img src="{% static 'imagens/tv.png' %}" alt="TV" class="icon-option"> Tv
+                                    </label>
+                                    
+                                    <input type="radio" id="radio" name="tipo" value="radio" class="mr-2 custom-radio">
+                                    <label for="radio" class="custom-radio-label">
+                                        <img src="{% static 'imagens/radio.png' %}" alt="Rádio" class="icon-option"> Rádio
+                                    </label>
+                                
+                                    <!-- Novo tipo: Ventilador -->
+                                    <input type="radio" id="ventilador" name="tipo" value="ventilador" class="mr-2 custom-radio">
+                                    <label for="ventilador" class="custom-radio-label">
+                                        <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" class="icon-option"> Ventilador
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="pessoa" class="font-weight-bold text-muted">Selecionar Pessoa:</label>
+                                <input type="text" id="id_pessoa" name="pessoa" class="form-control pessoa-selectize" placeholder="Digite para buscar uma pessoa..." autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="data_entrada" class="font-weight-bold text-muted">Data de Entrada:</label>
+                                {{ form.data_entrada }}
+                            </div>
+                            <div class="form-group">
+                                <label for="nova_fiscal" class="font-weight-bold text-muted">Anexar Nota Fiscal:</label>
+                                {{ form.nova_fiscal }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div id="nota-fiscal-card" class="card border-info">
+                                <div class="card-header text-center bg-info text-white">
+                                    <h5 class="m-0">Nota Fiscal Selecionada</h5>
+                                </div>
+                                <div class="card-body d-flex justify-content-center align-items-center" style="height: 300px; overflow: hidden;">
+                                    <div id="nota-fiscal-preview" class="text-center w-100">
+                                        <p>Você ainda não selecionou nem uma nota fiscal.</p>
+                                        <img id="nota-fiscal-img" src="" alt="Nota Fiscal" class="w-100 h-100" style="object-fit: contain; display: none;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+
+                    <button type="submit" class="btn btn-info btn-block mt-3 rounded-pill shadow-sm hover-shadow">Cadastrar Eletrônico</button>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL PARA OPÇÕES DE ELETRÔNICO -->
+{% for eletronico in eletronicos %}
+<div class="modal fade" id="opcoesModal{{ eletronico.id }}" tabindex="-1" role="dialog" aria-labelledby="opcoesModalLabel{{ eletronico.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="opcoesModalLabel{{ eletronico.id }}">"Confira as opções disponíveis."</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Você está visualizando as opções para o eletrônico de {{ eletronico.pessoa.nome_completo }}.</p>
+                <p>Escolha uma das opções abaixo para realizar uma ação com este eletrônico:</p>
+
+                <!-- Explicação sobre a Transferência -->
+                <div class="eletronico-transferencia" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h6 style="font-size: 18px; font-weight: bold; color: #333;">1. Transferir Eletrônico</h6>
+                    <p style="font-size: 14px; color: #555;">Você pode transferir este eletrônico para outra pessoa. Basta selecionar o nome de uma pessoa no campo abaixo e clicar no botão "Transferir Eletrônico".</p>
+                
+                    <form method="POST" action="{% url 'transferir_eletronico' eletronico.id %}" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="nova_pessoa_{{ eletronico.id }}" style="font-size: 14px; font-weight: 600; color: #333;">Transferir para:</label>
+                            <input type="text" id="nova_pessoa_{{ eletronico.id }}" name="nova_pessoa" class="form-control pessoa-selectize" placeholder="Digite para buscar uma pessoa..." autocomplete="off" style="margin-top: 8px; padding: 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ddd;">
+                        </div>
+                        <button type="submit" class="btn btn-warning float-right" style="padding: 10px 20px; font-size: 14px; border-radius: 4px; border: none;">Transferir Eletrônico</button>
+                    </form>
+                </div>
+                
+                
+
+                <hr>
+
+                <!-- Explicação sobre a Exclusão -->
+                <div class="eletronico-exclusao" style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h6 style="font-size: 18px; font-weight: bold; color: #333;">2. Excluir Eletrônico</h6>
+                    <p style="font-size: 14px; color: #555;">Se você deseja remover este eletrônico permanentemente do banco de dados, clique no botão "Excluir Eletrônico". Esta ação é irreversível e o eletrônico será excluído definitivamente.</p>
+                
+                    <form method="POST" action="{% url 'excluir_eletronico' eletronico.id %}" style="margin-top: 20px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger float-right" style="padding: 10px 20px; font-size: 14px; border-radius: 4px; border: none;">Excluir Eletrônico</button>
+                    </form>
+                </div>
+                
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary " data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+<style>
+    
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .pagination {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px; /* Espaço entre os links */
+    }
+    
+    .pagination a {
+        padding: 6px 12px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #007bff;
+        font-size: 14px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .pagination a:hover {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .pagination .current {
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+    
+
+
+
+
+
+    .col {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+
+    
+    
+    
+
+    body {
+        background-color: #f4f6f9;
+    }
+    
+
+    .icon-option {
+        width: 20px; /* Ajuste o tamanho do ícone */
+        height: auto; /* Mantém a proporção */
+        margin-right: 5px; 
+        
+        vertical-align: middle; /* Alinha o ícone ao texto */
+    }
+
+    /* Borda estilizada para o modal */
+    .modal-content {
+        border: 2px solid #B0BEC5; /* Borda cinza claro */
+        border-radius: 20px; /* Bordas arredondadas */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        transition: all 0.3s ease-in-out; /* Efeito de transição */
+    }
+    
+    /* Borda do cabeçalho do modal */
+    .modal-header {
+        border-bottom: 1px solid #B0BEC5; /* Linha de borda cinza claro */
+        border-top-left-radius: 20px; /* Arredondamento no topo esquerdo */
+        border-top-right-radius: 20px; /* Arredondamento no topo direito */
+    }
+    
+    /* Borda do rodapé do modal */
+    .modal-footer {
+        border-top: 1px solid #B0BEC5; /* Linha de borda cinza claro */
+        border-bottom-left-radius: 20px; /* Arredondamento no rodapé esquerdo */
+        border-bottom-right-radius: 20px; /* Arredondamento no rodapé direito */
+    }
+    
+    /* Estilizando os botões */
+    .custom-radio {
+        display: none; /* Esconde o input de rádio padrão */
+    }
+
+    .radio-group {
+        display: flex;
+        justify-content: center; /* Centraliza os itens horizontalmente */
+        align-items: center; /* Alinha os itens verticalmente */
+    }
+
+    .custom-radio-label {
+        margin-right: 20px; /* Espaçamento entre os itens */
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 15px;
+        border: 2px solid #607D8B;  /* Borda cinza escuro */
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .icon-option {
+        margin-right: 10px;
+        transition: transform 0.3s ease; /* Efeito ao passar o mouse */
+    }
+
+    .custom-radio-label:hover {
+        background-color: #ECEFF1; /* Fundo cinza muito claro ao passar o mouse */
+        border-color: #607D8B; /* Borda cinza escuro ao passar o mouse */
+    }
+
+    .custom-radio:checked + .custom-radio-label {
+        background-color: #607D8B; /* Fundo cinza escuro */
+        color: white;  /* Texto branco */
+        border-color: #455A64; /* Borda ainda mais escura ao selecionar */
+    }
+
+    .custom-radio:checked + .custom-radio-label .icon-option {
+        transform: scale(1.1); /* Aumenta o ícone um pouco ao ser selecionado */
+
+    }
+
+    /* Personalizando o fundo do selectize */
+    #opcoesModal32 > div > div > div.modal-body > div.eletronico-transferencia > form > div > div > div.selectize-input.items.not-full.has-options.has-items > div {
+        background: #CFD8DC; /* Fundo cinza claro */
+    }
+    
+</style>
+
+
+<!-- Script para exibir o preview da nota fiscal -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const fileInput = document.querySelector('#id_nova_fiscal');
+        const preview = document.querySelector('#nota-fiscal-preview');
+        const imageElement = document.querySelector('#nota-fiscal-img');
+        const textMessage = preview.querySelector('p');
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Exibe a imagem no lugar da mensagem
+                    imageElement.src = e.target.result;
+                    imageElement.style.display = 'block'; // Exibe a imagem
+                    textMessage.style.display = 'none';  // Esconde a mensagem de "Nenhuma imagem selecionada"
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Se nenhum arquivo for selecionado, exibe a mensagem padrão
+                imageElement.style.display = 'none'; // Esconde a imagem
+                textMessage.style.display = 'block'; // Exibe a mensagem de "Nenhuma imagem selecionada"
+            }
+        });
+    });
+</script>
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+
+
+<!-- Carregar primeiro o jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+            {% block extra_js %}
+            <!-- Carregar os arquivos do Selectize.js -->
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    // Inicializar o Selectize para os campos de busca de pessoa
+                    $('.pessoa-selectize').each(function() {
+                        var selectize = $(this).selectize({
+                            valueField: 'id',
+                            labelField: 'nome_completo',
+                            searchField: ['nome_completo'],
+                            options: [],  // A lista de opções será carregada via AJAX
+                            create: false,
+                            load: function(query, callback) {
+                                if (!query.length) return callback();  // Não carrega se a query for vazia
+
+                                var page = 1;  // Começa a carregar a primeira página
+
+                                // Função para carregar os resultados
+                                var loadResults = function(page) {
+                                    $.ajax({
+                                        url: '{% url "pessoa_search" %}',  // Rota para buscar as pessoas
+                                        data: {q: query, page: page},  // Parâmetros de busca e página
+                                        dataType: 'json',
+                                        success: function(res) {
+                                            callback(res);  // Carregar os resultados
+                                        }
+                                    });
+                                };
+
+                                // Carregar os resultados da página inicial
+                                loadResults(page);
+                            }
+                        });
+
+                        // Adicionar um evento de 'focus' para disparar a pesquisa automaticamente
+                        $(this).on('focus', function() {
+                            // Trigger de pesquisa imediata quando o input é focado
+                            var query = '';  // Pode colocar algum valor de filtro inicial se necessário
+                            $(this).trigger('input', [query]);  // Simula a digitação e carrega os resultados
+                        });
+                    });
+                });
+            </script>
+            {% endblock %}
+
+{% endblock %}

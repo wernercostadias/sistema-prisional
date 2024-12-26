@@ -1,0 +1,613 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Tela Inicial{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+ <!-- Scripts Bootstrap -->
+
+ 
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Boxicons CDN -->
+<!-- Font Awesome CDN -->
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="work-section">
+    <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 70px; height: 70px; margin-right: 10px;">FRENTES DE TRABALHO</h1>
+
+    <div class="work-block-container">
+        <div class="work-block">
+            <h4 class="work-title naotrabaha" style="text-align: center;">
+                <img src="{% static 'imagens/triste.png' %}" alt="Sem Trabalho" class="icon-horta" style="display: block; margin: 0 auto;">
+                Sem Trabalho
+            </h4>
+            <p class="work-total">{{ total_nao_trabalha }}</p>
+        </div>
+        
+        <div class="work-block">
+            <h4 class="work-title total-trabalhando" style="text-align: center;">
+                <img src="{% static 'imagens/feliz.png' %}" alt="Trabalhando" class="icon-horta">
+                <br>
+                Total Trabalhando
+            </h4>
+            <p class="work-total">{{ total_trabalhando }}</p>
+        </div>
+        
+        <div class="work-block">
+            <h4 class="work-title horta">
+                <img src="{% static 'imagens/horta.png' %}" alt="Horta" class="icon-horta">
+                <span>Horta</span>
+            </h4>
+            <p class="work-total">{{ total_horta }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title piscicultura">
+                <img src="{% static 'imagens/peixe.png' %}" alt="Peixe" class="icon-horta">
+                Piscicultura
+            </h4>
+            <p class="work-total">{{ total_piscicultura }}</p>
+        </div>
+        
+        <div class="work-block">
+            <h4 class="work-title minhocario">
+                <img src="{% static 'imagens/minhoca.png' %}" alt="Minhocario" class="icon-horta">
+                Minhocário
+            </h4>
+            <p class="work-total">{{ total_minhocario }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title limpeza">
+                <img src="{% static 'imagens/limpeza2.png' %}" alt="Limpeza" class="icon-limpeza">
+                Limpeza
+            </h4>
+            <p class="work-total">{{ total_limpeza }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title manutencao">
+                <img src="{% static 'imagens/manutencao4.png' %}" alt="Manutencao" class="icon-limpeza">
+                Manutenção
+            </h4>
+            <p class="work-total">{{ total_manutencao }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title croche">
+                <img src="{% static 'imagens/croche4.png' %}" alt="Croche" class="icon-limpeza">
+                Crochê
+            </h4>
+            <p class="work-total">{{ total_croche }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title digitalizador">
+                <img src="{% static 'imagens/impressora.png' %}" alt="Digitalizador" class="icon-horta">
+                Digitalizador
+            </h4>
+            <p class="work-total">{{ total_digitalizador }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title bibliotecario">
+                <img src="{% static 'imagens/livro.png' %}" alt="Bibliotecario" class="icon-horta">
+                Bibliotecário
+            </h4>
+            <p class="work-total">{{ total_bibliotecario }}</p>
+        </div>
+        <div class="work-block">
+            <h4 class="work-title fabrica-blocos">
+                <span class="icon-container">
+                    <img src="{% static 'imagens/tijolo.png' %}" alt="Fabrica" class="icon-horta">
+                </span>
+                <span class="text-container">
+                    Fábrica de Blocos
+                </span>
+            </h4>
+            <p class="work-total">{{ total_fabrica_blocos }}</p>
+        </div>
+        
+    </div>
+</div>
+
+ 
+
+<div class="main-container">
+
+
+    
+    <!-- Coluna 1: Conteúdo das tabelas -->
+    <div class="table-container">
+        <!-- Bloco A -->
+        <table>
+        <tr>
+            <th colspan="6" class="cell-highlight">BLOCO A</th>
+        </tr>
+        <tr>
+            <td class="cell-alert">
+                <div>A1</div>
+                <div class="small-text">Triagem 1</div>
+            </td>
+            <td class="cell-alert">
+                <div>A2</div>
+                <div class="small-text">Triagem 2</div>
+            </td>
+            <td class="cell-alert">
+                <div>A3</div>
+                <div class="small-text">Reflexão</div>
+            </td>
+            <td class="cell-alert">
+                <div>A4</div>
+                <div class="small-text">Central</div>
+            </td>
+            <td class="cell-alert">
+                <div>A5</div>
+                <div class="small-text">Intima</div>
+            </td>
+            <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+        </tr>
+        <tr>
+            <td class="cell">{{ cela_1_a }}</td>
+            <td class="cell">{{ cela_2_a }}</td>
+            <td class="cell">{{ cela_3_a }}</td>
+            <td class="cell">{{ cela_4_a }}</td>
+            <td class="cell">{{ cela_5_a }}</td>
+            <td class="cell-hub-1">{{ cela_1_a|add:cela_2_a|add:cela_3_a|add:cela_4_a }}</td>
+        </tr>
+        </table>
+
+        <!-- Bloco B -->
+        <table>
+            <tr>
+                <th colspan="6" class="cell-highlight">
+                    BLOCO B
+                    <div class="small-text" style="color: #333333;">Pavilhão Faccionado PCC</div>
+
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">B1
+                    <div class="small-text">Cela 1</div>
+                </td>
+                <td class="cell-alert1">B2
+                    <div class="small-text">Cela 2</div>
+                </td>
+                <td class="cell-alert1">B3
+                    <div class="small-text">Cela 3</div>
+                </td>
+                <td class="cell-alert1">B4
+                    <div class="small-text">Cela 4</div>
+                </td>
+                <td class="cell-alert1">B5
+                    <div class="small-text">Cela 5</div> 
+                </td>
+                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_b1 }}</td>
+                <td class="cell">{{ cela_b2 }}</td>
+                <td class="cell">{{ cela_b3 }}</td>
+                <td class="cell">{{ cela_b4 }}</td>
+                <td class="cell">{{ cela_b5 }}</td>
+                <td class="cell-hub-1">{{ cela_b1|add:cela_b2|add:cela_b3|add:cela_b4|add:cela_b5 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco C -->
+        <table>
+            <tr>
+                <th colspan="8" class="cell-highlight">
+                    <div>BLOCO C</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Neutro</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">C1
+                    <div class="small-text">Cela 1</div></td>
+                <td class="cell-alert1">C2
+                    <div class="small-text">Cela 2</div></td>
+                <td class="cell-alert1">C3
+                    <div class="small-text">Cela 3</div></td>
+                <td class="cell-alert1">C4
+                    <div class="small-text">Cela 4</div></td>
+                <td class="cell-alert1">C5
+                    <div class="small-text">Cela 5</div>
+                </td>
+                <td class="cell-alert1">C6
+                    <div class="small-text">Cela 6</div>
+                </td>
+                <td class="cell-alert">
+                    <div>C7</div>
+                    <div class="small-text">PCD</div>
+                </td>
+                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_c1 }}</td>
+                <td class="cell">{{ cela_c2 }}</td>
+                <td class="cell">{{ cela_c3 }}</td>
+                <td class="cell">{{ cela_c4 }}</td>
+                <td class="cell">{{ cela_c5 }}</td>
+                <td class="cell">{{ cela_c6 }}</td>
+                <td class="cell">{{ cela_c7 }}</td>
+                <td class="cell-hub-1">{{ cela_c1|add:cela_c2|add:cela_c3|add:cela_c4|add:cela_c5|add:cela_c6|add:cela_c7 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco D -->
+        <table>
+            <tr>
+                <th colspan="6" class="cell-highlight">
+                    <div>BLOCO D</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Faccionado CV</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">D1
+                    <div class="small-text">Cela 1</div>
+                </td>
+                <td class="cell-alert1">D2
+                    <div class="small-text">Cela 2</div>
+                </td>
+                <td class="cell-alert1">D3
+                    <div class="small-text">Cela 3</div>
+                </td>
+                <td class="cell-alert1">D4
+                    <div class="small-text">Cela 4</div>
+                </td>
+                <td class="cell-alert1">D5
+                    <div class="small-text">Cela 5</div>
+                </td>
+                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_d1 }}</td>
+                <td class="cell">{{ cela_d2 }}</td>
+                <td class="cell">{{ cela_d3 }}</td>
+                <td class="cell">{{ cela_d4 }}</td>
+                <td class="cell">{{ cela_d5 }}</td>
+                <td class="cell-hub-1">{{ cela_d1|add:cela_d2|add:cela_d3|add:cela_d4|add:cela_d5 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco E -->
+        <table>
+            <tr>
+                <th colspan="8" class="cell-highlight">
+                    <div>BLOCO E</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Seguro</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">E1
+                    <div class="small-text">Cela 1</div>
+                </td>
+                <td class="cell-alert1">E2
+                    <div class="small-text">Cela 2</div>
+                </td>
+                <td class="cell-alert1">E3
+                    <div class="small-text">Cela 3</div>
+                </td>
+                <td class="cell-alert1">E4
+                    <div class="small-text">Cela 4</div>
+                </td>
+                <td class="cell-alert1">E5
+                    <div class="small-text">Cela 5</div>
+                </td>
+                <td class="cell-alert1">E6
+                    <div class="small-text">Cela 6</div>
+                </td>
+                <td class="cell-alert1">E7
+                    <div class="small-text">Cela 7</div>
+                </td>
+                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_e1 }}</td>
+                <td class="cell">{{ cela_e2 }}</td>
+                <td class="cell">{{ cela_e3 }}</td>
+                <td class="cell">{{ cela_e4 }}</td>
+                <td class="cell">{{ cela_e5 }}</td>
+                <td class="cell">{{ cela_e6 }}</td>
+                <td class="cell">{{ cela_e7 }}</td>
+                <td class="cell-hub-1">{{ cela_e1|add:cela_e2|add:cela_e3|add:cela_e4|add:cela_e5|add:cela_e6|add:cela_e7 }}</td>
+            </tr>
+        </table>
+
+        </div>
+            <div class="test-column" style="width: 310px; text-align: center;  flex-direction: column; ">
+                <!-- Primeiro item -->
+                <div class="test-column" style="width: 310px; text-align: center; flex-direction: column;">
+                    <!-- Primeiro item -->
+                    <div class="item-container">
+                        <h3 class="item-title">População Carcerária</h3>
+                        <div class="circular-chart">
+                            <svg viewBox="0 0 36 36" class="circular-svg">
+                                <!-- Fundo do círculo -->
+                                <path class="circle-bg"
+                                      d="M18 2.0845 a 15.9155 15.9155 0 1 1 -0.0001 0" 
+                                      style="stroke: #dcdcdc;" />
+                                <!-- Progresso -->
+                                <path id="progress-circle" class="circle"
+                                      stroke-dasharray="{{ porcentagem_cadastrados }}, 100"
+                                      d="M18 2.0845 a 15.9155 15.9155 0 1 1 -0.0001 0" />
+                            </svg>
+                            <!-- Texto no centro do gráfico -->
+                            <div class="center-text">
+                                <div class="percentage-text" id="percentage-text">{{ porcentagem_cadastrados|floatformat:1 }}%</div>
+                                <div class="quantity-text">
+                                    {{ total_pessoas }} / {{ limite_maximo }}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Informações adicionais -->
+                        <div class="additional-info">
+                            <p>Presos atuais vs. capacidade máxima.</p>
+
+
+                            <p><strong class="current-status">Atual:</strong> {{ total_pessoas }} Internos Ativos</p>
+                            <p><strong class="current-saiu">Saida Temporária:</strong> {{ total_saiu_temporariamente }} Internos </p>  <!-- Exibindo a contagem de pessoas que saíram temporariamente -->
+                            <p><strong class="critical-capacity">Capacidade Máxima:</strong> {{ limite_maximo }} Internos</p>
+                        </div>
+                    </div>
+                </div>
+                
+
+            
+
+            
+            <!-- Segundo item -->
+            <div style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+                <!-- segundo item -->
+                <h3 class="section-title">Quantitativos Estudantes</h3>
+
+                <div class="d-flex justify-content-around w-100">
+                    <div class="custom-block bg-info text-white p-3">
+                        <h4 class="text-light" style="margin-left: -5px;">IBRAEMA</h4>
+                        <p class="text-light">{{ total_ibraema }}</p>
+                    </div>
+                    <div class="custom-block bg-warning text-dark p-3">
+                        <h4 class="text-dark">EJA I</h4>
+                        <p class="text-dark">{{ total_eja_i }}</p>
+                    </div>
+                    <div class="custom-block bg-success text-white p-3">
+                        <h4 class="text-light">EJA II</h4>
+                        <p class="text-light">{{ total_eja_ii }}</p>
+                    </div>
+                    <div class="custom-block bg-danger text-white p-3">
+                        <h4 class="text-light">EJA III</h4>
+                        <p class="text-light">{{ total_eja_iii }}</p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-around w-100">
+                    <div class="custom-block bg-dark text-white p-3">
+                        <h4 class="text-light">Ensino Superior</h4>
+                        <p class="text-light">{{ total_ensino_superior }}</p>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+                <!-- segundo item -->
+                <h3 class="section-title">Outros Quantitativos</h3>
+
+                <div class="d-flex justify-content-around w-100">
+                    <div class="custom-block tv-block p-3">
+                        <img src="{% static 'imagens/tv.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
+                        <p class="text-content">{{ total_tv }}</p>
+                    </div>
+                    
+                    <div class="custom-block radio-block p-3">
+                        <img src="{% static 'imagens/radio.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
+                        <p class="text-content">{{ total_radio }}</p>
+                    </div>
+
+                    <div class="custom-block radio-block p-3">
+                        <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
+                        <p class="text-content">{{ total_ventilador }}</p>
+                    </div>
+
+                    <div class="custom-block fotos-block p-3">
+                        <h4 class="text-title">FOTOS - Construção</h4>
+                        <p class="text-content">{{ total_eja_ii }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+
+        
+
+        <!-- Coluna 3: Texto "Teste" -->
+
+    
+        
+        <div class="test-column" style="width: 765px;">
+
+            <table class="table  ">
+                
+                <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 0px; font-size: 18px;">Registro de Histórico de Bloco, Cela<br> e Transferência</h1>
+                <thead class="thead-light">
+                    <tr>
+                      <th class="text-primary text-center">Servidor<div class="small-text"style='font-size:8px;'>Responsável</div></th>
+                      <th class="text-primary text-center" style="width: 200px;">Interno<div class="small-text"style='font-size:8px;'>Modificado</div></th>
+                      <th class="text-primary text-center" style="width: 65px;">Ação<div class="small-text" style='font-size:8px;'>Modificada</div></th>
+                      <th class="text-primary text-center">Antes<div class="small-text"style='font-size:8px;'>Onde estava?</div></th>
+                      <th class="text-primary text-center">Agora<div class="small-text"style='font-size:8px;'>Onde está?</div></th>
+                      <th class="text-primary text-center" style="width: 10px;">Data<div class="small-text" style="font-size: 8px;">modificação</div></th>
+
+                    </tr>
+                </thead>
+                  
+                <tbody>
+                {% for alteracao in page_obj %}
+                <tr>
+                    
+                    <td class="text-center">{{ alteracao.usuario.username }}</td>
+                    <td class="text-center">{{ alteracao.pessoa.nome_completo }}</td>
+                    <td class="text-center">{{ alteracao.campo_alterado }}</td>
+                    <td class="valor-antigo text-center">
+                        <span style="display: inline-block;">{{ alteracao.valor_antigo }}</span>
+                        {% if alteracao.valor_antigo == "A - 1" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                        {% elif alteracao.valor_antigo == "A - 2" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                        {% elif alteracao.valor_antigo == "A - 3" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
+                        {% elif alteracao.valor_antigo == "A - 4" %}
+                            <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
+                        {% elif alteracao.valor_antigo == "A - 5" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Íntima</span>
+                        {% elif alteracao.valor_antigo == "C - 7" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
+                        {% endif %}
+                    </td>
+
+                        
+                    </td>
+                    <td class="valor-novo" style="text-align: center;">
+                        <span style="display: inline-block;">{{ alteracao.valor_novo }}</span>
+                        {% if alteracao.valor_novo == "A - 1" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                        {% endif %}
+                        {% if alteracao.valor_novo == "A - 2" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                        {% endif %}
+                        {% if alteracao.valor_novo == "A - 3" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
+                        {% endif %}
+                        {% if alteracao.valor_novo == "A - 4" %}
+                        <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
+                        {% endif %}
+                        {% if alteracao.valor_novo == "A - 5" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Intima</span>
+                        {% endif %}
+                        {% if alteracao.valor_novo == "C - 7" %}
+                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
+                        {% endif %}
+
+                    </td>
+
+                    <td data-data="{{ alteracao.data_alteracao|date:"Y-m-d" }}">
+                        {{ alteracao.data_alteracao|date:"d/m/Y" }}
+                        <div class="small-text" style="font-size: 10px;"></div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          
+            <!-- Navegação de paginação -->
+            <div class="pagination-wrapper">
+                {% if page_obj.has_previous %}
+                  <a href="?page=1" class="pagination-link">&laquo; Primeira</a>
+                  <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">Anterior</a>
+                {% endif %}
+                
+                <span class="pagination-info">
+                  Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                  <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Próxima</a>
+                  <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">Última &raquo;</a>
+                {% endif %}
+              </div>
+              
+              
+              
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Captura todas as células de data
+            const dataCells = document.querySelectorAll('td[data-data]');
+            
+            dataCells.forEach(cell => {
+              // Pega a data armazenada no atributo 'data-data' da célula
+              const dataAlteracao = new Date(cell.getAttribute('data-data'));
+              
+              // Data atual
+              const hoje = new Date();
+              
+              // Calculando a diferença em dias entre a data da alteração e a data atual
+              const diffTime = hoje - dataAlteracao;
+              const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+              
+              // Adicionando o texto correto embaixo da data
+              const smallText = cell.querySelector('.small-text');
+              
+              if (diffDays === 0) {
+                smallText.textContent = 'Hoje';
+                smallText.style.color = 'green';  // Altere para a cor desejada
+              } else if (diffDays === 1) {
+                smallText.textContent = 'Ontem';
+                smallText.style.color = 'black';  // Cor padrão
+              } else {
+                smallText.textContent = `${diffDays} Dias atrás`;
+                smallText.style.color = 'black';  // Cor padrão
+              }
+            });
+          });
+          
+
+
+
+
+
+      </script>
+      
+    <style>
+
+        body {
+            background:#CFCECD;
+        }
+
+
+        .custom-container {
+            background: #CFCECD;
+            
+        }
+        
+        
+        
+        .main-container {
+            background: #CFCECD;
+        }
+        
+        
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pega o valor da porcentagem diretamente do texto exibido
+            const percentageText = document.getElementById('percentage-text');
+            const progressCircle = document.getElementById('progress-circle');
+            const percentage = parseFloat(percentageText.textContent); // Pega o valor numérico da porcentagem
+    
+            // Define a cor do círculo e do texto com base na porcentagem (cores invertidas)
+            if (percentage <= 25) {
+                progressCircle.style.stroke = '#00ff00'; // Verde
+                percentageText.style.color = '#00ff00'; // Texto verde
+            } else if (percentage <= 50) {
+                progressCircle.style.stroke = '#ffff00'; // Amarelo
+                percentageText.style.color = '#ffff00'; // Texto amarelo
+            } else if (percentage <= 75) {
+                progressCircle.style.stroke = '#ffaa00'; // Laranja suave
+                percentageText.style.color = '#ffaa00'; // Texto laranja suave
+            } else {
+                progressCircle.style.stroke = '#ff4d4d'; // Vermelho mais suave
+                percentageText.style.color = '#ff4d4d'; // Texto vermelho suave
+            }
+            
+        });
+    </script>
+    
+    
+    
+    
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Internos Transferidos{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+
+<br>
+<h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Internos Transferidos</h1>
+
+<div class="row">
+    <div class="container">
+        
+                    {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        <!-- Divisão para o formulário de filtros -->
+        <div class="col mb-4">
+            <form method="GET" class="form-inline">
+                <div class="form-group mr-2">
+                    <label for="pessoa" class="mr-2">Pessoa:</label>
+                    <input type="text" class="form-control" name="pessoa" value="{{ pessoa }}" placeholder="Nome da pessoa">
+                </div>
+                <div class="form-group mr-2">
+                    <label for="penitenciaria_destino" class="mr-1">Destino:</label>
+                    <input type="text" class="form-control" name="penitenciaria_destino" value="{{ penitenciaria_destino }}" placeholder="Destino da transferência">
+                </div>
+                <div class="form-group mr-2">
+                    <label for="data_inicio" class="mr-1">Data Início:</label>
+                    <input type="date" class="form-control" name="data_inicio" value="{{ data_inicio }}">
+                </div>
+                <div class="form-group mr-2">
+                    <label for="data_fim" class="mr-1">Data Fim:</label>
+                    <input type="date" class="form-control" name="data_fim" value="{{ data_fim }}">
+                </div>
+                
+                <button type="submit" class="btn btn-outline-dark">Filtrar</button>
+            </form>
+        </div>
+
+        <!-- Divisão da tabela -->
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-bordered table-dark">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Interno</th>
+                            <th class="text-center">Destino da Transferência</th>
+                            <th class="text-center">Data da Transferência</th>
+                            <th class="text-center">Justificativa</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transferencia in page_obj %}
+                            <tr>
+                                <td class="text-center">{{ transferencia.pessoa.nome_completo }}</td>
+                                <td class="text-center">{{ transferencia.penitenciaria_destino }}</td>
+                                <td class="text-center">{{ transferencia.data_transferencia }}</td>
+                                <td class="text-center">{{ transferencia.justificativa }}</td>
+                                <td class="text-center">{{ transferencia.transferencia_ativa|yesno:"Ativa,Inativa" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Nenhuma transferência encontrada.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+            
+            
+            
+
+            <!-- Controles de paginação -->
+            <div class="d-flex justify-content-center">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <!-- Botão "Primeira" -->
+                            <a class="page-link" href="?page=1&{{ request.GET.urlencode }}" aria-label="Primeira">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <!-- Botão "Anterior" -->
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <!-- Botão "Próxima" -->
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}" aria-label="Próxima">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <!-- Botão "Última" -->
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&{{ request.GET.urlencode }}" aria-label="Última">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+<style>
+    .modal-dialog {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 500px; /* Opcional, pode definir a largura máxima do modal */
+    }
+</style>
+
+<!-- Adicionando um estilo mais moderno e clean -->
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    h2 {
+        color: #4CAF50;
+        margin-bottom: 30px;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .col {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    /* Melhorando a tabela */
+    .table {
+        background-color: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table thead {
+        background-color: black;
+        color: white;
+    }
+    
+    .table tbody tr td{
+        color:black;
+    }
+
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        justify-content: center;
+    }
+
+    .page-item.active .page-link {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+
+    .page-link {
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+    }
+
+    .page-item.disabled .page-link {
+        color: #aaa;
+        border: 1px solid #ddd;
+    }
+
+    /* Estilizando o controle de página */
+    .pagination li {
+        margin: 0 5px;
+    }
+
+</style>
+<!-- jQuery (necessário para o Bootstrap JS) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<!-- Bootstrap JS -->
+
+{% endblock %}

@@ -1,0 +1,531 @@
+{% extends 'bases/base2.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- Link para o arquivo CSS -->
+
+    
+    
+    <style>
+        /* Importação de fontes */
+        @import url('https://fonts.googleapis.com/css?family=Lato:100,400,900');
+        @import url('https://fonts.googleapis.com/css?family=Great+Vibes');
+        
+        /* Estilo geral do body */
+        body {
+            margin: 0;
+            background: linear-gradient(0deg, rgba(7,37,48,1) 0%, rgba(0,0,0,1) 100%);
+	        height: 100svh;
+            display: flex;
+            justify-content: space-between; /* Garante que os elementos fiquem nas extremidades */
+            align-items: center; /* Centraliza verticalmente os elementos */
+            height: 100vh; /* Altura da tela inteira */
+            backdrop-filter: blur(5px); /* Efeito de desfoque */
+        }
+        
+        
+
+        
+        .apresentacao {
+            flex: 1;
+            padding-left: 100px;
+            transform: translateY(-80px); /* Ajuste o valor para subir */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza os itens horizontalmente */
+            justify-content: center; /* Centraliza os itens verticalmente */
+            color: #fff;
+            text-align: center; /* Centraliza o texto */
+        }
+        
+        /* Container para a apresentação de texto */
+        .texto-apresentacao {
+            margin-bottom: 30px; /* Espaço entre o texto e a imagem */
+        }
+        
+        .austin {
+            font-size: 55px;
+            font-weight: 900;
+            color: #ff6f61;
+            text-transform: uppercase;
+            margin-bottom: -10px;
+            font-family: 'Lato', sans-serif;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.3); /* Sombra preta e branca */
+        }
+        
+        
+        
+        
+        
+        
+        /* Subtítulo */
+        .austin1 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #fff;
+            font-family: 'Raleway', sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Estilo para a logo */
+        .logo {
+            width: 350px;
+            height: auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* Ajuste na imagem da logo */
+        .logo-img {
+            width: 100%;
+            height: auto;
+        }
+        
+        
+        /* Estilos para o formulário no canto direito */
+        .form-entrada {
+            position: fixed;
+            top: 50%; /* Coloca o formulário no meio da tela verticalmente */
+            right: 200px; /* Coloca o formulário no canto direito */
+            transform: translateY(-50%); /* Ajusta para centralizar o formulário em relação à altura */
+            
+            /* Estilos do formulário */
+            width: 400px;
+            padding: 15px;
+            background-color: rgba(248, 249, 250, 0.05);
+            border-radius: 8px;
+            z-index: 9999;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        /* Estilos para o label */
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Estilos para os campos de entrada (text e password) */
+        .form-entrada input[type="text"], .form-entrada input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 5px;
+            font-size: 14px;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        /* Efeito de foco (campo ativo) */
+        .form-entrada input[type="text"]:focus, .form-entrada input[type="password"]:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Estilos para o botão "Entrar" */
+        .form-entrada button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 18px;
+            color: #fff;
+            background-color: rgba(0, 123, 155, 0.4);
+            background-image: linear-gradient(45deg, rgba(0, 123, 155, 0.4), rgba(0, 92, 115, 0.4));
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 123, 155, 0.2);
+        }
+        
+        /* Efeito ao passar o mouse (hover) */
+        .form-entrada button[type="submit"]:hover {
+            background-color: rgba(0, 92, 115, 0.7);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 16px rgba(0, 123, 155, 0.3);
+            transform: scale(1.02);
+        }
+        
+        /* Efeito de foco (quando o botão está ativo) */
+        .form-entrada button[type="submit"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 123, 155, 0.8), 0 0 15px rgba(0, 92, 115, 0.5);
+            transform: scale(1.05);
+        }
+        
+        /* Estilos adicionais */
+        .form-entrada .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Responsividade para telas pequenas (como celular) */
+        @media (max-width: 768px) {
+            /* Estilo da área de apresentação */
+            .apresentacao {
+                padding-left: 20px; /* Ajuste do padding */
+                transform: translateY(-150px); 
+                flex-direction: column; /* Muda a direção para coluna */
+                align-items: center; /* Centraliza os itens horizontalmente */
+                justify-content: center; /* Centraliza os itens verticalmente */
+            }
+            
+
+            .logo {
+                width: 150px; /* Ajuste no tamanho da logo para telas pequenas */
+                height: auto;
+            }
+
+            .austin {
+                font-size: 20px; /* Tamanho da fonte do título ajustado */
+                margin-bottom: 2px;
+            }
+
+            .austin1 {
+                font-size: 18px; /* Tamanho da fonte do subtítulo ajustado */
+            }
+
+        
+        }
+
+        /* Responsividade para telas pequenas (como celular) */
+        @media (max-width: 768px) {
+            /* Estilo do formulário de login */
+            .form-entrada {
+                position: absolute; /* Alterado de relative para absolute */
+                top: 70%; /* Coloca o formulário no meio da tela verticalmente */
+                left: 50%; /* Coloca o formulário no meio da tela horizontalmente */
+                transform: translate(-50%, -50%); /* Ajusta para centralizar */
+                width: 75%; /* Ajuste do formulário para ocupar mais largura */
+                padding: 20px;
+                box-sizing: border-box; /* Para garantir que o padding não afete o tamanho total */
+            }
+
+            /* Estilo do botão "Entrar" */
+            .form-entrada button[type="submit"] {
+                font-size: 16px; /* Ajuste no tamanho da fonte do botão */
+                padding: 12px;
+            }
+
+            /* Ajuste do input */
+            .form-entrada input[type="text"], .form-entrada input[type="password"] {
+                font-size: 16px; /* Ajuste no tamanho da fonte do input */
+            }
+        }
+
+       
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .rodape {
+                font-size: 12px;  /* Reduz o tamanho da fonte em dispositivos menores */
+                padding: 8px 0;   /* Diminui o padding para otimizar o espaço */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .rodape {
+                font-size: 10px;  /* Ajusta o tamanho da fonte para telas muito pequenas */
+                padding: 6px 0;   /* Ajuste no padding para telas menores */
+            }
+        }
+        /* Estilo do rodapé */
+        .rodape {
+            position: fixed;  /* Fixa o rodapé na parte inferior da página */
+            bottom: 0;
+            width: 100%;      /* Garante que o rodapé ocupe toda a largura da tela */
+            padding: 10px 0;
+            text-align: center; /* Centraliza o texto */
+            font-size: 14px;    /* Tamanho da fonte */
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* Fonte clean e moderna */
+            font-weight: 300;   /* Peso da fonte mais leve */
+            color: #666;        /* Cor do texto mais suave para um visual minimalista */
+            letter-spacing: 0.5px; /* Leve espaçamento entre as letras para maior clareza */
+            text-transform: none; /* Sem alteração no formato das letras */
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .rodape {
+                font-size: 12px;  /* Reduz o tamanho da fonte em dispositivos menores */
+                padding: 8px 0;   /* Diminui o padding para otimizar o espaço */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .rodape {
+                font-size: 10px;  /* Ajusta o tamanho da fonte para telas muito pequenas */
+                padding: 6px 0;   /* Ajuste no padding para telas menores */
+            }
+
+            .gorro-natal {
+                opacity:0;
+            }
+        }
+        
+        .snowverlay {
+            /* 	Position depending how you want it to behave on scroll */
+                position: absolute;  
+            /* 	position: fixed; */
+                
+                top: 0;
+                left: 0;
+                width: 100%;
+                pointer-events: none;
+            }
+
+            .gorro-natal {
+                position: absolute;
+                top: -13px; /* Ajuste conforme necessário */
+                left: 101%;
+                transform: translateX(-50%) scaleX(-1) rotate(-30deg); /* Inverte a imagem e gira para a esquerda */
+                transform-origin: top center; /* Gira a partir do topo central */
+                width: 55px; /* Ajuste o tamanho do gorro */
+              }
+              
+              
+            
+</style>
+    
+    
+    
+</head>
+<body>
+    <canvas class="snowverlay"></canvas>
+    <div class="container">
+        <!-- Área de apresentação no lado esquerdo -->
+        <div class="apresentacao">
+            <div class="texto-apresentacao">
+                <div class="austin">Sistema de Inteligência UPACA</div>
+                <img src="{% static 'imagens/gorrodenatal1.png' %}" class="gorro-natal" alt="Gorro de Natal">
+                <div class="austin1">Unidade Prisional de Ressocialização de Açailândia</div>
+            </div>
+            <div class="logo">
+                <img src="{% static 'imagens/braco.png' %}" alt="Ícone" class="logo-img">
+            </div>
+        </div>
+
+        <!-- Formulário de login no lado direito -->
+        <form method="POST" class="form-entrada">
+            {% csrf_token %}
+            {% load crispy_forms_tags %}
+
+            <!-- Exibição de mensagens -->
+            {% if messages %}
+                <div class="mensagens">
+                    {% for message in messages %}
+                        <div class="alert 
+                            {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <div id="div_id_username" class="mb-3">
+                    <label for="id_username" class="form-label requiredField">
+                        ⭐ Servidor<span class="asteriskField"></span>
+                    </label>
+                    <input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" class="textinput form-control" required="" id="id_username">
+                </div>
+                <div id="div_id_password" class="mb-3">
+                    <label for="id_password" class="form-label requiredField">
+                        ⭐ Senha<span class="asteriskField"></span>
+                    </label>
+                    <input type="password" name="password" autocomplete="current-password" class="passwordinput form-control" required="" id="id_password">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 mt-3">Entrar</button>
+        </form>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="rodape">
+        <div class="container text-center py-3">
+            <p>Criado por: Estudante de Eng. Software Werner Costa Dias , interno da UPACA</p>
+        </div>
+    </footer>
+</body>
+
+<script>
+    const CANVAS_HEIGHT = 0.6;
+const SNOWFLAKE_AMOUNT = 50;
+const SNOWFLAKE_SIZE = {
+	min: 1,
+	max: 4
+};
+const SNOWFLAKE_SPEED = {
+	min: 0.2,
+	max: 1.2
+};
+const CANVAS_SELECTOR = ".snowverlay";
+
+let animationFrame;
+
+// Shared utilities
+const setupCanvas = () => {
+	const canvas = document.querySelector(CANVAS_SELECTOR);
+	const ctx = canvas.getContext("2d");
+	if (!ctx) {
+		return null;
+	}
+
+	const setCanvasSize = () => {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight * CANVAS_HEIGHT;
+	};
+
+	setCanvasSize();
+	window.addEventListener("resize", setCanvasSize);
+
+	return { canvas, ctx };
+};
+
+const createSnowflake = (canvas, isAnimated = true, index = 0) => ({
+	x: Math.random() * canvas.width,
+	y: isAnimated
+		? -20 - (index * canvas.height) / SNOWFLAKE_AMOUNT
+		: Math.random() * canvas.height,
+	size:
+		Math.random() * (SNOWFLAKE_SIZE.max - SNOWFLAKE_SIZE.min) +
+		SNOWFLAKE_SIZE.min,
+	speed:
+		Math.random() * (SNOWFLAKE_SPEED.max - SNOWFLAKE_SPEED.min) +
+		SNOWFLAKE_SPEED.min,
+	opacity: isAnimated ? null : Math.random() * 0.5 + 0.2
+});
+// Função que desenha um floco de neve no contexto de desenho (ctx)
+const drawSnowflake = (ctx, flake, canvas) => {
+    // Inicia um novo caminho de desenho
+    ctx.beginPath();
+    
+    // Define a cor do floco de neve com base na opacidade
+    // Se a opacidade não estiver definida no floco, ela será calculada
+    // Quanto maior o floco, menor a opacidade, mais transparente ele será
+    ctx.fillStyle = `rgba(255, 255, 255, ${
+        flake.opacity ?? 1 - flake.y / canvas.height // opacidade baseada na posição Y
+    })`;
+
+    // Desenha um círculo (floco de neve) com as coordenadas e tamanho fornecidos
+    ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2); 
+
+    // Preenche o círculo com a cor definida (branco com a opacidade calculada)
+    ctx.fill();
+};
+
+// Função para renderizar a neve estática (sem animação)
+const renderStaticSnow = () => {
+    // Configura o canvas chamando a função setupCanvas()
+    const setup = setupCanvas();
+    
+    // Se a configuração do canvas falhar (setup não existir), sai da função
+    if (!setup) return;
+    
+    // Desestruturação para obter o canvas e o contexto de desenho (ctx)
+    const { canvas, ctx } = setup;
+
+    // Cria flocos de neve e os desenha no canvas
+    Array(SNOWFLAKE_AMOUNT)  // Cria um array com o número de flocos de neve
+        .fill(undefined) // Preenche o array com valores indefinidos
+        .map(() => createSnowflake(canvas, false)) // Cria os flocos de neve
+        .forEach((flake) => drawSnowflake(ctx, flake, canvas)); // Desenha cada floco de neve no canvas
+};
+
+// Função para iniciar a animação de neve
+const startSnowAnimation = () => {
+    // Configura o canvas
+    const setup = setupCanvas();
+    
+    // Se a configuração do canvas falhar, sai da função
+    if (!setup) {
+        return;
+    }
+
+    // Desestruturação para obter o canvas e o contexto de desenho (ctx)
+    const { canvas, ctx } = setup;
+
+    // Cria os flocos de neve com animação
+    const snowflakes = Array(SNOWFLAKE_AMOUNT)
+        .fill(undefined)  // Preenche o array com valores indefinidos
+        .map((_event, index) => createSnowflake(canvas, true, index)); // Cria os flocos de neve com animação
+
+    // Função que será chamada para cada quadro da animação
+    const animate = () => {
+        // Limpa o canvas para o próximo quadro
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Atualiza a posição de cada floco de neve e os desenha
+        snowflakes.forEach((flake) => {
+            // Atualiza a posição vertical (y) do floco de neve
+            flake.y += flake.speed;
+            
+            // Movimento horizontal baseado na posição Y do floco (efeito de ondulação)
+            flake.x += Math.sin(flake.y / 30) * 0.5;
+
+            // Se o floco de neve passar do fundo da tela, ele volta para o topo e muda sua posição horizontal
+            if (flake.y > canvas.height) {
+                flake.y = 0; // Volta para o topo
+                flake.x = Math.random() * canvas.width; // Posiciona aleatoriamente na largura
+            }
+
+            // Desenha o floco de neve com a posição e tamanho atualizados
+            drawSnowflake(ctx, flake, canvas);
+        });
+
+        // Chama a função de animação no próximo quadro
+        animationFrame = requestAnimationFrame(animate);
+    };
+
+    // Inicia a animação
+    animate();
+
+    // Retorna uma função para cancelar a animação
+    return () => {
+        cancelAnimationFrame(animationFrame); // Cancela a animação quando chamada
+    };
+};
+
+// Função de inicialização
+const init = () => {
+    // Verifica as preferências do usuário sobre movimentos animados
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    
+    // Função que lida com a mudança da preferência do usuário sobre animações
+    const handleMotionPreference = (event) => {
+        // Se o usuário preferir menos movimento (ou seja, animação estática), renderiza neve estática
+        if (event.matches) {
+            renderStaticSnow();
+        } else {
+            // Caso contrário, inicia a animação de neve
+            startSnowAnimation();
+        }
+    };
+
+    // Adiciona um ouvinte para mudanças nas preferências do usuário sobre movimento
+    mediaQuery.addEventListener("change", handleMotionPreference);
+    
+    // Executa a função logo que a página é carregada, usando o estado atual das preferências
+    handleMotionPreference(mediaQuery);
+};
+
+// Espera a página ser totalmente carregada e, então, chama a função init
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+
+{% endblock %}

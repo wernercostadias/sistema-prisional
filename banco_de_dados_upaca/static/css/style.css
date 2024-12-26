@@ -1,0 +1,1526 @@
+
+*{
+    margin: 0;
+}
+
+/* ============================================
+        "TABELA DE PORCENTAGEM" PAGINA INDEX PRINCIPAL
+        POPULAÇÃO CARCERÁRIA GRÁFICO
+============================================== */
+
+
+.item-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    color: #333;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 358px;
+}
+
+.item-title {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #007acc;
+    text-align: center;
+}
+
+.additional-info p {
+    margin-bottom: 7px; /* Reduz o espaço entre os parágrafos */
+}
+
+.circular-chart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #282828; /* Fundo escuro e elegante */
+    border-radius: 50%; /* Tornar o contêiner circular */
+    box-shadow: 0 0 20px rgba(255, 64, 129, 0.8), 0 0 30px rgba(0, 229, 255, 0.8), 0 0 20px rgba(103, 233, 7, 0.8); /* Sombra fixa com várias cores vibrantes */
+    padding: 5px; /* Espaçamento interno para deixar o gráfico centralizado */
+    width: 150px;
+    height: 150px;
+    margin: 5px auto;
+}
+
+.circular-svg {
+    transform: rotate(-90deg); /* Faz o gráfico começar do topo */
+    width: 100%;
+    height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #444444; /* Cor do fundo em cinza escuro */
+    stroke-width: 4; /* Aumenta a espessura da borda do fundo */
+    opacity: 0.3; /* Torna o fundo um pouco transparente */
+}
+
+.circle {
+    fill: none;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease, stroke 0.3s ease-in-out;
+    animation: colorChange 2s infinite alternate; 
+    
+}
+
+.percentage-text {
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra no texto para mais destaque */
+    transition: color 0.3s ease; /* Transição suave para a mudança de cor */
+}
+
+
+.center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-family: 'Roboto', sans-serif;  
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra no texto para mais destaque */
+}
+
+
+.quantity-text {
+    font-size: 16px;
+    color: #76ff03; /* Texto da quantidade em verde limão */
+    margin-top: 5px; /* Espaçamento entre a percentagem e a quantidade */
+}
+
+.additional-info {
+    text-align: center;
+    margin-top: 1px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+}
+
+
+.additional-info p {
+    margin-bottom: 2px; /* Reduz o espaçamento entre os parágrafos */
+    padding: 0; /* Remove o padding extra */
+}
+
+.critical-capacity {
+    color: #d32f2f; /* Capacidade crítica em vermelho */
+    margin-bottom: 1px; /* Diminui a distância para o próximo item */
+}
+
+.current-status {
+    color: #388e3c; /* Status atual em verde */
+    margin-bottom: 2px; /* Diminui a distância para o próximo item */
+}
+
+
+.current-saiu{
+    color: #38398e; /* Status atual em verde */
+    margin-bottom: 2px; /* Diminui a distância para o próximo item */
+}
+/* ================================================
+QUANTIDADE DE INTERNOS ESTUDANDO NA PAGINA PRINCIPAL INDEX
+================================================= */
+
+.custom-block {
+    background-color: #ffffff; /* Fundo branco para maior contraste */
+    border-radius: 8px;
+    color: #222; /* Texto mais escuro */
+    text-align: center;
+    width: 70px; /* Mantém o tamanho fixo */
+    max-height: 80px;
+    max-width: 110px;
+    margin: 0.15rem; /* Suave afastamento entre os elementos */
+    
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombras mais suaves */
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Borda suave e translúcida */
+    transition: all 0.3s ease; /* Transição suave para todos os efeitos */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    padding: 10px;
+}
+
+.custom-block h4 {
+    margin: 0; /* Remove margens extras */
+    font-size: 0.55em; /* Tamanho fixo */
+    font-weight: 500;
+    color: #000000; /* Cor preta para o título */
+    text-align: center;
+    text-shadow: 0.5px 0.5px 2px rgba(0, 0, 0, 0.1); /* Sombra mais suave */
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.2px; /* Afastamento suave das letras */
+}
+
+.custom-block p {
+    margin: 0; /* Remove margens extras */
+    font-size: 18px; /* Tamanho fixo */
+    font-weight: bold;
+    color: #222; /* Texto mais escuro */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); /* Sombra para realce */
+}
+
+
+
+
+.fotos-block {
+    background-color: #46a728; /* bg-success */
+}
+
+.text-title {
+    color: #000000; /* text-light */
+    margin-left: -5px;
+}
+
+
+
+
+
+
+/* ===================================================
+    COLUNA PRINCIPAL DE TODAS AS TELAS, E RELOGIO DO INDEX 
+==================================================== */
+
+.custom-container {
+    max-width: 1580px;
+}
+
+#clock {
+    border: 1px solid #ddd;
+    padding: 4px 12px;
+    background-color: #F8F9FA; /* Corrigido de 'baclground-color' */
+    color: #000000;
+    font-size: 1.2em;
+    font-weight: 300;
+    border-radius: 4px;
+    
+}
+
+/* ====================================================
+        TABELA DO INDEX QUE MOSTRA A QUANTIDADE DE INTERNOS POR BLOCO E CELA
+=================================================== */
+
+
+.main-container {
+    display: flex;
+    width: 100%;
+}
+
+.table-container, .test-column {
+    width: 33.33%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+}
+
+
+table {
+    width: 95%;
+    border-collapse: collapse;
+    
+}
+
+.cell, .header, .cell-highlight, .cell-highlight1, .cell-alert, .cell-alert1 {
+    padding: 5px;
+    background-color: #f6f6f6;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    transition: background 0.3s, box-shadow 0.3s;
+    position: relative; /* Necessário para o pseudo-elemento */
+    border-radius: 10px; /* Borda arredondada */
+    border: 3px solid transparent; /* Borda transparente para dar espaço ao gradiente */
+}
+
+.cell::after, .header::after, .cell-highlight::after, .cell-highlight1::after, .cell-alert::after, .cell-alert1::after{
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #8e8e8e, #5c5c5c, #4b4b4b, #333333); /* Gradiente mais escuro */
+    border-radius: 10px; /* Borda arredondada para combinar com o conteúdo */
+    z-index: -1; /* Coloca o pseudo-elemento atrás do conteúdo */
+}
+
+
+
+.cell:hover {
+    background: linear-gradient(135deg, #e0e0e0, #c0c0c059, #eeeeee);
+    
+    color: #333;
+}
+
+.cell-highlight {
+    background: linear-gradient(135deg, #3A91E3, #2378D8, #00A9C7, #007E93); /* Azul + verde vibrante */
+    border-radius: 8px; /* Cantos arredondados */
+    padding: 5px; /* Adiciona espaçamento interno */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra mais forte para dar mais profundidade */
+}
+
+
+.cell-alert {
+    background-color: #a7686336;
+}
+
+.cell-alert1 {
+    background-color: #A9B8C0;
+}
+
+
+.header {
+    background-color: #b9b9b9;  
+}
+
+
+/* Estilo para a classe cell-hub */
+.cell-hub {
+    font-size: 1.2rem;      
+    font-weight: bold;         
+                   
+    background-color: #a1b2c0; /* Cor mais suave */
+    text-align: center;        
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);  /* Sombra mais leve */
+    transition: background-color 0.3s ease; 
+}
+
+.cell-hub-1 {
+    font-size: 1.2rem;      
+    font-weight: bold;         
+                    
+    background-color: #c4d0d9; /* Cor mais suave */
+    text-align: center;        
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);  /* Sombra mais leve */
+    transition: background-color 0.3s ease; 
+}
+
+
+.small-text {
+    font-size: 10px;  
+    color: #575757; 
+    text-align: center;  
+    margin-top: -5px;  
+    letter-spacing: 0.5px; /* Separação suave entre as letras */
+}
+
+
+/* Desabilitar o tooltip nativo do title */
+.form-check-label[title]:hover {
+    cursor: pointer;
+    position: relative;
+}
+
+/* Tooltip customizado com a pseudo-classe ::after */
+.form-check-label[title]:hover::after {
+    content: attr(title);  /* Usamos o texto do title */
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    z-index: 10;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Mostrar o tooltip customizado */
+.form-check-label[title]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
+
+
+
+
+
+/* ====================================================
+             TABELA DE HISTORICO INICIO DO INDEX
+====================================================== */
+
+
+.test-column {
+    display: flex;
+    
+    align-items: center;
+    background-color: #cfcecd; /* Cor de fundo para diferenciar as colunas */
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    
+   
+}
+
+
+
+
+/* Estilo para o título (h2) dentro da .test-column */
+.test-column h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;  /* Tom de cinza-escuro para contraste suave */
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Estilo da tabela dentro da .test-column */
+.test-column table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+    border: 1px solid #b2bec3; /* Cor de borda mais suave */
+    border-radius: 8px; /* Cantos arredondados */
+    overflow: hidden;
+
+}
+
+/* Estilo das células (th, td) dentro da .test-column */
+.test-column th, .test-column td {
+    padding: 0.6rem 0.8rem;  /* Maior espaçamento para melhor legibilidade */
+    text-align: left;
+    font-size: 0.8rem;
+    color: #34495e;  /* Cor mais suave e escura para texto */
+    border: 1px solid #dfe6e9;  /* Borda mais clara e suave */
+    background-color: #f4f6f7;  /* Fundo muito suave e claro */
+}
+
+/* Cabeçalho da tabela dentro da .test-column */
+.test-column th {
+    font-weight: bold;
+    background-color: #dcdde1; /* Cor mais neutra e sutil para o cabeçalho */
+    color: #2f3542; /* Contraste mais forte no cabeçalho */
+    text-transform: uppercase;
+    padding: 0.6rem 0.8rem;
+}
+
+/* Efeito de hover */
+.test-column tr:hover td {
+    background-color: #f4f7f8; /* Cor mais clara de destaque */
+    color: #2c3e50;  /* Texto mais visível ao passar o mouse */
+    cursor: pointer;
+}
+
+/* Coluna com largura personalizada */
+th.campo-alterado {
+    width: 12px;
+}
+
+th[scope="col"] {
+    width: auto;
+}
+
+/* Valor antigo (preço ou destaque anterior) */
+.test-column td.valor-antigo {
+    background-color: #f8d7da; /* Fundo mais suave de rosa claro */
+    color: #e74c3c;  /* Vermelho mais suave e legível */
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Valor novo (preço ou destaque atual) */
+.test-column td.valor-novo {
+    background-color: #d4edda; /* Verde suave para novo valor */
+    color: #28a745; /* Verde mais visível e agradável */
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+
+
+
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 1px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .pagination-link {
+    text-decoration: none;
+    color: #007bff;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+  
+  .pagination-link:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  .pagination-info {
+    font-weight: bold;
+    padding: 6px 12px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #555;
+  }
+  
+  
+
+/* Estilos para telas menores */
+@media (max-width: 768px) {
+    .custom-container {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    #clock {
+        font-size: 1em;
+        padding: 2px 8px;
+    }
+
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .table-container, .test-column {
+        width: 100%;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    .cell, .header, .cell-highlight, .cell-alert, .cell-alert1 {
+        padding: 3px;
+        font-size: 0.9em;
+    }
+
+    .cell-hub, .cell-hub-1 {
+        font-size: 1rem;
+    }
+
+    .small-text {
+        font-size: 8px;
+    }
+
+    /* Ajustes de título na coluna de teste */
+    .test-column h2 {
+        font-size: 1.4rem;
+    }
+
+    /* Ajustes de tabela */
+    .test-column table {
+        border-radius: 8px;
+        font-size: 0.9rem; /* Reduz tamanho da fonte na tabela */
+    }
+
+    .test-column th, .test-column td {
+        padding: 0.2rem 0.3rem;
+        text-align: center; /* Centraliza o texto */
+        font-size: 0.9rem; /* Ajuste adicional no tamanho da fonte */
+    }
+
+    /* Ajustes de paginação */
+    .test-column .pagination .step-links a {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .test-column table {
+        font-size: 0.75rem; /* Reduz tamanho da fonte para caber na tela */
+    }
+
+    .test-column th, .test-column td {
+        padding: 0.1rem 0.2rem; /* Reduz o padding ainda mais */
+    }
+
+    .test-column .pagination .step-links a {
+        padding: 3px 6px; /* Torna os botões menores */
+    }
+    
+    
+}
+
+
+
+
+
+
+
+
+/* 
+----------TABELA------------- */
+
+/* Estilos gerais para o formulário */
+.filter-form {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+/* Espaçamento entre grupos de form */
+.filter-form .form-group {
+    margin-bottom: 15px;
+    
+}
+
+/* Label */
+.filter-form label {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilos específicos para o grupo de botões */
+.filter-form .button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+/* Botão de filtro */
+.filter-form .btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #141414;
+}
+
+/* Botão de imprimir */
+.filter-form .btn-info {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.no-print {
+    display: inline-block;
+}
+
+/* Ajuste para dispositivos menores */
+@media (max-width: 768px) {
+    .filter-form .form-row {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .filter-form .button-group {
+        justify-content: space-between;
+    }
+}
+
+
+
+.icone-option {
+    width: 20px; /* Tamanho dos ícones */
+    height: 20px;
+    margin-left: 5px; /* Espaço entre o texto e o ícone */
+    vertical-align: -2px; /* Ajusta o ícone para cima, dependendo do alinhamento desejado */
+    /* Ou, como alternativa, use: */
+    /* margin-top: -3px; */ /* Ajuste do ícone para cima */
+}
+
+
+
+/*=====================================================
+        TOTAL CARDs FRENTES DE TRABALHOS INDEX
+====================================================== */
+
+
+
+.work-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    
+}
+
+
+.section-title {
+    color: #333;
+    font-size: 1.10rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+.work-block-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+
+.work-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 20px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    width: 105px;
+    height: 150px;
+    text-align: center;
+    position: relative;
+    
+    border: 3px solid transparent;
+    background-clip: padding-box; 
+}
+
+.work-block::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #4e4e4e, #6e6e6e, #8e8e8e, #a0a0a0);
+    border-radius: 20px; 
+    z-index: -1; 
+}
+
+
+
+.icon-horta {
+    width: 35px; /* Ajuste o tamanho do ícone */
+    height: auto;
+    margin-bottom: 8px; /* Espaçamento entre o ícone e o texto */
+}
+
+.icon-limpeza {
+    width: 35px; /* Ajuste o tamanho do ícone */
+    height: auto;
+    margin-bottom: 8px; /* Espaçamento entre o ícone e o texto */
+}
+
+
+
+.work-title.horta {
+    display: flex;
+    flex-direction: column; /* Coloca o ícone acima do texto */
+    align-items: center; /* Centraliza o conteúdo */
+    text-align: center; /* Centraliza o texto */
+}
+
+
+
+.work-title {
+    display: inline-block; /* Faz o título se comportar como um bloco em linha */
+    text-align: center; /* Centraliza o texto */
+}
+
+.work-title i {
+    display: block; /* Faz o ícone ser exibido como um bloco */
+    margin-bottom: 4px; /* Adiciona um pequeno espaço entre o ícone e o texto */
+    font-size: 24px; /* Ajuste o tamanho do ícone conforme necessário */
+}
+
+
+
+
+
+
+@keyframes glowing {
+    0% {
+        filter: blur(10px);
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+        filter: blur(20px);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        filter: blur(10px);
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+.work-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+/* Estilos específicos para cada título */
+.work-title.horta {
+    color: #f39c12; /* Um tom de laranja mais suave */
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+.work-title.naotrabalha{
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+.work-title.total{
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.piscicultura {
+    color: #8bc34a;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.minhocario {
+    color: #ff5f5f;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.limpeza {
+    color: #ff6f00;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.manutencao {
+    color: #000000;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.croche {
+    color: #e91e63;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.digitalizador {
+    color: #00bcd4;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.bibliotecario {
+    color: #8e24aa;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-title.fabrica-blocos {
+    color: #647585;
+    font-weight: 600; 
+    font-family: 'Helvetica', sans-serif;
+}
+
+.work-total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #222;
+    text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.3); /* Contorno sutil */
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+
+
+
+
+
+
+
+
+/* =====================================================
+    INPUT DE SELECIONAR PESSOA DA PÁGINA CADASTRAR ELETRÔNICO
+   ===================================================== */
+    
+    /* Estilizando o campo input */
+    
+    
+    
+    .selectized {
+        border-radius: 5px;
+        padding: 15px 20px;  /* Aumenta o padding */
+        font-size: 18px;  /* Aumenta o tamanho da fonte */
+        color: #333;
+        background-color: #f0f8ff; /* Cor de fundo mais suave e agradável */
+        border: 2px solid #ced4da; /* Cor mais neutra para bordas */
+        transition: border-color 0.3s, box-shadow 0.3s;
+        height: 40px; /* Aumenta a altura do campo */
+    }
+    
+
+    
+
+
+    #cadastrarEletronicoModal > div > div > div.modal-body > form > div > div:nth-child(1) > div:nth-child(2) > div > div.selectize-input.items.not-full.has-options.has-items > div{
+        background: #000000;
+        font-size: 16px;
+        
+    }
+    .selectized:focus {
+        border-color: #5bc0de; /* Cor azul suave */
+        background-color: #ffffff; /* Cor mais clara ao focar */
+        box-shadow: 0 0 8px rgba(91, 192, 222, 0.4); /* Efeito de brilho suave */
+    }
+    
+    /* Estilo para o dropdown */
+    .selectize-dropdown {
+        background: linear-gradient(135deg, #2d3436, #636e72); /* Gradiente mais sofisticado */
+        border-radius: 17px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        overflow-y: auto;
+        font-family: 'Arial', sans-serif;
+        color: #ffffff; /* Texto branco para melhor contraste */
+        padding: 10px;
+        transition: all 0.3s ease-in-out;
+        width: 200px; /* Aumentando um pouco a largura para mais legibilidade */
+        height: 230px; /* Aumentando a altura para mais opções visíveis */
+    }
+    
+    /* Estilo para o conteúdo do dropdown */
+    .selectize-dropdown-content {
+        height: 350px;
+        overflow-y: auto;
+        padding: 0;
+    }
+    
+    /* Aumentando o espaço para opções */
+    .selectize-dropdown .option {
+        padding: 12px 18px; /* Mais espaçamento para as opções */
+        font-size: 16px;
+        color: #444; /* Cor mais suave para o texto */
+        cursor: pointer;
+        border-bottom: 1px solid #b2bec3; /* Cor suave para as divisórias */
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    
+    /* Hover nas opções */
+    .selectize-dropdown .option:hover {
+        background-color: #000000; /* Cor vibrante de hover */
+        color: #fff;
+    }
+    
+    /* Estilo para a opção selecionada */
+    .selectize-dropdown .option.selected {
+        background-color: #00b894; /* Cor verde suave para seleção */
+        color: #fff;
+    }
+    
+    /* Estilizando a entrada com item selecionado */
+    .selectize-input {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 8px;
+        font-size: 14px;
+        color: #333;
+        border: none;
+        background-color: #f0f8ff; /* Cor suave de fundo */
+    }
+    
+    .selectize-input .item {
+        background-color: #000000; /* Cor suave para os itens */
+        padding: 5px 12px;
+        border-radius: 20px;
+        margin-right: 8px;
+        margin-top: 2px;
+        font-size: 13px;
+        color: #2d3436; /* Cor escura para os itens */
+    }
+    
+    /* Estilo do campo de input */
+    .selectize-input input {
+        border: none;
+        outline: none;
+        font-size: 14px;
+        color: #333;
+        background-color: transparent;
+        min-width: 100px;
+        flex-grow: 1;
+    }
+    
+    /* Quando o dropdown está aberto, ajusta a visibilidade */
+    .selectize-dropdown.show {
+        display: block !important;
+    }
+    
+    /* Estilo para o multi-select (quando várias opções são selecionadas) */
+    .selectize-control.multi .selectize-input {
+        border-radius: 5px;
+        border: 2px solid #ced4da;
+        background-color: #f0f8ff;
+    }
+    
+    .selectize-control.multi .selectize-dropdown {
+        width: 100%;
+    }
+    
+    
+
+/* ==============================================
+            TABELA DE ITENS ELETRONICOS
+============================================= */
+/* Estilos Gerais */
+.tabela-titulo {
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+/* Estilo para o botão de cadastro */
+
+
+/* Estilo para a tabela */
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    
+}
+
+.tabela th,
+.tabela td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.tabela th {
+    background: linear-gradient(90deg, #000000, #333333); /* De preto para cinza escuro */
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center; /* Centraliza o texto (opcional) */
+    padding: 10px; /* Espaçamento interno (opcional) */
+}
+
+
+.tabela td {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    color: black;
+        
+}
+
+/* Estilo para as células de link fiscal */
+.link-fiscal {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.link-fiscal:hover {
+    text-decoration: underline;
+}
+
+/* Estilo para o botão de opções */
+.tabela-btn-opcao {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.tabela-btn-opcao:hover {
+    background-color: #218838;
+}
+
+
+/* Estilos para os ícones */
+.tabela td i {
+    font-size: 20px;
+    margin-right: 1px; /* Espaço entre o ícone e o texto */
+    color: #007bff; /* Cor padrão para os ícones */
+    vertical-align: middle; /* Alinhar o ícone com o texto */
+}
+
+.tabela td i.bx-tv {
+    color: #f506ad; /* Cor verde para ícones de TV */
+}
+
+.tabela td i.bx-radio {
+    color: #000000; /* Cor amarela para ícones de rádio */
+}
+
+
+/* Estilos para os tipos de eletrônico */
+.tabela td {
+    font-size: 14px;
+}
+
+.tabela td i.bx {
+    transition: color 0.3s ease;
+}
+
+.tabela td i.bx:hover {
+    color: #007bff; /* Cor de destaque ao passar o mouse */
+}
+
+
+
+
+/* =====================================================
+         CARD PARA MOSTAR A NOTA FISCAL DA PAGINA ELETRONICOS
+======================================================== */
+
+#nota-fiscal-card {
+    border: 2px solid #607D8B; /* Cor de borda do card */
+    border-radius: 8px;
+}
+
+.card-body {
+    padding: 0;
+    position: relative;
+}
+
+#nota-fiscal-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#nota-fiscal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ajusta a imagem para caber sem distorção */
+    display: none; /* Inicialmente escondida */
+}
+
+#nota-fiscal-preview p {
+    position: absolute;
+    color: #455A64;
+    font-size: 1.2rem;
+}
+
+
+
+
+/* ===============================================
+    OFF CANVAS DA BASE PAGINA PRINCIPAL PESSOAS ON-LINE NO SERVER
+================================================== */
+
+
+.offcanvas {
+    position: fixed;
+    top: 0;
+    left: -400px;  /* Inicialmente oculto à esquerda */
+    width: 400px;
+    height: 100%;
+    background-image: linear-gradient(45deg, #1a1a1a, #444444); /* Degradê suave de cinza escuro */
+    color: #fff;
+    overflow: hidden;
+    transition: left 0.3s ease;
+    z-index: 1050; /* Garantir que fique acima de outros elementos */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); /* Adiciona sombra para dar mais destaque */
+}
+
+
+.offcanvas h5 {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;  /* Centraliza o título */
+    color: #fff;
+    margin: 0; /* Remove a margem para ficar centralizado sem espaçamento extra */
+    
+}
+
+.offcanvas-header {
+    padding: 10px 20px;
+    background: transparent; /* Fundo transparente */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #444;  /* Borda fina separando o cabeçalho do conteúdo */
+}
+
+
+.offcanvas-body {
+    padding: 20px;
+    overflow-y: auto;  /* Permite rolar o conteúdo se necessário */
+}
+
+.close-btn {
+    font-size: 30px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s; /* Transições suaves */
+}
+
+.close-btn:hover {
+    color: black; /* Cor do texto no hover */
+    background-color: rgba(255, 255, 255, 0.2); /* Fundo sutil e translúcido */
+}
+
+
+
+
+/* Quando o offcanvas estiver ativo, mova ele para a posição correta */
+.offcanvas.open {
+    left: 0;
+}
+
+/* Efeito de escurecimento do fundo ao abrir o offcanvas */
+body.offcanvas-open {
+    overflow: hidden; /* Impede rolagem da página quando o offcanvas estiver aberto */
+}
+
+body.offcanvas-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* Fundo transparente */
+    z-index: 1040; /* Um valor abaixo do offcanvas */
+}
+
+
+/* Personalização do ícone de online */
+.offcanvas-body i {
+    font-size: 18px;  /* Tamanho do ícone */
+    color: #28a745;   /* Cor verde */
+    margin-right: 8px;  /* Espaçamento entre o ícone e o nome */
+}
+
+
+/* Estilo para a tabela personalizada */
+.custom-table th, .custom-table td {
+    
+    border-left: none; /* Remover borda esquerda */
+    border-right: none; /* Remover borda direita */
+}
+
+
+
+
+/* Tabela personalizada */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    
+}
+
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid #111111;
+    border-bottom: 1px solid #111111;
+    
+
+}
+
+.custom-table th {
+    background: transparent; /* Fundo transparente */
+    font-weight: bold;
+    color: white;
+}
+
+.custom-table td {
+    background: transparent; /* Fundo transparente */
+    word-wrap: break-word; /* Quebra de linha automática */
+    overflow-wrap: break-word; /* Garantir compatibilidade */
+}
+
+
+
+.custom-table td span.badge {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.custom-table .badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.custom-table .badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.custom-table td a {
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.custom-table td a:hover {
+    background-color: #c82333;
+}
+
+/* Estilo para o texto "Nenhum usuário online" */
+.offcanvas-body p {
+    text-align: center;
+    font-size: 16px;
+    color: white;
+}
+
+
+
+.custom-table td.text-center {
+    font-size: 16px;               /* Tamanho da fonte */
+    font-weight: bold;             /* Deixa o nome em negrito para destaque */
+    color: #333;                   /* Cor do texto */
+    text-transform: capitalize;    /* Garante que o nome comece com letras maiúsculas */
+    padding: 12px;                 /* Espaçamento dentro da célula */
+}
+
+.custom-table td.text-center:first-child {
+    color: white;                /* Cor azul para o nome do usuário */
+}
+
+
+/* ================================================
+     SETA DE NOTIFICAÇÕES DA BASE
+================================================ */
+
+
+/* Cor padrão da seta (fechado) */
+#notificationDropdown.dropdown-toggle::after {
+    color: #dcdcdc; /* Branco mais escuro (cinza claro) quando fechado */
+    transition: color 0.3s ease; /* Transição suave */
+}
+
+/* Cor da seta quando aberto (abrindo) */
+#notificationDropdown.dropdown-toggle[aria-expanded="true"]::after {
+    color: #ffffff; /* Branco mais claro quando aberto */
+}
+
+/* Definindo altura máxima e exibindo o scroll quando necessário */
+.notification-dropdown-menu {
+    max-height: 400px; /* Limita a altura do contêiner */
+    overflow-y: auto;  /* Exibe a barra de rolagem quando o conteúdo exceder a altura */
+}
+
+.status {
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 5px;
+    padding: 2px 5px;
+    border-radius: 12px;
+    display: inline-block;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+/* Efeito suave para o status "Hoje" */
+.status-hoje {
+    color: #d32f2f; /* vermelho intenso para o texto */
+    background-color: rgba(255, 255, 255, 0.5); /* fundo suave */
+    border: 2px solid #d32f2f; /* borda inicial com cor vibrante */
+    animation: pulse-hoje 3s infinite ease-in-out;
+}
+/* Animação para o status "Hoje" */
+@keyframes pulse-hoje {
+    0% {
+        border-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    50% {
+        border-color: #d32f2f;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        border-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Alternativa com preto */
+.status-ontem {
+    color: #000000; /* Preto para o texto */
+    background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco (semi-transparente) */
+    border: 2px solid #000000; /* Borda preta */
+    animation: pulse-ontem 3s infinite ease-in-out;
+}
+
+/* Animação para o status "Ontem" - Alternativa com preto */
+@keyframes pulse-ontem {
+    0% {
+        border-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco */
+    }
+    25% {
+        border-color: #424242; /* Cor intermediária da borda (preto mais suave) */
+        background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco */
+    }
+    50% {
+        border-color: #000000; /* Borda preta final */
+        background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco */
+    }
+    75% {
+        border-color: #424242; /* Cor intermediária da borda */
+        background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco */
+    }
+    100% {
+        border-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.5); /* Fundo suave em branco */
+    }
+}
+
+
+
+
+/* ===============================================
+        BOTÕES DE DROPDOWNS DA BASE NAVBAR = HOVER
+================================================== */
+
+#navbarTogglerDemo01 > ul > li.nav-item.dropdown.show > div {
+    display: block; /* Garantir que o menu dropdown fique visível */
+    max-height: 500px; /* Definir um limite para a altura do menu */
+    overflow: hidden; /* Esconder o conteúdo extra */
+    transition: max-height 0.3s ease-out; /* Transição suave */
+}
+
+#navbarTogglerDemo01 > ul > li.nav-item.dropdown.show > div a {
+    color: #333; /* Cor normal do link */
+    transition: color 0.3s ease-in-out; /* Transição suave na cor */
+    text-decoration: none; /* Remover o sublinhado */
+}
+
+#navbarTogglerDemo01 > ul > li.nav-item.dropdown.show > div a:hover {
+    color: #27A444; /* Cor do link ao passar o mouse */
+}
+
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div a {
+    color: #333; /* Cor normal do link */
+    transition: color 0.3s ease-in-out; /* Transição suave na cor */
+}
+
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div a:hover {
+    color: #27A444; /* Cor do link ao passar o mouse */
+}
+
+/* Remover o fundo azul ao clicar */
+#navbarTogglerDemo01 > ul > li.nav-item.dropdown.show > div a:focus,
+#navbarTogglerDemo01 > ul > li.nav-item.dropdown.show > div a:active,
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div a:focus,
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div a:active,
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div > form > button {
+    outline: none; /* Remove o contorno azul */
+    background: transparent; /* Remove qualquer fundo de clique */
+}
+
+#navbarTogglerDemo01 > div.navbar-nav.ml-auto > li > div > form > button:hover{
+    color:black;
+}
+
+
+
+/* ===============================================
+     ICONE E TOLTIP DE INTERNO À SAIDA TEMPORÁRIA NA PAGINA TABELA GERAL
+================================================== */
+
+
+
+  /* Estilo para a imagem piscando */
+  .imagem-piscando {
+    width: 20px;
+    height: 20px;
+    animation: piscar 1s infinite;
+    position: relative;
+}
+
+/* Animação de piscar */
+@keyframes piscar {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Contêiner do tooltip */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Tooltip */
+.tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333; /* Fundo escuro */
+    color: #fff; /* Texto branco */
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Posiciona o tooltip acima da imagem */
+    left: 50%;
+    margin-left: -100px; /* Centraliza o tooltip */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: translateY(20px);
+}
+
+/* Exibe o tooltip quando passa o mouse */
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Efeito de sombra e suavização do tooltip */
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%; /* Coloca a seta do tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}

@@ -1,0 +1,66 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block title %}Cadastro de Novo Servidor{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+<div class="container custom-container my-5" style="max-width: 600px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert" style="padding: 10px; font-size: 14px; margin-bottom: 15px; border-radius: 5px;">
+          {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  <h2 class="text-center mb-4 custom-title" style="font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; color: #333; margin-bottom: 30px;">Cadastrar Servidor no Sistema UPACA</h2>
+
+  <form method="post" class="mb-4">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Campo: Usuário -->
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label for="id_username" class="font-weight-bold" style="font-size: 16px; color: #333;">Usuário do Servidor:</label>
+      <input type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus="" required="" id="id_username" class="form-control" style="padding: 10px; font-size: 16px; border-radius: 4px; border: 1px solid #ddd;">
+      <small class="form-text text-muted" style="font-size: 12px; color: #777;">Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_ apenas.</small>
+    </div>
+
+    <!-- Campo: Senha -->
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label for="id_password1" class="font-weight-bold" style="font-size: 16px; color: #333;">Senha:</label>
+      <input type="password" name="password1" autocomplete="new-password" required="" id="id_password1" class="form-control" style="padding: 10px; font-size: 16px; border-radius: 4px; border: 1px solid #ddd;">
+      <small class="form-text text-muted" style="font-size: 12px; color: #777;">
+        Sua senha não pode ser muito parecida com Usuário.
+        <br>Sua senha precisa conter pelo menos 8 dígitos.
+        <br>Sua senha não pode ser inteiramente numérica ou comumente utilizada.
+      </small>
+    </div>
+
+    <!-- Campo: Confirmação de Senha -->
+    <div class="form-group" style="margin-bottom: 20px;">
+      <label for="id_password2" class="font-weight-bold" style="font-size: 16px; color: #333;">Confirmação de Senha:</label>
+      <input type="password" name="password2" autocomplete="new-password" required="" id="id_password2" class="form-control" style="padding: 10px; font-size: 16px; border-radius: 4px; border: 1px solid #ddd;">
+      <small class="form-text text-muted" style="font-size: 12px; color: #777;">Informe a mesma senha informada anteriormente, para verificação.</small>
+    </div>
+
+    <!-- Botão de Envio -->
+    <div class="form-group text-center" style="margin-bottom: 30px;">
+      <button type="submit" class="btn btn-success btn-custom" style="background-color: #28a745; color: white; padding: 12px 25px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
+        Cadastrar
+      </button>
+    </div>
+  </form>
+
+  <!-- Link para o painel de admin -->
+  <div class="text-center">
+    <a href="/admin/" class="btn btn-secondary btn-custom" style="background-color: #6c757d; color: white; padding: 12px 25px; font-size: 16px; border: none; border-radius: 5px; transition: background-color 0.3s ease;">
+      Ir para o Painel de Admin
+    </a>
+  </div>
+</div>
+{% endblock %}

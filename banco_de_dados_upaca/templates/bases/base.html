@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" href="{% static 'imagens/icon.ico' %}" type="image/x-icon"> 
+    
+{% comment %} 
+                         Letras 
+{% endcomment %}
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+
+
+{% comment %} 
+                        Bootstrap 
+{% endcomment %}
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+
+
+</head>
+<body>
+    
+    
+<!-- Navbar -->
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Alterna navegação">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'imagens/braco.png' %}" alt="Ícone" style="width: 30px; height: 30px; margin-left: 10px;">
+            UPACA 
+        </a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Inicio <span class="sr-only">(Página atual)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Ver Tabelas
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'ver_tabela' %}">Tabela Geral</a>
+                    <a class="dropdown-item" href="{% url 'tabela-eletronico' %}">Tabela Eletrônicos</a>
+                    <a class="dropdown-item" href="{% url 'tabela_transferidos' %}">Tabela Transferidos</a>
+                    <a class="dropdown-item" href="{% url 'ver_tabela_sancoes' %}">Tabela Sanções Disciplinares</a>
+                    <a class="dropdown-item" href="{% url 'tabela_pdi' %}">Tabela PDI</a>
+                </div>
+            </li>
+            
+            
+        </ul>
+        
+        
+        <div class="navbar-nav ml-3" style="background-color: #333; padding: 5px;">
+            <span class="navbar-text" id="clock" style="background:black; color: white;"></span>
+        </div>
+
+
+        
+        {% if user.is_authenticated %}
+        <div class="navbar-nav ml-auto">
+            <span class="navbar-text mr-3">Olá, {{ user.username }}</span>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Opçôes
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <!-- Link para abrir o offcanvas, organizado como os outros itens -->
+                    {% if user.is_superuser %}
+                        <a href="javascript:void(0)" id="openBtn" class="dropdown-item" style="color:black;">Status</a>
+                    {% endif %}
+                    <a class="dropdown-item" href="{% url 'adicionar_pessoa' %}">Cadastrar Interno</a>
+                    
+                    {% if user.is_superuser %}
+                        <a class="dropdown-item" href="{% url 'create-user' %}">Cadastrar Servidor</a>
+
+                    {% endif %}
+                    
+                    {% comment %} <a class="dropdown-item" href="{% url 'arquivos' %}">Documentos Diários</a> {% endcomment %}
+                    {% comment %} <a class="dropdown-item" href="{% url 'users-online' %}">Usúarios Online</a> {% endcomment %}
+                    <div class="dropdown-divider"></div>
+                    
+                    <a class="dropdown-item" href="{% url 'configuracoes_pessoais' %}">Alterar Senha</a>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item">Sair</button>
+                    </form>
+                </div>
+                
+            </li>
+
+        </div>
+        {% else %}
+        <div class="navbar-nav ml-auto">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+        </div>
+
+        {% endif %}
+<!-- Ícone de notificações -->
+<div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell {% if notificacoes_count > 0 %}text-success{% else %}text-white{% endif %}"></i>
+        {% if notificacoes_count > 0 %}
+        <span class="badge badge-success">{{ notificacoes_count }}</span>
+        {% endif %}
+    </a>
+    <div class="dropdown-menu dropdown-menu-right text-dark notification-dropdown-menu" 
+         aria-labelledby="notificationDropdown" 
+         style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="dropdown-header mb-0">Notificações</h6>
+            {% if notificacoes_nao_lidas %}
+            <button id="mark-all-read" class="btn btn-sm text-primary" 
+                    style="border: none; background-color: transparent; cursor: pointer; color: #007bff; 
+                           font-weight: bold; padding: 3px 8px; font-size: 12px; margin-top: -6px;">
+                Marcar todas
+            </button>
+            {% endif %}
+        </div>
+
+        {% if notificacoes_nao_lidas %}
+            {% for notificacao in notificacoes_nao_lidas %}
+            <a class="dropdown-item {% if not notificacao.lida %} bg-light text-dark {% endif %} notification-item" 
+               href="#" data-notification-id="{{ notificacao.id }}">
+                <strong>{{ notificacao.titulo }}</strong>
+                <p style="font-size: 0.85rem; margin-bottom: 0;">{{ notificacao.mensagem }}</p>
+                <small class="text-muted">{{ notificacao.data_criacao|date:"d/m/Y H:i" }}</small>
+            </a>
+            <div class="dropdown-divider"></div>
+            {% endfor %}
+        {% else %}
+        <p class="dropdown-item" style="background-color:rgb(245, 234, 235); color: #721c24; font-weight: bold; padding: 10px 15px;  text-align: center;">
+            Você receberá notificações sobre PDI's e Sanções Disciplinares prestes a vencer,<br> além de atualizações e informativos importantes da unidade.
+        </p>
+    
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+
+        <form class="form-inline my-2 my-lg-0" method="get" action="{% url 'ver_tabela' %}">
+            <input class="form-control mr-sm-2" 
+                   type="search" 
+                   name="nome" 
+                   placeholder="Fazer busca por interno na UPACA" 
+                   style="width: 400px; font-size: 1.0rem;">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Pesquisar</button>
+        </form>
+    </div>
+</nav>
+
+
+
+<!-- Link para a área de desconexão -->
+<div id="offcanvas" class="offcanvas">
+    <div class="offcanvas-header">
+        <img src="{% static 'imagens/braco.png' %}" alt="Ícone" style="width: 50px; height: 50px; margin-left: 10px;">
+        <h5>Servidores Online</h5>
+        <button id="closeBtn" class="close-btn">&times;</button>
+    </div>
+    <div class="offcanvas-body">
+        {% if users_status %}
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Servidor</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users_status %}
+                        <tr>
+                            <td class="text-center">{{ user.user.username }}</td>
+                            <td class="text-center">
+                                {% if user.is_online %}
+                                    <span class="badge badge-success">Online</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Offline</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if user.user != request.user %}
+                                    <a href="#" class="btn btn-danger btn-sm" style="margin-left: 10px;"
+                                       data-toggle="modal" data-target="#confirmationModal"
+                                       onclick="setModalData('{{ user.user.username }}', '{% url 'logout_user' user.user.id %}')">
+                                        Desconectar
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">Nenhum usuário online.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+<!-- Modal de Confirmação (Bootstrap) -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Tem certeza?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Você está prestes a desconectar o usuário do servidor. Isso não pode ser desfeito.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <a id="confirmLogout" href="#" class="btn btn-danger">Confirmar Desconexão</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Conteúdo principal -->
+<div class="container custom-container">
+        {% block content %}
+        
+        
+        
+        {% endblock %}
+</div>
+
+    <!-- Rodapé -->
+    <footer class="bg-light text-center text-lg-start mt-4 py-3">
+        <div class="container"  style="background-color:#F8F9FA; ">
+            <p>&copy; 2024 Sistema da Unidade Prisional de Ressocialização de Açailândia (UPACA). 
+            {% comment %} Licença MIT --PROPRIEDADE INTELECTUAL LEI Nº 9.609 , DE 19 DE FEVEREIRO DE 1998.-- Proibido retirar os direitos autorais ou auterar os direitos autorais, Criado por: Werner C. Dias {% endcomment %}
+            <p style="cursor: pointer; color: #007BFF; font-weight: bold;" onclick="mostrarModal()">
+                Criado por: Werner C. Dias
+            </p>
+            {% comment %} Licença MIT --PROPRIEDADE INTELECTUAL LEI Nº 9.609 , DE 19 DE FEVEREIRO DE 1998.-- Proibido retirar os direitos autorais ou auterar os direitos autorais, Criado por: Werner C. Dias{% endcomment %}
+            <!-- Modal -->
+            <div id="modalCriador" class="modal" style="display: none;">
+                <div class="modal-content1">
+                    <span class="close1" onclick="fecharModal()">&times;</span>
+                    <img src="{% static 'imagens/digitalizador.webp' %}" alt="Criador" style="max-width: 100%; height: auto; border-radius: 10px;">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+   
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <style>
+        
+    </style>
+    <script>
+        // Função para mostrar o modal
+        function mostrarModal() {
+            const modal = document.getElementById('modalCriador');
+            modal.style.display = 'block'; // Exibe o modal
+        }
+        
+        // Função para fechar o modal
+        function fecharModal() {
+            const modal = document.getElementById('modalCriador');
+            modal.style.display = 'none'; // Oculta o modal
+        }
+    
+        // Fecha o modal se o usuário clicar fora da caixa de conteúdo
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalCriador');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+    
+    
+    <style>
+        
+
+
+        /* Modal da foto de desenho do Werner Digitalizador */
+        #modalCriador {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+            z-index: 1050; /* Garante que o modal fique acima de outros elementos */
+            overflow: hidden;
+            display: none;
+        }
+    
+        /* Estilo do conteúdo do modal */
+        .modal-content1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza o conteúdo */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px; /* Máximo de largura do conteúdo */
+            width: 80%; /* Largura do modal será 80% da tela */
+            box-sizing: border-box;
+        }
+    
+        /* Estilo do botão de fechar */
+        .close1 {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 5px;
+            right: 15px;
+        }
+    
+        .close1:hover,
+        .close1:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .loading {
+            font-family: arial;
+            font-size: 7px;
+            animation: blink 0.9s ease-in-out infinite;
+          }
+          
+          .triangulo {
+            stroke-dasharray: 17;
+            animation: dash 2.5s cubic-bezier(0.35, 0.04, 0.63, 0.95) infinite;
+          }
+          
+          @keyframes dash {
+            to {
+              stroke-dashoffset: 136;
+            }
+          }
+          
+          @keyframes blink {
+            50% {
+              opacity: 0;
+            }
+          }
+
+         
+        
+        
+        /* Estilo da barra de rolagem */
+
+
+        /* Estilo da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 15px; /* Largura da barra de rolagem */
+            height: 8px; /* Altura da barra de rolagem horizontal */
+        }
+        
+        /* Estilo do trilho da barra de rolagem */
+        ::-webkit-scrollbar-track {
+            background-color: #333333; /* Cor do fundo do trilho, mais suave */
+            border-radius: 10px; /* Bordas arredondadas para um visual suave */
+        }
+        
+        /* Estilo do polegar da barra de rolagem */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #56ab2f, #a8e063); /* Gradiente de verde suave */
+            border-radius: 10px; /* Bordas arredondadas no polegar */
+            border: 2px solid #444444; /* Borda sutil para destacar o polegar */
+        }
+        
+        /* Estilo do polegar ao passar o mouse (hover) */
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #a8e063, #56ab2f); /* Inverte o gradiente ao passar o mouse */
+            box-shadow: 0px 0px 8px rgba(86, 171, 47, 0.8); /* Efeito de brilho suave ao passar o mouse */
+        }
+        
+        /* Estilo da barra de rolagem horizontal */
+        ::-webkit-scrollbar-horizontal {
+            height: 10px; /* Aumenta levemente a altura da barra horizontal */
+        }
+        
+        /* Somente no Firefox - barra de rolagem discreta */
+        * {
+            scrollbar-width: thin; /* Largura fina */
+            scrollbar-color: #56ab2f #333333; /* Cor do polegar e do trilho */
+        }
+        body {
+            
+            padding-top: 65px; /* Ajuste conforme a altura do seu navbar */
+        }
+        
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transform: translateY(0); /* Posição inicial visível */
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .notification-item.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
+
+    <script>
+        // Função que seta o nome do usuário e a URL de desconexão no modal
+        function setModalData(username, logoutUrl) {
+            document.getElementById("modal-message").innerText = "Você tem certeza que deseja desconectar " + username + "? Isso não pode ser desfeito.";
+            document.getElementById("confirmLogout").setAttribute("href", logoutUrl);
+        }
+    </script>
+   
+    <script>
+        const showTimeNow = () => {
+            // Selecionando a tag de destino
+            const clockTag = document.getElementById('clock');
+          
+            // Instanciando a classe Date
+            let dateNow = new Date();
+        
+            // Pegando os valores desejados
+            let hh = dateNow.getHours();
+            let mm = dateNow.getMinutes();
+            let ss = dateNow.getSeconds();
+          
+            hh = hh < 10 ? '0'+ hh : hh; 
+            mm = mm < 10 ? '0'+ mm : mm; 
+            ss = ss < 10 ? '0'+ ss : ss; 
+           
+            clockTag.innerText = hh +':' + mm +':' + ss;
+        }
+        
+        // Executando a função a cada 1 segundo
+        showTimeNow();
+        setInterval(showTimeNow, 1000);
+
+
+        
+    </script>
+
+    <script>
+        // Marcar notificação como lida quando clicada
+        document.querySelectorAll('.notification-item').forEach(function(item) {
+            item.addEventListener('click', function(event) {
+                let notificationId = this.getAttribute('data-notification-id');
+    
+                // Evitar que o dropdown feche automaticamente
+                event.stopPropagation();
+    
+                fetch(`/notificacoes/marcar-como-lida/${notificationId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        // Suavemente ocultar a notificação e removê-la
+                        this.classList.add('fade-out');
+                        setTimeout(() => this.remove(), 500);
+    
+                        // Atualizar o número de notificações não lidas
+                        let notificacoesCountElem = document.querySelector('.badge-success');
+                        if (notificacoesCountElem) {
+                            let currentCount = parseInt(notificacoesCountElem.textContent);
+                            notificacoesCountElem.textContent = currentCount - 1;
+    
+                            // Se o contador chegar a 0, remova o badge
+                            if (currentCount - 1 === 0) {
+                                notificacoesCountElem.style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    
+        // Marcar todas as notificações como lidas ao clicar no botão
+        document.getElementById('mark-all-read')?.addEventListener('click', function(event) {
+            // Impede que o dropdown feche automaticamente
+            event.stopPropagation();
+    
+            fetch('/notificacoes/marcar-todas-como-lidas/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            }).then(response => {
+                if (response.ok) {
+                    // Suavemente ocultar todas as notificações e removê-las
+                    document.querySelectorAll('.notification-item').forEach(function(item) {
+                        item.classList.add('fade-out');
+                        setTimeout(() => item.remove(), 500);
+                    });
+    
+                    // Atualizar o número de notificações não lidas
+                    let notificacoesCountElem = document.querySelector('.badge-success');
+                    if (notificacoesCountElem) {
+                        notificacoesCountElem.style.display = 'none';
+                        notificacoesCountElem.textContent = 0;
+                    }
+                }
+            });
+        });
+    </script>
+    
+    
+    
+
+    <script>
+        let lastScrollY = window.scrollY; // Posição inicial do scroll
+const navbar = document.getElementById("navbar");
+
+window.addEventListener("scroll", () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY) {
+        // Rolar para baixo - esconde o navbar
+        navbar.style.transform = "translateY(-100%)";
+    } else {
+        // Rolar para cima - mostra o navbar
+        navbar.style.transform = "translateY(0)";
+    }
+
+    lastScrollY = currentScrollY; // Atualiza a última posição do scroll
+});
+
+    </script>
+        {% comment %} ======================================
+                    OFF CANVAS
+        ====================================== {% endcomment %}
+    <script>
+                  // Seleciona os elementos
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+const offcanvas = document.getElementById("offcanvas");
+
+// Abre o offcanvas
+openBtn.addEventListener("click", () => {
+  offcanvas.classList.add("open");
+});
+
+// Fecha o offcanvas
+closeBtn.addEventListener("click", () => {
+  offcanvas.classList.remove("open");
+});
+
+// Fecha o offcanvas se clicar fora dele
+window.addEventListener("click", (e) => {
+  if (!offcanvas.contains(e.target) && e.target !== openBtn) {
+    offcanvas.classList.remove("open");
+  }
+});
+
+    </script>
+      
+</body>
+
+</html>

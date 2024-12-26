@@ -1,0 +1,855 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Tela Inicial{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<!-- Scripts Bootstrap -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+<!-- Carregar primeiro o jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Boxicons CDN -->
+<!-- Font Awesome CDN -->
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+
+
+<div class="container">
+    
+    <br>
+    <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;">
+        <img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Procedimento Disciplinar Interno - PDI
+    </h1>
+    
+
+    {% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    </div>
+
+
+{% endif %}
+<div class="col mb-3">
+    <div class="container mt-3">
+        <form method="GET" class="row g-2">
+            <!-- Filtro por Pessoa -->
+            <div class="col-md-3">
+                <label for="filterPessoa" class="form-label text-dark">Pessoa</label>
+                <input type="text" name="pessoa" id="filterPessoa" class="form-control form-control-sm bg-light text-dark border-secondary" placeholder="Digite o nome" value="{{ request.GET.pessoa }}">
+            </div>
+
+            <!-- Filtro por Natureza -->
+            <div class="col-md-1">
+                <label for="filterNatureza" class="form-label text-dark">Natureza</label>
+                <select name="natureza" id="filterNatureza" class="form-select form-select-sm bg-light text-dark border-secondary">
+                    <option value="">Todas</option>
+                    <option value="leve" {% if request.GET.natureza == "leve" %}selected{% endif %}>Leve</option>
+                    <option value="media" {% if request.GET.natureza == "media" %}selected{% endif %}>Média</option>
+                    <option value="grave" {% if request.GET.natureza == "grave" %}selected{% endif %}>Grave</option>
+                </select>
+            </div>
+
+            <!-- Filtro por Descrição -->
+            <div class="col-md-3">
+                <label for="filterDescricao" class="form-label text-dark">Descrição</label>
+                <input type="text" name="descricao" id="filterDescricao" class="form-control form-control-sm bg-light text-dark border-secondary" placeholder="Descrição..." value="{{ request.GET.descricao }}">
+            </div>
+
+            <!-- Filtro por Data -->
+            <div class="col-md-2">
+                <label for="filterData" class="form-label text-dark">Data</label>
+                <input type="date" name="data" id="filterData" class="form-control form-control-sm bg-light text-dark border-secondary" value="{{ request.GET.data }}">
+            </div>
+
+            <!-- Filtro por Resultado -->
+            <div class="col-md-2">
+                <label for="filterResultado" class="form-label text-dark">Resultado</label>
+                <select name="resultado" id="filterResultado" class="form-select form-select-sm bg-light text-dark border-secondary">
+                    <option value="">Todos</option>
+                    <option value="andamento" {% if request.GET.resultado == "andamento" %}selected{% endif %}>Andamento</option>
+                    <option value="condenado" {% if request.GET.resultado == "condenado" %}selected{% endif %}>Condenado</option>
+                    <option value="sobrestado" {% if request.GET.resultado == "sobrestado" %}selected{% endif %}>Sobrestado</option>
+                </select>
+            </div>
+            <!-- Filtro e Ordenação por Letra -->
+            <div class="col-md-2 mt-3">
+                <div class="form-check">
+                    <input type="checkbox" name="ordenar_por_letra" id="filterPorLetra" class="form-check-input" value="1" {% if request.GET.ordenar_por_letra == "1" %}checked{% endif %}>
+                    <label class="form-check-label text-dark" for="filterPorLetra">Ordenar lista de A-Z</label>
+                </div>
+            </div>
+            <!-- Botões -->
+            <div class="col-md-12 mt-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-outline-primary btn-sm mr-2">Aplicar Filtros</button>
+                <a href="{% url 'tabela_pdi' %}" class="btn btn-outline-secondary btn-sm mr-2">Limpar Filtros</a>
+                <button type="button" 
+                        class="btn btn-outline-success btn-sm" 
+                        data-toggle="modal" 
+                        data-target="#pdiModal"
+                        {% if not user.is_superuser %}
+                            disabled 
+                            data-toggle="tooltip" 
+                            title="Você não tem permissão"
+                        {% endif %}>
+                    Cadastrar PDI
+                </button>
+
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+    <div class="col">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">Nº PDI</th>
+                    <th class="text-center">Nº Oco.</th>
+                    <th class="text-center">Pessoa</th>
+                    <th class="text-center">Natureza</th>
+                    <th class="text-center">Descrição</th>
+                    <th class="text-center">Data de Início</th>
+                    <th class="text-center">Data de Fim</th>
+                    <th class="text-center">Tempo Aplicado</th> 
+                    <th class="text-center">Tempo Restante</th>    
+                    <th class="text-center">Resultado</th>
+                    <th class="text-center">Ação</th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for pdi_info in pd_is_info %}
+                    <tr>
+                        <td class="text-center">{{ pdi_info.pdi.numero_pdi }}</td>
+                        <td class="text-center">{{ pdi_info.pdi.numero_ocorrencia }}</td>
+                        <td class="text-center">{{ pdi_info.pdi.pessoa.nome_completo }}</td>
+                        <td class="text-center">{{ pdi_info.pdi.get_natureza_display }}</td>
+                        <td class="text-center descricao-wrap">{{ pdi_info.pdi.descricao }}</td>
+
+                        <td class="text-center">{{ pdi_info.pdi.data_inicio|date:"d/m/Y H:i" }}</td>
+                        <td class="text-center">
+                            {% if pdi_info.pdi.data_fim %}
+                                {{ pdi_info.pdi.data_fim|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Não registrado
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if pdi_info.meses_aplicados > 0 or pdi_info.dias_aplicados > 0 %}
+                                {{ pdi_info.meses_aplicados }} meses e {{ pdi_info.dias_aplicados }} dias
+                            {% else %}
+                                Não aplicado
+                            {% endif %}
+                        </td>
+                        
+                        <td class="text-center">
+                            {{ pdi_info.dias_restantes }}
+                        </td>
+                        <td class="text-center">
+                            <span class="
+                                {% if pdi_info.pdi.get_resultado_display == 'Condenado' %}
+                                    text-danger fw-bold
+                                {% elif pdi_info.pdi.get_resultado_display == 'Andamento' %}
+                                    text-primary fw-bold
+                                {% elif pdi_info.pdi.get_resultado_display == 'Sobrestado' %}
+                                    text-warning fw-bold
+                                {% else %}
+                                    text-muted fw-bold
+                                {% endif %}
+                            ">
+                                {{ pdi_info.pdi.get_resultado_display }}
+                            </span>
+                        </td>
+                        
+                        
+                        <td class="text-center">
+                            {% if user.is_superuser %}
+                                <!-- Botão para abrir o modal de edição -->
+                                <button class="btn btn-custom" data-toggle="modal" data-target="#editModal{{ pdi_info.pdi.id }}">
+                                    Editar
+                                </button>
+                            {% else %}
+                                <!-- Mensagem de permissão negada -->
+                                <span style="font-size:12px;">Você não tem permissão.</span>
+                            {% endif %}
+                        </td>
+                        
+                        
+                    </tr>
+
+                    <!-- Modal para edição -->
+                    <!-- Modal para edição -->
+                    <div class="modal fade" id="editModal{{ pdi_info.pdi.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ pdi_info.pdi.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editModalLabel{{ pdi_info.pdi.id }}">Editar PDI</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                
+                                
+                                <div class="modal-body">
+                                    <form method="POST" action="{% url 'editar_pdi' pdi_info.pdi.id %}">
+                                        {% csrf_token %}
+                                        <div class="col-12 mb-3">
+                                            <p style="font-weight: bold; color: #155724; background-color: #d4edda; padding: 10px 15px; border-radius: 5px; text-align: center;">
+                                                Fique tranquilo! Você será notificado quando o PDI estiver prestes a acabar.
+                                            </p>
+                                        </div>
+                                        
+                                        <input type="hidden" name="action_type" id="action_type" value="edit">
+                                        
+                                        <div class="form-row">
+                                            <input type="hidden" name="pessoa" value="{{ pdi_info.pdi.pessoa.id }}">
+                                            
+                                            <div class="form-group col-sm-6">
+                                                <label for="numero_pdi">Número PDI</label>
+                                                <input type="text" name="numero_pdi" class="form-control" value="{{ pdi_info.pdi.numero_pdi }}">
+                                            </div>
+                                            <div class="form-group col-sm-6">
+                                                <label for="numero_ocorrencia">Número Ocorrência</label>
+                                                <input type="text" name="numero_ocorrencia" class="form-control" value="{{ pdi_info.pdi.numero_ocorrencia }}">
+                                            </div>
+                                        </div>
+                    
+                                        <div class="form-group">
+                                            <label for="descricao">Descrição</label>
+                                            <input type="text" name="descricao" class="form-control" value="{{ pdi_info.pdi.descricao }}">
+                                        </div>
+                                        <div class="form-row">
+                                            
+                                            <!-- Data de Início -->
+                                            <div class="form-group col-sm-4">
+                                                <label for="data_inicio{{ pdi_info.pdi.id }}">Data Início</label>
+                                                <input type="datetime-local" id="data_inicio{{ pdi_info.pdi.id }}" name="data_inicio" class="form-control"
+                                                    value="{{ pdi_info.pdi.data_inicio|date:'Y-m-d\TH:i' }}" required>
+                                                <small class="form-text text-muted">Informe a data e hora de início do PDI.</small>
+                                            </div>
+
+                                            <!-- Dias -->
+                                            <div class="form-group col-sm-4">
+                                                <label for="dias{{ pdi_info.pdi.id }}">Número de Dias</label>
+                                                <input type="number" id="dias{{ pdi_info.pdi.id }}" class="form-control" placeholder="Ex: 30"
+                                                    title="Informe a quantidade de dias para calcular a Data de Fim"
+                                                    oninput="calcularDataFim({{ pdi_info.pdi.id }})"> <!-- Passa o id dinâmico -->
+                                                <small class="form-text text-muted">Este campo é utilizado para calcular a Data de Fim com base na Data de Início.</small>
+                                            </div>
+
+                                            <!-- Data de Fim -->
+                                            <div class="form-group col-sm-4">
+                                                <label for="data_fim{{ pdi_info.pdi.id }}">Data Fim</label>
+                                                <input type="datetime-local" id="data_fim{{ pdi_info.pdi.id }}" name="data_fim" class="form-control"
+                                                    value="{% if pdi_info.pdi.data_fim %}{{ pdi_info.pdi.data_fim|date:'Y-m-d\TH:i' }}{% endif %}" readonly>
+                                                <small class="form-text text-muted">A Data de Fim será calculada automaticamente com base na Data Início e no número de Dias.</small>
+                                            </div>
+
+                                        </div>
+                                        
+                                        
+                    
+                                        <div class="form-row">
+                                            <div class="form-group col-sm-6">
+                                                <label for="natureza">Natureza</label>
+                                                <select name="natureza" class="form-control" required>
+                                                    <option value="" {% if not pdi_info.pdi.natureza %}selected{% endif %}>Selecione a natureza</option>
+                                                    <option value="leve" {% if pdi_info.pdi.natureza == 'leve' %}selected{% endif %}>Leve</option>
+                                                    <option value="media" {% if pdi_info.pdi.natureza == 'media' %}selected{% endif %}>Média</option>
+                                                    <option value="grave" {% if pdi_info.pdi.natureza == 'grave' %}selected{% endif %}>Grave</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-sm-6">
+                                                <label for="resultado">Resultado</label>
+                                                <select name="resultado" class="form-control" required>
+                                                    <option value="" {% if not pdi_info.pdi.resultado %}selected{% endif %}>Selecione o resultado</option>
+                                                    <option value="andamento" {% if pdi_info.pdi.resultado == 'andamento' %}selected{% endif %}>Andamento</option>
+                                                    <option value="condenado" {% if pdi_info.pdi.resultado == 'condenado' %}selected{% endif %}>Condenado</option>
+                                                    <option value="sobrestado" {% if pdi_info.pdi.resultado == 'sobrestado' %}selected{% endif %}>Sobrestado</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                    
+                                        <!-- Botões para Salvar e Apagar -->
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                        <!-- Botão de apagar -->
+                                        <button type="button" class="btn btn-danger" onclick="document.getElementById('action_type').value = 'delete'; if(confirm('Tem certeza que deseja apagar este PDI?, Essa ação é irreversível.')) { this.form.submit(); }">
+                                            Apagar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center">Nenhum PDI registrado.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pagination-wrapper">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page=1">Primeira</a>
+                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                    {% endif %}
+        
+                    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        
+                    {% if page_obj.has_next %}
+                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        
+        
+    <div>
+
+
+
+        <!-- Modal para cadastro de PDI -->
+    <div class="modal fade" id="pdiModal" tabindex="-1" aria-labelledby="pdiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"> <!-- Centralizando o modal -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdiModalLabel">{% if pdi_id %}Editar{% else %}Cadastrar{% endif %} PDI</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center" style="gap: 35px;">
+                            <div class="mb-3">
+                                <label for="id_numero_pdi" class="form-label">Número PDI</label>
+                                <input type="text" class="form-control form-control-custom" style="max-width:150px;" 
+                                       name="numero_pdi" id="id_numero_pdi" value="" placeholder="Digite o Número">
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_numero_ocorrencia" class="form-label">Número Ocorrência</label>
+                                <input type="text" class="form-control form-control-custom" style="max-width:150px;" 
+                                       name="numero_ocorrencia" id="id_numero_ocorrencia" value="" placeholder="Digite o Número">
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                        <div class="form-group">
+                            <label for="pessoa" class="font-weight-bold text-muted">Selecionar Pessoa:</label>
+                            <input type="text" id="id_pessoa" name="pessoa" class="form-control pessoa-selectize form-control-custom" placeholder="Digite para buscar uma pessoa..." autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_natureza" class="form-label">Natureza</label>
+                            <select class="form-select" name="natureza" id="id_natureza" required>
+                                <option value="leve" {% if pdi and pdi.natureza == 'leve' %}selected{% endif %}>Natureza Leve</option>
+                                <option value="media" {% if pdi and pdi.natureza == 'media' %}selected{% endif %}>Natureza Média</option>
+                                <option value="grave" {% if pdi and pdi.natureza == 'grave' %}selected{% endif %}>Natureza Grave</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_descricao" class="form-label">Descrição</label>
+                            <textarea class="form-control form-control-custom" 
+                                    name="descricao" 
+                                    id="id_descricao" 
+                                    required 
+                                    placeholder="Descreva o PDI...">{{ form.descricao.value|default:'' }}</textarea>
+                        </div>
+                        
+                        
+                        <div class="d-flex justify-content-between">
+                            <div class="mb-3 me-2 flex-grow-1">
+                                <label for="id_data_inicio" class="form-label">Data de Início</label>
+                                <input type="datetime-local" class="form-control form-control-custom" 
+                                    name="data_inicio" id="id_data_inicio" 
+                                    value="{{ form.data_inicio.value|date:'Y-m-d\TH:i' }}">
+                            </div>
+                            <div class="mb-3 ms-2 flex-grow-1">
+                                <label for="id_data_fim" class="form-label">Data de Fim</label>
+                                <input type="datetime-local" class="form-control form-control-custom" 
+                                    name="data_fim" id="id_data_fim" 
+                                    value="{{ form.data_fim.value|date:'Y-m-d\TH:i' }}">
+                            </div>
+                        </div>
+                        
+                        
+                        <!-- Novo Campo Resultado -->
+                        <div class="mb-3">
+                            <label for="id_resultado" class="form-label">Resultado</label>
+                            <select class="form-select" name="resultado" id="id_resultado">
+                                <option value="andamento" {% if pdi and pdi.resultado == 'andamento' %}selected{% endif %}>Andamento</option>
+                                <option value="condenado" {% if pdi and pdi.resultado == 'condenado' %}selected{% endif %}>Condenado</option>
+                                <option value="sobrestado" {% if pdi and pdi.resultado == 'sobrestado' %}selected{% endif %}>Sobrestado</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <button type="submit" class="btn btn-primary">{% if pdi_id %}Atualizar{% else %}Aplicar{% endif %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+
+
+{% block extra_js %}
+
+<script>
+    $(document).ready(function(){
+        // Ativar tooltips para elementos com data-toggle="tooltip"
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+
+
+
+<!-- Carregar os arquivos do Selectize.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Inicializar o Selectize para os campos de busca de pessoa
+        $('.pessoa-selectize').each(function() {
+            var selectize = $(this).selectize({
+                valueField: 'id',
+                labelField: 'nome_completo',
+                searchField: ['nome_completo'],
+                options: [],  // A lista de opções será carregada via AJAX
+                create: false,
+                load: function(query, callback) {
+                    if (!query.length) return callback();  // Não carrega se a query for vazia
+
+                    var page = 1;  // Começa a carregar a primeira página
+
+                    // Função para carregar os resultados
+                    var loadResults = function(page) {
+                        $.ajax({
+                            url: '{% url "pessoa_search" %}',  // Rota para buscar as pessoas
+                            data: {q: query, page: page},  // Parâmetros de busca e página
+                            dataType: 'json',
+                            success: function(res) {
+                                callback(res);  // Carregar os resultados
+                            }
+                        });
+                    };
+
+                    // Carregar os resultados da página inicial
+                    loadResults(page);
+                }
+            });
+
+            // Adicionar um evento de 'focus' para disparar a pesquisa automaticamente
+            $(this).on('focus', function() {
+                // Trigger de pesquisa imediata quando o input é focado
+                var query = '';  // Pode colocar algum valor de filtro inicial se necessário
+                $(this).trigger('input', [query]);  // Simula a digitação e carrega os resultados
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Função para calcular Data de Fim
+        function calcularDataFim(pdiId) {
+            const dataInicioInput = document.getElementById('data_inicio' + pdiId);
+            const diasInput = document.getElementById('dias' + pdiId);
+            const dataFimInput = document.getElementById('data_fim' + pdiId);
+        
+            const dataInicio = new Date(dataInicioInput.value);
+            const dias = parseInt(diasInput.value);
+        
+            if (!isNaN(dataInicio.getTime()) && !isNaN(dias)) {
+                // Adicionar dias à data de início
+                const dataFim = new Date(dataInicio);
+                dataFim.setDate(dataFim.getDate() + dias);
+        
+                // Formatar data no formato YYYY-MM-DDTHH:mm
+                const ano = dataFim.getFullYear();
+                const mes = String(dataFim.getMonth() + 1).padStart(2, '0');
+                const dia = String(dataFim.getDate()).padStart(2, '0');
+                const horas = String(dataFim.getHours()).padStart(2, '0');
+                const minutos = String(dataFim.getMinutes()).padStart(2, '0');
+        
+                dataFimInput.value = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+            }
+        }
+        
+        // Atualizar data fim ao alterar data de início ou quantidade de dias
+        const allDiasInputs = document.querySelectorAll('[id^="dias"]');
+        allDiasInputs.forEach(diasInput => {
+            const pdiId = diasInput.id.replace('dias', '');
+            diasInput.addEventListener('input', function() {
+                calcularDataFim(pdiId);
+            });
+        });
+    
+        const allDataInicioInputs = document.querySelectorAll('[id^="data_inicio"]');
+        allDataInicioInputs.forEach(dataInicioInput => {
+            const pdiId = dataInicioInput.id.replace('data_inicio', '');
+            dataInicioInput.addEventListener('input', function() {
+                calcularDataFim(pdiId);
+            });
+        });
+    });
+    
+</script>
+    
+
+
+
+<style>
+
+
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .container {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    .col {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+
+    #filterNatureza {
+        height: 30px;
+        padding: 5px;
+    }
+    
+    #filterResultado{
+        height: 30px;
+        padding: 5px;
+    }
+
+
+    /* Estilo para a linha da tabela */
+tr {
+    background-color: #f8f9fa; /* Cor de fundo clara */
+    transition: background-color 0.3s ease; /* Transição suave no hover */
+}
+
+/* Estilo para o cabeçalho (th) */
+tr > th {
+    background-color: #343A40; /* Cor de fundo escura */
+    color: #f1f1f1; /* Cor do texto clara */
+    font-weight: bold; /* Texto em negrito */
+    text-align: center; /* Alinhamento do texto no centro */
+    padding: 8px 12px; /* Ajuste do padding para um espaçamento mais leve */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Borda super fina e quase invisível */
+    
+    transition: border-bottom 0.3s ease; /* Transição suave para borda */
+}
+
+/* Estilo para as células da tabela (td) */
+tr > td {
+    padding: 8px 12px; /* Espaçamento nas células */
+    text-align: center; /* Alinhamento do texto nas células */
+    border-bottom: 1px solid #ddd; /* Borda fina e clara */
+    transition: background-color 0.3s ease; /* Transição suave no hover */
+}
+
+
+/* Estilo geral da tabela */
+table {
+    width: 100%; /* Tamanho da tabela ocupando 100% da largura */
+    border-collapse: collapse; /* Colapsar as bordas para ficar mais limpo */
+    margin: 10px 0; /* Margem nas laterais para separar da página */
+}
+
+    
+
+    
+    
+
+
+
+
+
+/* Garante que a descrição seja quebrada corretamente */
+.descricao-wrap {
+    white-space: normal;   /* Permite quebras de linha automáticas */
+    word-wrap: break-word; /* Quebra palavras longas */
+    word-break: break-word; /* Quebra palavras longas ou sequências sem espaços */
+}
+
+
+    /* Estilizando o container do campo select */
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+/* Estilo para o label */
+.form-label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+/* Estilo para o select */
+.form-select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efeito de foco para o select */
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Estilo para as opções do select */
+.form-select option {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* Estilizando o select para quando estiver desabilitado */
+.form-select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Alterando o estilo do select quando estiver selecionado */
+.form-select option:checked {
+    background-color: #007bff;
+    color: white;
+}
+
+    /* Centralizando o modal */
+    .modal-dialog-centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    
+    /* Estilo para os campos do formulário (exceto o select) */
+    .form-control-custom {
+        border-radius: 5px;  /* Bordas arredondadas */
+        padding: 10px;       /* Maior espaçamento interno */
+        font-size: 14px;     /* Ajuste no tamanho da fonte */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    }
+    
+    .form-select {
+        font-size: 14px; /* Ajuste no tamanho da fonte para o select */
+    }
+    
+
+    /* Estilizando o modal */
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabeçalho do modal */
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Centralizando e estilizando a title */
+.modal-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Estilizando o botão de fechar */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: white;
+    cursor: pointer;
+}
+
+/* Organizando os botões na parte inferior */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Botões de fechar e salvar */
+.btn-secondary, .btn-primary {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Estilizando o botão de fechar */
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+/* Estilizando o botão de salvar */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+/* Botão personalizado */
+.btn-custom {
+    background-color: #007bff; /* Cor de fundo personalizada */
+    color: white; /* Cor do texto */
+    border: 2px solid #0056b3; /* Borda mais suave e com contraste */
+    border-radius: 30px; /* Bordas arredondadas para um design mais moderno */
+    padding: 5px 12px; /* Espaçamento interno para deixar o botão mais 'gordinho' */
+    font-size: 14px; /* Tamanho da fonte */
+    font-weight: 600; /* Negrito no texto */
+    transition: background-color 0.3s, transform 0.3s; /* Efeitos de transição */
+}
+
+/* Efeito de foco e hover */
+.btn-custom:hover, .btn-custom:focus {
+    background-color: #0056b3; /* Cor de fundo ao passar o mouse ou focar */
+    border-color: #004085; /* Cor da borda ao passar o mouse ou focar */
+    transform: translateY(-2px); /* Pequeno efeito de elevação */
+}
+
+/* Efeito ao clicar */
+.btn-custom:active {
+    background-color: #003366; /* Cor de fundo ao clicar */
+    border-color: #002244; /* Cor da borda ao clicar */
+    transform: translateY(0); /* Retorno ao estado original */
+}
+
+
+
+/* Estilo para a tabela */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Estilo para as células da tabela */
+.table th, .table td {
+    padding: 8px 12px;
+    text-align: left;
+    word-wrap: break-word; /* Permite que o texto seja quebrado em várias linhas, se necessário */
+}
+
+/* Ajustes específicos para cada coluna, dependendo do conteúdo */
+.table th:nth-child(1), .table td:nth-child(1) {
+    max-width: 100px; /* Limita a largura da coluna "Nº PDI" */
+}
+
+.table th:nth-child(2), .table td:nth-child(2) {
+    max-width: 120px; /* Limita a largura da coluna "Nº Oco." */
+}
+
+.table th:nth-child(3), .table td:nth-child(3) {
+    max-width: 200px; /* Limita a largura da coluna "Pessoa" */
+}
+
+.table th:nth-child(4), .table td:nth-child(4) {
+    max-width: 150px; /* Limita a largura da coluna "Natureza" */
+}
+
+.table th:nth-child(5), .table td:nth-child(5) {
+    max-width: 300px; /* Limita a largura da coluna "Descrição" */
+}
+
+.table th:nth-child(6), .table td:nth-child(6) {
+    max-width: 150px; /* Limita a largura da coluna "Data de Início" */
+}
+
+.table th:nth-child(7), .table td:nth-child(7) {
+    max-width: 150px; /* Limita a largura da coluna "Data de Fim" */
+}
+
+.table th:nth-child(8), .table td:nth-child(8) {
+    max-width: 200px; /* Limita a largura da coluna "Tempo Aplicado" */
+}
+
+.table th:nth-child(9), .table td:nth-child(9) {
+    max-width: 200px; /* Limita a largura da coluna "Tempo Restante" */
+}
+
+.table th:nth-child(10), .table td:nth-child(10) {
+    max-width: 150px; /* Limita a largura da coluna "Resultado" */
+}
+
+.table th:nth-child(11), .table td:nth-child(11) {
+    max-width: 120px; /* Limita a largura da coluna "Ação" */
+}
+
+/* Ajuste para colunas com conteúdo dinâmico */
+.table td {
+    text-overflow: ellipsis; /* Adiciona reticências (...) caso o conteúdo seja muito grande */
+    overflow: hidden;
+}
+
+/* Ajusta a largura das colunas conforme necessário */
+.table th {
+    white-space: nowrap; /* Evita quebra de linha no título da coluna */
+}
+
+</style>
+
+
+
+
+
+
+
+
+{% endblock %}

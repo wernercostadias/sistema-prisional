@@ -1,0 +1,1414 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Tabela Geral de Internos{% endblock %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="{% static 'js/script.js' %}"></script>
+<br>
+<h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);  font-size: 24px;">
+    <img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 70px; height: 70px; margin-right: 10px;">População Carcerária - UPACA
+</h1>
+
+
+<link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"> 
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Formulário de Filtro -->
+<form method="get" action="{% url 'ver_tabela' %}" class="filter-form">
+    <div class="form-row align-items-center">
+        <!-- Filtros de seleção -->
+        <div class="col-md-1 col-12 mb-2">
+            <label for="bloco">Bloco</label>
+            <select id="bloco" name="bloco" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                <option value="A" {% if bloco_filter == 'A' %}selected{% endif %}>Bloco A</option>
+                <option value="B" {% if bloco_filter == 'B' %}selected{% endif %}>Bloco B</option>
+                <option value="C" {% if bloco_filter == 'C' %}selected{% endif %}>Bloco C</option>
+                <option value="D" {% if bloco_filter == 'D' %}selected{% endif %}>Bloco D</option>
+                <option value="E" {% if bloco_filter == 'E' %}selected{% endif %}>Bloco E</option>
+            </select>
+        </div>
+
+        <div class="col-md-1 col-12 mb-2">
+            <label for="cela">Cela</label>
+            <select id="cela" name="cela" class="form-control form-control-sm">
+                <option value="">Todas</option>
+                <option value="1" {% if cela_filter == '1' %}selected{% endif %}>Cela 1</option>
+                <option value="2" {% if cela_filter == '2' %}selected{% endif %}>Cela 2</option>
+                <option value="3" {% if cela_filter == '3' %}selected{% endif %}>Cela 3</option>
+                <option value="4" {% if cela_filter == '4' %}selected{% endif %}>Cela 4</option>
+                <option value="5" {% if cela_filter == '5' %}selected{% endif %}>Cela 5</option>
+                <option value="6" {% if cela_filter == '6' %}selected{% endif %}>Cela 6</option>
+                <option value="7" {% if cela_filter == '7' %}selected{% endif %}>Cela 7</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 col-12 mb-2">
+            <label for="escolaridade">Escolaridade</label>
+            <select id="escolaridade" name="escolaridade" class="form-control form-control-sm">
+                <option value="">Todas</option>
+                <option value="1" {% if escolaridade_filter == '1' %}selected{% endif %}>Ensino Fundamental Incompleto</option>
+                <option value="2" {% if escolaridade_filter == '2' %}selected{% endif %}>Ensino Fundamental Completo</option>
+                <option value="3" {% if escolaridade_filter == '3' %}selected{% endif %}>Ensino Médio Incompleto</option>
+                <option value="4" {% if escolaridade_filter == '4' %}selected{% endif %}>Ensino Médio Completo</option>
+                <option value="5" {% if escolaridade_filter == '5' %}selected{% endif %}>Ensino Superior Incompleto</option>
+                <option value="6" {% if escolaridade_filter == '6' %}selected{% endif %}>Ensino Superior Completo</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 col-12 mb-2">
+            <label for="estudando">Estudando</label>
+            <select id="estudando" name="estudando" class="form-control form-control-sm">
+                <option value="">Todos</option>
+                <option value="ibraema" {% if estudando_filter == 'ibraema' %}selected{% endif %}>IBRAEMA</option>
+                <option value="eja_i" {% if estudando_filter == 'eja_i' %}selected{% endif %}>EJA I</option>
+                <option value="eja_ii" {% if estudando_filter == 'eja_ii' %}selected{% endif %}>EJA II</option>
+                <option value="eja_iii" {% if estudando_filter == 'eja_iii' %}selected{% endif %}>EJA III</option>
+                <option value="ensino_superior" {% if estudando_filter == 'ensino_superior' %}selected{% endif %}>Ensino Superior</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 col-12 mb-2">
+            <label for="frente_trabalho">Frente de Trabalho</label>
+            <select id="frente_trabalho" name="frente_trabalho" class="form-control form-control-sm">
+                <option value="">Todas</option>
+                <option value="nao_trabalha" {% if frente_trabalho_filter == 'nao_trabalha' %}selected{% endif %}>Não trabalha</option>
+                <option value="horta" {% if frente_trabalho_filter == 'horta' %}selected{% endif %}>Horta</option>
+                <option value="piscicultura" {% if frente_trabalho_filter == 'piscicultura' %}selected{% endif %}>Piscicultura</option>
+                <option value="minhocario" {% if frente_trabalho_filter == 'minhocario' %}selected{% endif %}>Minhocário</option>
+                <option value="limpeza" {% if frente_trabalho_filter == 'limpeza' %}selected{% endif %}>Limpeza</option>
+                <option value="manutencao" {% if frente_trabalho_filter == 'manutencao' %}selected{% endif %}>Manutenção</option>
+                <option value="fabrica_blocos" {% if frente_trabalho_filter == 'fabrica_blocos' %}selected{% endif %}>Fábrica de Blocos</option>
+                <option value="croche" {% if frente_trabalho_filter == 'croche' %}selected{% endif %}>Crochê</option>
+                <option value="digitalizador" {% if frente_trabalho_filter == 'digitalizador' %}selected{% endif %}>Digitalizador</option>
+                <option value="bibliotecario" {% if frente_trabalho_filter == 'bibliotecario' %}selected{% endif %}>Bibliotecário</option>
+            </select>
+        </div>
+
+        <!-- Checkboxes e Botões em linha -->
+        <div class="col-md-2 col-12 mb-2">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="ordenar_nome" name="ordenar_nome" {% if ordenar_nome %}checked{% endif %}>
+                <label class="form-check-label" for="ordenar_nome">Ordenar por A-Z</label>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-12 mb-2">
+            <div class="form-check">
+                <input type="checkbox" name="ordenar_bloco_cela" id="ordenar_bloco_cela" value="on" {% if ordenar_bloco_cela == 'on' %}checked{% endif %}>
+                <label class="form-check-label" for="ordenar_bloco_cela">Ordenar por Bloco e Cela</label>
+            </div>
+        </div>
+
+        <!-- Filtro para Saiu Temporariamente -->
+        <div class="col-md-2 col-12 mb-2">
+            <div class="form-check">
+                <input type="checkbox" name="saiu_temporariamente" id="saiu_temporariamente" value="on" {% if saiu_temporariamente %}checked{% endif %}>
+                <label class="form-check-label" for="saiu_temporariamente">Saiu Temporariamente</label>
+            </div>
+        </div>
+        
+
+        <!-- Botões -->
+        <div class="col-12 mb-2 text-center">
+            <!-- Botão de Filtrar (Verde Claro) -->
+            <button type="submit" class="btn btn-success btn-sm shadow-lg   px-4 py-2" data-toggle="tooltip" data-placement="bottom" title="Clique para filtrar" style="font-weight: bold; transition: all 0.3s ease-in-out;">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+
+            <a href="{% url 'exportar_tabela_pdf' %}?bloco={{ bloco_filter }}&cela={{ cela_filter }}&escolaridade={{ escolaridade_filter }}&estudando={{ estudando_filter }}&sancao={{ sancao_filter }}&frente_trabalho={{ frente_trabalho_filter }}&nome_completo={{ nome_filter }}&ordenar_bloco_cela={{ ordenar_bloco_cela|default:'' }}&ordenar_nome={{ ordenar_nome|default:'' }}&saiu_temporariamente={{ saiu_temporariamente|default:'' }}" 
+            class="btn btn-outline-success btn-sm shadow-lg  px-4 py-2" style="font-weight: bold; transition: all 0.3s ease-in-out;">
+                Baixar PDF
+            </a>
+
+        </div>
+
+
+        
+    </div>
+</form>
+
+
+
+
+
+<!-- Tabela Responsiva -->
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="thead-light">
+            <tr> 
+                              
+                <th scope="col" class="col-id text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    #
+                </th>
+                <th scope="col" class="col-bloco text-center" style="max-width: 40px; background-color: #27A444; color: #ffffff; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #1d8c3b;">
+                    B
+                </th>
+                <th scope="col" class="col-cela text-center" style="max-width: 40px; background-color: #27A444; color: #ffffff; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #1d8c3b;">
+                    C
+                </th>
+
+                <th scope="col" class="col-nome text-center" style="width: 20px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444; ">
+                    ST
+                </th>
+                
+                
+                
+                
+                
+                <th scope="col" class="col-nome text-center" style="width: 300px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Nome do Interno
+                </th>
+                <th scope="col" class="col-artigo d-none d-md-table-cell text-center" style="width: 120px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Art. Crim
+                </th>
+                <th scope="col" class="col-escolaridade d-none d-md-table-cell text-center" style="width: 95px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Escolaridade
+                </th>
+                <th scope="col" class="col-estudando d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Estudando
+                </th>
+                <th scope="col" class="col-estudando d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    PDI
+                </th>
+                <th scope="col" class="col-sancao d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Sanção Disciplinar
+                </th>
+                <th scope="col" class="col-eletronicos d-none d-md-table-cell text-center" style="background-color:#343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Eletrônicos
+                </th>
+                <th scope="col" class="col-cidade d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Cidade
+                </th>
+                <th scope="col" class="col-frente d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Trabalho
+                </th>
+                <th scope="col" class="col-entrada d-md-table-cell d-none text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Entrada
+                </th>
+                <th scope="col" class="col-acoes text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Ações
+                </th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for pessoa in page_obj %}
+            <tr>
+                    <td>{{ pessoa.counter }}</td>
+                    <td class="text-center" style="font-weight: bold;">{{ pessoa.bloco }}</td>
+                    
+                    <td class="text-center" style="font-weight: bold;">{{ pessoa.cela }}</td>
+
+                    <td class="text-center" style="font-weight: bold;">
+                        {% if pessoa.saiu_temporariamente_ativo %}
+                            <!-- Ícone com Tooltip -->
+                            <div class="tooltip-container">
+                                <img src="{% static 'imagens/saidao.png' %}" class="imagem-piscando" alt="Saída Temporária">
+                                <span class="tooltip-text">Interno à Saída Temporária</span>
+                            </div>
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                    </td>
+                    
+                    
+                    
+
+                
+                    <td class="nome-completo">
+                        {{ pessoa.nome_completo }}
+                        {% if pessoa.status_novo == 'Hoje' %}
+                            <span class="status status-hoje">Hoje</span>
+                        {% elif pessoa.status_novo == 'Ontem' %}
+                            <span class="status status-ontem">Ontem</span>
+                        {% endif %}
+                    </td>
+                    
+
+                    
+                
+                    <td class="d-none d-md-table-cell text-center">
+                    <span class="texto-limitado">{{ pessoa.artigo_criminal }}</span>
+                    </td>
+                
+                    <td class="d-none d-md-table-cell text-center" style="font-size:13px;">{{ pessoa.get_escolaridade_display }}</td>
+
+                
+                    <td class="d-none d-md-table-cell text-center" style="font-size:13px; 
+                        {% if pessoa.get_estudando_display == 'IBRAEMA' or pessoa.get_estudando_display == 'EJA I' or pessoa.get_estudando_display == 'EJA II' or pessoa.get_estudando_display == 'EJA III' or pessoa.get_estudando_display == 'Ensino Superior' %}
+                            font-weight: bold;
+                        {% endif %}">
+                        {{ pessoa.get_estudando_display }}
+                    </td>
+
+                    <td class="d-none d-md-table-cell text-center" style="font-size:13px; 
+                        {% if pessoa.pdi_ativo == 'Sim' %}
+                            color: #28a745; font-weight: bold; text-transform: uppercase; background-color: #e8f5e9;
+                        {% else %}
+                            color: #6c757d; font-weight: normal; text-transform: none; background-color: #f8f9fa;
+                        {% endif %}
+                    ">
+                        {{ pessoa.pdi_ativo }}  <!-- Para depurar -->
+                    </td>
+
+                    
+
+
+
+                
+                
+                    <td class="d-md-table-cell text-center">
+                        {% if pessoa.sancoes_ativas %}
+                            <!-- Itera sobre as sanções ativas -->
+                            {% for sancao in pessoa.sancoes_ativas %}
+                                <div class="sancao-ativa" style="margin-bottom: -5px;">
+                                    {{ sancao.get_tipo_display }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="font-size:13px;">Não Há</div>
+                        {% endif %}
+                    </td>
+                    
+                    
+                    
+
+
+                                <!-- Exibir os eletrônicos cadastrados -->
+                <td class="d-none d-md-table-cell text-center">
+                    {% if pessoa.eletronicos.all %}
+                        <!-- Itera sobre os eletrônicos cadastrados para a pessoa -->
+                        {% for eletronico in pessoa.eletronicos.all %}
+                            <div class="eletronico-ativo" style="margin-bottom: -5px;">
+                                <!-- Exibe o tipo do eletrônico -->
+                                {{ eletronico.get_tipo_display }}
+
+                                <!-- Ícones Condicionais -->
+                                {% if eletronico.tipo == 'tv' %}
+                                    <img src="{% static 'imagens/tv.png' %}" alt="TV" class="icone-option">
+                                {% elif eletronico.tipo == 'radio' %}
+                                    <img src="{% static 'imagens/radio.png' %}" alt="Rádio" class="icone-option">
+                                {% elif eletronico.tipo == 'ventilador' %}
+                                    <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" class="icone-option">
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="font-size:13px;">Não Há</div>
+                    {% endif %}
+                </td>
+
+
+                <td class="d-none d-md-table-cell text-center cidade-limitada" style="font-size:13px;">{{ pessoa.cidade }}</td>
+
+                <td class="d-none d-md-table-cell text-center" style="font-size:13px; 
+                    {% if pessoa.get_frente_trabalho_display == 'Horta' or pessoa.get_frente_trabalho_display == 'Piscicultura' or pessoa.get_frente_trabalho_display == 'Minhocário' or pessoa.get_frente_trabalho_display == 'Limpeza' or pessoa.get_frente_trabalho_display == 'Manutenção' or pessoa.get_frente_trabalho_display == 'Fáb. de Blocos' or pessoa.get_frente_trabalho_display == 'Crochê' or pessoa.get_frente_trabalho_display == 'Digitalizador' or pessoa.get_frente_trabalho_display == 'Bibliotecário' %}
+                        font-weight: bold;
+                    {% endif %}">
+                    {{ pessoa.get_frente_trabalho_display }}
+                </td>
+
+
+                
+                <td class="d-md-table-cell d-none text-center" style="font-size:13px;"> {{ pessoa.data_entrada|date:"d/m/Y" }}</td>
+                
+                <td>
+                    <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#opcoesModal{{ pessoa.id }}">
+                        Opções
+                    </button>
+                    
+
+        <!-- Modal de Opções (Centralizado e Maior) -->
+        <div class="modal fade custom-modal" id="opcoesModal{{ pessoa.id }}" tabindex="-1" role="dialog" aria-labelledby="opcoesModalLabel{{ pessoa.id }}">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document"> <!-- modal-lg para aumentar a largura -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="custom-title">
+                            Dados Cadastrais do Interno
+                        </h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+            <div class="modal-body">
+                <!-- Formulário de Modificação -->
+                <form method="post" action="{% url 'editar_pessoa' pessoa.id %}">
+                    {% csrf_token %}
+                    
+                                   
+                    <div class="row">
+                        <!-- Nome Completo e Cidade lado a lado -->
+                        <div class="form-group col-md-6">
+                            <label for="nome_completo">Nome Completo</label>
+                            <input type="text" name="nome_completo" id="nome_completo" class="form-control" value="{{ pessoa.nome_completo }}">
+                        </div>
+                    
+                        <div class="form-group col-md-6">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" name="cidade" id="cidade" value="{{ pessoa.cidade }}" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Data de Entrada e Idade lado a lado -->
+                        <div class="form-group col-md-6">
+                            <label for="data_entrada">Data de Entrada</label>
+                            <input type="date" name="data_entrada" id="data_entrada" value="{{ pessoa.data_entrada|date:'Y-m-d' }}" class="form-control">
+                        </div>
+                    
+                        {% comment %} <div class="form-group col-md-6">
+                            <label for="idade">Idade</label>
+                            <input type="number" name="idade" id="idade" class="form-control" value="{{ pessoa.idade }}">
+                        </div> {% endcomment %}
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Artigo Criminal e Escolaridade lado a lado -->
+                        <div class="form-group col-md-6">
+                            <label for="artigo_criminal">Artigo Criminal</label>
+                            <input type="text" name="artigo_criminal" id="artigo_criminal" value="{{ pessoa.artigo_criminal }}" class="form-control">
+                        </div>
+                    
+                        <div class="form-group col-md-6">
+                            <label for="escolaridade">Escolaridade</label>
+                            <select name="escolaridade" id="escolaridade" class="form-control">
+                                <option value="" {% if not pessoa.escolaridade %}selected{% endif %}>Selecione a Escolaridade</option>
+                                <option value="1" {% if pessoa.escolaridade == '1' %}selected{% endif %}>Fundamental Incompleto</option>
+                                <option value="2" {% if pessoa.escolaridade == '2' %}selected{% endif %}>Fundamental Completo</option>
+                                <option value="3" {% if pessoa.escolaridade == '3' %}selected{% endif %}>Médio Incompleto</option>
+                                <option value="4" {% if pessoa.escolaridade == '4' %}selected{% endif %}>Médio Completo</option>
+                                <option value="5" {% if pessoa.escolaridade == '5' %}selected{% endif %}>Superior Incompleto</option>
+                                <option value="6" {% if pessoa.escolaridade == '6' %}selected{% endif %}>Superior Completo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        
+                        <div class="form-group col-md-6">
+                            <label for="estudando">Estudando</label>
+                            <select id="estudando" name="estudando" class="form-control">
+                                <option value="nao_estuda" {% if pessoa.estudando == 'nao_estuda' %}selected{% endif %}>Não</option>
+                                <option value="ibraema" {% if pessoa.estudando == 'ibraema' %}selected{% endif %}>IBRAEMA</option>
+
+                                <option value="eja_i" {% if pessoa.estudando == 'eja_i' %}selected{% endif %}>EJA I</option>
+                                <option value="eja_ii" {% if pessoa.estudando == 'eja_ii' %}selected{% endif %}>EJA II</option>
+                                <option value="eja_iii" {% if pessoa.estudando == 'eja_iii' %}selected{% endif %}>EJA III</option>
+                                <option value="ensino_superior" {% if pessoa.estudando == 'ensino_superior' %}selected{% endif %}>Ensino Superior</option>
+
+                            </select>
+                        </div>
+                    
+                        <div class="form-group col-md-6">
+                            <label for="frente_trabalho">Frente de Trabalho</label>
+                            <select name="frente_trabalho" id="frente_trabalho" class="form-control">
+                                <option value="nao_trabalha" {% if pessoa.frente_trabalho == 'nao_trabalha' %}selected{% endif %}>Não trabalha</option>
+                                <option value="horta" {% if pessoa.frente_trabalho == 'horta' %}selected{% endif %}>Horta</option>
+                                <option value="piscicultura" {% if pessoa.frente_trabalho == 'piscicultura' %}selected{% endif %}>Piscicultura</option>
+                                <option value="minhocario" {% if pessoa.frente_trabalho == 'minhocario' %}selected{% endif %}>Minhocário</option>
+                                <option value="limpeza" {% if pessoa.frente_trabalho == 'limpeza' %}selected{% endif %}>Limpeza</option>
+                                <option value="manutencao" {% if pessoa.frente_trabalho == 'manutencao' %}selected{% endif %}>Manutenção</option>
+                                <option value="fabrica_blocos" {% if pessoa.frente_trabalho == 'fabrica_blocos' %}selected{% endif %}>Fábrica de Blocos</option>
+                                <option value="croche" {% if pessoa.frente_trabalho == 'croche' %}selected{% endif %}>Crochê</option>
+                                <option value="digitalizador" {% if pessoa.frente_trabalho == 'digitalizador' %}selected{% endif %}>Digitalizador</option>
+                                <option value="bibliotecario" {% if pessoa.frente_trabalho == 'bibliotecario' %}selected{% endif %}>Bibliotecário</option>
+                            </select>
+                        </div>
+                        
+                    </div>
+                    
+                    <h4 class="text-center mb-4" 
+                            style="font-size: 1.4rem; font-weight: 600; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); border-bottom: 3px solid rgba(0, 0, 0, 0.9);; padding-bottom: 12px; display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                            <i class="fas fa-gavel" style="color: rgba(0, 0, 0, 0.5);; margin-right: 12px; font-size: 1.8rem;"></i> 
+                            Trocar Cela e Bloco
+                        </h4>
+                    
+                    <div class="row">
+                        <!-- Bloco e Cela lado a lado -->
+                        <div class="form-group col-md-6">
+                            <label for="bloco">Bloco</label>
+                            <select id="bloco" name="bloco" class="form-control">
+                                <option value="A" {% if pessoa.bloco == 'A' %}selected{% endif %}>Bloco A</option>
+                                <option value="B" {% if pessoa.bloco == 'B' %}selected{% endif %}>Bloco B</option>
+                                <option value="C" {% if pessoa.bloco == 'C' %}selected{% endif %}>Bloco C</option>
+                                <option value="D" {% if pessoa.bloco == 'D' %}selected{% endif %}>Bloco D</option>
+                                <option value="E" {% if pessoa.bloco == 'E' %}selected{% endif %}>Bloco E</option>
+                            </select>
+                        </div>
+                    
+                        <div class="form-group col-md-6">
+                            <label for="cela">Cela</label>
+                            <select id="cela" name="cela" class="form-control">
+                                <option value="1" {% if pessoa.cela == '1' %}selected{% endif %}>Cela 1</option>
+                                <option value="2" {% if pessoa.cela == '2' %}selected{% endif %}>Cela 2</option>
+                                <option value="3" {% if pessoa.cela == '3' %}selected{% endif %}>Cela 3</option>
+                                <option value="4" {% if pessoa.cela == '4' %}selected{% endif %}>Cela 4</option>
+                                <option value="5" {% if pessoa.cela == '5' %}selected{% endif %}>Cela 5</option>
+                                <option value="6" {% if pessoa.cela == '6' %}selected{% endif %}>Cela 6</option>
+                                <option value="7" {% if pessoa.cela == '7' %}selected{% endif %}>Cela 7</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_saiu_temporariamente">Saiu Temporariamente</label>
+                        <input type="checkbox" name="saiu_temporariamente" id="id_saiu_temporariamente" class="custom-checkbox-stylish" {% if pessoa.saiu_temporariamente %}checked{% endif %}>
+                    </div>
+                    
+                    
+
+
+                    
+        
+                    {% if user.is_superuser %}
+                        <div class="container">
+
+                            <h4 class="text-center mb-4" 
+                    style="font-size: 1.4rem; font-weight: 600; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #99c2ff; padding-bottom: 12px; display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                    <i class="fas fa-gavel" style="color: rgba(0, 0, 0, 0.5);; margin-right: 12px; font-size: 1.8rem;"></i> 
+                    Aplicar Transferência ao Interno
+                    </h4>
+                
+                    <div class="row">
+                        <!-- Checkbox de Transferência -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card sancao-card transferencia-card p-3">
+                                <h5 class="card-title mb-3">
+                                    <img src="{% static 'imagens/policia.png' %}" alt="Polícia" class="card-img-icon">
+                                    Transferência
+                                </h5>
+                    
+                                <div class="form-check d-flex align-items-center">
+                                    <div class="custom-checkbox-wrapper">
+                                        <input type="checkbox" class="form-check-input sancao-checkbox" id="transferencia_{{ pessoa.id }}" name="transferencia_ativa" {% if pessoa.transferencia_set.exists %}checked{% endif %} onclick="toggleTransferenciaOptions({{ pessoa.id }})">
+                                        <label for="transferencia_{{ pessoa.id }}" class="custom-checkbox-label">
+                                            <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                            </svg>
+                                            <span class="checkbox-label-text" >Transfêrir</span>
+                                        </label>
+                                    </div>
+                                </div>
+                    
+                                <div id="transferencia_opcoes_{{ pessoa.id }}" class="transferencia-opcoes mt-3" style="display: {% if pessoa.transferencia_ativa %}block{% else %}none{% endif %};">
+                                    <label for="penitenciaria_destino_{{ pessoa.id }}" class="label-sancao">Penitenciária Destino:</label>
+                                    <input type="text" name="penitenciaria_destino" id="penitenciaria_destino_{{ pessoa.id }}" class="form-control" value="{{ pessoa.penitenciaria_destino }}">
+                    
+                                    <label for="data_transferencia_{{ pessoa.id }}" class="mt-3 label-sancao">Data da Transferência:</label>
+                                    <input type="datetime-local" name="data_transferencia" value="{{ form.data_transferencia.value }}" class="form-control">
+                    
+                                    <label for="justificativa_{{ pessoa.id }}" class="mt-3 label-sancao">Justificativa:</label>
+                                    <textarea name="justificativa" id="justificativa_{{ pessoa.id }}" class="form-control">{{ pessoa.justificativa }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        
+                    
+
+                    </div>
+
+
+
+                            <h4 class="text-center mb-4" 
+                            style="font-size: 1.4rem; font-weight: 600; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); border-bottom: 3px solid #99c2ff; padding-bottom: 12px; display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                            <i class="fas fa-gavel" style="color: rgba(0, 0, 0, 0.5);; margin-right: 12px; font-size: 1.8rem;"></i> 
+                            Aplicar Sanção Disciplinar ao Interno
+                            </h4>
+
+                            <p style="font-size: 14px; color: #333; text-align: center; margin: 10px 0;">Calcule a sanção aplicável, caso prefira.</p>
+
+
+                            {% comment %} <div class="row">
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="data_inicio_meses">Data de Início:</label>
+                                    <input type="datetime-local" id="data_inicio_meses" class="form-control form-control-sm" onchange="calcularDataFimMeses()">
+                                    <small class="small-info">Escolha a data de início.</small>
+                                </div>
+                                
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="meses">Quantidade de Meses:</label>
+                                    <input type="number" id="meses" class="form-control form-control-sm" oninput="calcularDataFimMeses()" placeholder="Ex: 2">
+                                    <small class="small-info">Informe a quantidade de meses.</small>
+                                </div>
+                                
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="data_fim_meses">Data de Fim:</label>
+                                    <input type="datetime-local" id="data_fim_meses" class="form-control form-control-sm" readonly>
+                                    <small class="small-info">Data de fim será preenchida automaticamente.</small>
+                                </div>
+                            </div> {% endcomment %}
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="data_inicio">Data de Início:</label>
+                                    <input type="datetime-local" class="form-control form-control-sm data-inicio" onchange="calcularDataFim(this)">
+                                    <small class="small-info">Escolha a data de início.</small>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="dias">Quantidade de Dias:</label>
+                                    <input type="number" class="form-control form-control-sm dias" oninput="calcularDataFim(this)" placeholder="Ex: 30 ">
+                                    <small class="small-info">Informe a quantidade de dias.</small>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="data_fim">Data de Fim:</label>
+                                    <input type="datetime-local" class="form-control form-control-sm data-fim" readonly>
+                                    <small class="small-info">Data de fim será preenchida automaticamente.</small>
+                                </div>
+                            </div>
+                            
+                            
+                            
+
+                            <div class="row">
+                                <!-- Sem Castelo -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card p-3 sancao-card">
+                                        <h5 class="card-title mb-3" style="font-size: 1.1rem; font-weight: bold; color: #2C3E50; text-align: center; border-bottom: 2px solid #BDC3C7; padding-bottom: 6px;">
+                                            <img src="{% static 'imagens/castelo.png' %}" alt="Castelo" style="width: 25px; height: 25px; margin-right: 5px;">
+                                            Sem Castelo
+                                        </h5>
+                                        <div class="form-check d-flex align-items-center">
+                                            <div class="custom-checkbox-wrapper">
+                                                <input type="checkbox" class="form-check-input sancao-checkbox" id="sancao_sem_castelo_{{ pessoa.id }}" name="sancao_sem_castelo_{{ pessoa.id }}" {% if sancoes.sem_castelo %}checked{% endif %}>
+                                                <label for="sancao_sem_castelo_{{ pessoa.id }}" class="custom-checkbox-label">
+                                                    <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                        <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                                    </svg>
+                                                    <span>Aplicar Sanção</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="sancao-opcoes mt-3">
+                                            <!-- Início da Sanção -->
+                                            <label for="data_inicio_sem_castelo_{{ pessoa.id }}" class="label-sancao">Início da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_inicio_sem_castelo_{{ pessoa.id }}" value="{{ sancoes.sem_castelo.data_inicio|date:'Y-m-d\\TH:i' }}">
+                                        
+                                            <!-- Fim da Sanção -->
+                                            <label for="data_fim_sem_castelo_{{ pessoa.id }}" class="label-sancao mt-3">Fim da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_fim_sem_castelo_{{ pessoa.id }}" value="{{ sancoes.sem_castelo.data_fim|date:'Y-m-d\\TH:i' }}">
+                                        
+                                            <!-- Descrição da Sanção -->
+                                            <label for="descricao_sancao_sem_castelo_{{ pessoa.id }}" class="mt-3">Descreva algo:</label>
+                                            <textarea class="form-control" name="descricao_sancao_sem_castelo_{{ pessoa.id }}" style="min-height: 100px;">{{ sancoes.sem_castelo.descricao }}</textarea>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <!-- Sem Visita Íntima -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card sancao-card p-3">
+                                        <h5 class="card-title mb-3" style="font-size: 1.1rem; font-weight: bold; color: #2C3E50; text-align: center; border-bottom: 2px solid #BDC3C7; padding-bottom: 6px;">
+                                            <img src="{% static 'imagens/visitaintima.png' %}" alt="Visita Íntima" style="width: 25px; height: 25px; margin-right: 5px;">
+                                            Sem Visita Íntima
+                                        </h5>
+                                        <div class="form-check d-flex align-items-center">
+                                            <div class="custom-checkbox-wrapper">
+                                                <input type="checkbox" class="form-check-input sancao-checkbox" id="sancao_sem_visita_intima_{{ pessoa.id }}" name="sancao_sem_visita_intima_{{ pessoa.id }}" {% if sancoes.sem_visita_intima %}checked{% endif %}>
+                                                <label for="sancao_sem_visita_intima_{{ pessoa.id }}" class="custom-checkbox-label">
+                                                    <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                        <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                                    </svg>
+                                                    <span>Aplicar Sanção</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="sancao-opcoes mt-3">
+                                            <label for="data_inicio_sem_visita_intima_{{ pessoa.id }}" style="color: #2C3E50; font-weight: bold;">Início da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_inicio_sem_visita_intima_{{ pessoa.id }}" value="{{ sancoes.sem_visita_intima.data_inicio|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="data_fim_sem_visita_intima_{{ pessoa.id }}" class="mt-3" style="color: #2C3E50; font-weight: bold;">Fim da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_fim_sem_visita_intima_{{ pessoa.id }}" value="{{ sancoes.sem_visita_intima.data_fim|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="descricao_sancao_sem_visita_intima_{{ pessoa.id }}" class="mt-3" style="color: #2C3E50; font-weight: bold;">Descreva algo:</label>
+                                            <textarea class="form-control" name="descricao_sancao_sem_visita_intima_{{ pessoa.id }}" style="min-height: 100px;">{{ sancoes.sem_visita_intima.descricao }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sem Visita Social -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card sancao-card p-3">
+                                        <h5 class="card-title mb-3">
+                                            <img src="{% static 'imagens/visitasocial.png' %}" alt="Visita Social" class="card-img-icon">
+                                            Sem Visita Social
+                                        </h5>
+                                        <div class="form-check d-flex align-items-center">
+                                            <div class="custom-checkbox-wrapper">
+                                                <input type="checkbox" class="form-check-input sancao-checkbox" id="sancao_sem_visita_social_{{ pessoa.id }}" name="sancao_sem_visita_social_{{ pessoa.id }}" {% if sancoes.sem_visita_social %}checked{% endif %}>
+                                                <label for="sancao_sem_visita_social_{{ pessoa.id }}" class="custom-checkbox-label">
+                                                    <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                        <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                                    </svg>
+                                                    <span>Aplicar Sanção</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="sancao-opcoes mt-3">
+                                            <label for="data_inicio_sem_visita_social_{{ pessoa.id }}" class="label-sancao">Início da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_inicio_sem_visita_social_{{ pessoa.id }}" value="{{ sancoes.sem_visita_social.data_inicio|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="data_fim_sem_visita_social_{{ pessoa.id }}" class="label-sancao mt-3">Fim da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_fim_sem_visita_social_{{ pessoa.id }}" value="{{ sancoes.sem_visita_social.data_fim|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="descricao_sancao_sem_visita_social_{{ pessoa.id }}" class="mt-3">Descreva algo:</label>
+                                            <textarea class="form-control" name="descricao_sancao_sem_visita_social_{{ pessoa.id }}" style="min-height: 100px;">{{ sancoes.sem_visita_social.descricao }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                            <div class="form-group" style="text-align: right; margin-top: 10px;">
+                                <button type="submit" class="btn btn-success btn-sm">Aplicar Alterações</button>
+                            </div>
+                         
+
+                </form>
+
+                
+                
+            </div>
+            <div class="modal-footer">
+                <!-- Fechar Modal -->
+                <form id="alvara-form" method="post" action="{% url 'remover_pessoa' pessoa.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-danger btn-sm" onclick="handleClick(event)">Alvará</button>
+                </form>
+                
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+             <!--        FIM DO MODAL         -->
+</td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11" class="text-center">Nenhum interno encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginação -->
+<nav aria-label="Navegação de página exemplo">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link pagination-btn" href="?page={{ page_obj.previous_page_number }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}" tabindex="-1">Anterior</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link pagination-btn disabled-btn" href="#" tabindex="-1">Anterior</a>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:-3 and num <= page_obj.number|add:3 %}
+                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                    <a class="page-link pagination-btn" href="?page={{ num }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}">
+                        {{ num }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link pagination-btn" href="?page={{ page_obj.next_page_number }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}">Próximo</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link pagination-btn disabled-btn" href="#">Próximo</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+    function handleClick(event) {
+        event.preventDefault(); // Evita o envio imediato do formulário
+
+        // Dispara os confetes
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            zIndex: 9999
+        });
+
+        // Aguarda 2 segundos antes de enviar o formulário
+        setTimeout(function () {
+            const form = document.getElementById('alvara-form');
+            if (form) {
+                form.submit(); // Envia o formulário após o tempo
+            } else {
+                console.error('Formulário não encontrado!');
+            }
+        }, 2000); // 2 segundos de atraso
+
+        // Aguarda 4 segundos no total antes de recarregar a página suavemente
+        setTimeout(function () {
+            location.reload(); // Recarrega a página atual
+        }, 4000); // Tempo total de 4 segundos
+    }
+</script>
+
+
+
+
+
+
+
+
+{% comment %} -------------------------------------------------------
+PARA ABRIR O CHECKBEX DE SANÇÕES DE TRANSFERENCIAS
+------------------------------------------------------- {% endcomment %}
+<script type="text/javascript">
+    function toggleTransferenciaOptions(pessoaId) {
+        var optionsDiv = document.getElementById('transferencia_opcoes_' + pessoaId);
+        var checkbox = document.getElementById('transferencia_' + pessoaId);
+        
+        // Exibe os campos de transferência se o checkbox estiver marcado
+        if (checkbox.checked) {
+            optionsDiv.style.display = 'block';
+        } else {
+            optionsDiv.style.display = 'none';
+        }
+    }
+</script>
+<script>
+    function calcularDataFim(elemento) {
+        // Encontra o contêiner mais próximo
+        var container = elemento.closest(".row");
+    
+        // Seleciona os campos relativos a este contêiner
+        var dataInicio = container.querySelector(".data-inicio").value; // Data de início
+        var dias = container.querySelector(".dias").value; // Quantidade de dias
+    
+        if (dataInicio && dias) {
+            // Converte a data de início para objeto Date
+            var inicio = new Date(dataInicio);
+    
+            // Adiciona os dias ao objeto Date
+            inicio.setDate(inicio.getDate() + parseInt(dias));
+    
+            // Formata a data de fim no formato YYYY-MM-DDTHH:MM
+            var dataFim = inicio.toISOString().slice(0, 16);
+    
+            // Preenche o campo de data de fim com o valor calculado
+            container.querySelector(".data-fim").value = dataFim;
+        }
+    }
+     
+    
+</script>
+<style>
+    /* Estilo personalizado para o checkbox com outra classe */
+    .custom-checkbox-stylish {
+        position: relative;
+        width: 40px;
+        height: 20px;
+        background-color: #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: none;
+    }
+    
+    .custom-checkbox-stylish:checked {
+        background-color: #4CAF50;
+    }
+    
+    .custom-checkbox-stylish:checked::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background-color: #fff;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+        transform: translateX(20px);
+    }
+    
+    .custom-checkbox-stylish::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        background-color: #fff;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+    }
+    
+    .custom-checkbox-stylish:hover {
+        background-color: #9ccc65;
+    }
+    
+    label {
+        font-size: 16px;
+        margin-left: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+
+    
+</style>
+<style>
+
+
+    
+    .modal-header {
+        border-bottom: none; /* Remove a linha inferior padrão */
+    }
+    
+    .custom-title {
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.5);; /* Cor verde no texto */
+        text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra leve no texto */
+        padding: 10px 0; /* Espaçamento interno */
+        border: 2px solid black; /* Borda preta ao redor */
+        border-radius: 8px; /* Bordas arredondadas */
+        background: white; /* Fundo branco */
+        background-clip: padding-box; /* Mantém o fundo na área interna */
+        animation: fade-in 0.8s ease-in-out; /* Animação de entrada suave */
+    }
+    
+    /* Animação de fade-in */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    
+    
+    .small-info {
+        font-size: 10px; /* Fonte pequena para as informações abaixo */
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    
+    
+    
+    .cidade-limitada {
+        word-break: break-word;
+        white-space: normal;
+        max-width: 100px; /* Ajuste conforme necessário */
+        display: inline-block;
+        
+    }
+    
+    .cidade-limitada::before {
+        content: attr(data-value);
+        visibility: hidden;
+        height: 0;
+        overflow: hidden;
+        display: block;
+    }
+    
+    .cidade-limitada {
+        data-value:"*/
+    
+    }
+    
+
+
+    .texto-limitado {
+        display: inline-block;
+        font-size: 12px;
+        max-width: 100px;
+        word-wrap: break-word; /* Permite a quebra de linha dentro do conteúdo */
+        white-space: normal; /* Garante que o texto pode quebrar */
+    }
+    
+    .texto-limitado::before {
+        content: attr(data-text);
+        display: block;
+    }
+
+
+    /* Estilo para o nome completo */
+.nome-completo {
+    white-space: normal;  /* Permite quebra de linha */
+    word-wrap: break-word;  /* Quebra a palavra se for muito longa */
+    overflow-wrap: break-word;  /* Garante que palavras longas quebrem */
+    
+    max-width: 350px;  /* Aumenta a largura máxima antes da quebra de linha */
+}
+
+/* Estilo para a célula da tabela */
+td {
+    word-wrap: break-word;  /* Permite a quebra de palavra nas células */
+    max-width: 350px;  /* Ajusta a largura máxima da célula */
+    width: auto;  /* Permite que a largura da célula seja dinâmica */
+}
+
+/* Para telas menores, como smartphones */
+@media (max-width: 767px) {
+    .nome-completo {
+        max-width: 100%;  /* Usa a largura total disponível na tela */
+        word-wrap: break-word;  /* Garante a quebra de palavras longas */
+        overflow-wrap: break-word;  /* Garante que palavras longas quebrem */
+        word-break: break-all;  /* Força a quebra de palavras longas */
+    }
+    td {
+        max-width: 100%;  /* A largura da célula vai ocupar a tela inteira */
+    }
+}
+
+/* Estilos gerais para a célula */
+.d-md-table-cell {
+    text-align: center; /* Alinha o texto ao centro */
+}
+
+/* Estilo específico para telas menores, como celulares */
+@media (max-width: 767px) {
+    .d-md-table-cell {
+        font-size: 12px;  /* Reduz o tamanho da fonte no celular */
+    }
+
+    .d-md-table-cell div {
+        font-size: 11px;  /* Também aplica a redução ao conteúdo dentro da célula */
+    }
+}
+    
+/* Estilo para as sanções ativas */
+.sancao-ativa {
+    color: OrangeRed;  /* Define a cor do texto como verde */
+    font-weight: bold;  /* Deixa o texto em negrito para maior destaque */
+    font-size:14px;
+}
+
+/* Estilo para telas menores, como celulares */
+@media (max-width: 767px) {
+    .sancao-ativa {
+        font-size: 12px;  /* Ajusta o tamanho da fonte no celular */
+    }
+}
+
+/* Estilo para as sanções ativas */
+.eletronico-ativo {
+    color: DarkBlue;  /* Define a cor do texto como verde */
+    font-weight: bold;  /* Deixa o texto em negrito para maior destaque */
+}
+
+/* Estilo para telas menores, como celulares */
+@media (max-width: 767px) {
+    .eletronico-ativo {
+        font-size: 12px;  /* Ajusta o tamanho da fonte no celular */
+
+    }
+
+    .icone-option {
+        width: 15px; /* Tamanho dos ícones */
+        height: 15px;
+        margin-left: 5px; /* Espaço entre o texto e o ícone */
+        vertical-align: -2px; /* Ajusta o ícone para cima, dependendo do alinhamento desejado */
+        /* Ou, como alternativa, use: */
+        /* margin-top: -3px; */ /* Ajuste do ícone para cima */
+    }
+}
+    
+    .btn:hover {
+        transform: translateY(-2px); /* Levanta o botão ao passar o mouse */
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Sombra sutil ao passar o mouse */
+    }
+    .btn:active {
+        transform: translateY(1px); /* Faz o botão "afundar" um pouco quando pressionado */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra mais suave no clique */
+    }
+</style>
+
+<style>
+  
+    
+
+
+
+    /* Aplica o gradiente ao fundo do modal */
+    .modal.fade .modal-dialog {
+        background: linear-gradient(135deg, #1e3c72, #2a5298); /* Gradiente azul elegante */
+        border-radius: 12px; /* Bordas arredondadas */
+        padding: 2px; /* Espaço para destacar a borda */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Sombra para destaque */
+        animation: modal-appear 0.5s ease-out; /* Animação de entrada */
+    }
+    
+    /* Fundo interno translúcido com borda elegante */
+    .modal-content {
+        background: white; /* Fundo branco translúcido */
+        backdrop-filter: blur(15px); /* Efeito de desfoque no fundo */
+        border-radius: 10px; /* Bordas arredondadas */
+        box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.3); /* Sombra para profundidade */
+        border: 2px solid transparent; /* Borda inicial invisível */
+        background-clip: padding-box; /* Mantém o gradiente na borda externa */
+        transition: all 0.4s ease-in-out; /* Transição para suavidade */
+    }
+
+    
+
+
+    .sancao-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f9f9f9;
+        border-radius: 20px; /* Borda arredondada */
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        padding: 15px;
+        position: relative;
+        border: 3px solid transparent; /* Borda inicial transparente */
+        background-clip: padding-box; /* Evita que o fundo invada a borda */
+    }
+    
+    .sancao-card::after {
+        content: '';
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(45deg, #cccccc, #e0e0e0, #f0f0f0, #f8f8f8); /* Gradiente para a borda */
+        border-radius: 20px; /* Mesmo arredondamento da borda */
+        z-index: -1; /* Faz a borda ficar atrás do conteúdo */
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #2C3E50;
+        text-align: center;
+        border-bottom: 2px solid #BDC3C7;
+        padding-bottom: 6px;
+    }
+    
+    .card-img-icon {
+        width: 25px;
+        height: 25px;
+        margin-right: 5px;
+    }
+    
+    .label-sancao {
+        color: #2C3E50;
+        font-weight: bold;
+    }
+    
+    .custom-checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+    
+    .form-check-input.sancao-checkbox {
+        display: none; /* Oculta o checkbox padrão */
+    }
+    
+    .custom-checkbox-label {
+        display: flex;
+        align-items: center;
+        font-size: 1.1rem;
+        color: #34495E;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    
+    .custom-checkbox-label:hover {
+        color: #000; /* Muda a cor do texto ao passar o mouse */
+    }
+    
+    .checkbox-svg {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s ease;
+    }
+    
+    .checkbox-rect {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: #000;
+        stroke-width: 2;
+        rx: 5; /* Arredondamento dos cantos */
+        transition: fill 0.3s ease, stroke 0.3s ease;
+    }
+    
+    .checkbox-tick {
+        stroke: none;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke: #fff;
+        stroke-dasharray: 24;
+        stroke-dashoffset: 24;
+        transition: stroke-dashoffset 0.3s ease;
+    }
+    
+    .form-check-input.sancao-checkbox:checked + .custom-checkbox-label .checkbox-rect {
+        fill: #000; /* Preenche o retângulo ao clicar */
+        stroke: #000;
+    }
+    
+    .form-check-input.sancao-checkbox:checked + .custom-checkbox-label .checkbox-tick {
+        stroke-dashoffset: 0; /* Animação do "check" */
+    }
+    
+    .custom-checkbox-label span {
+        margin-left: 10px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    
+</style>
+
+
+
+<style>
+    /* Botão verde claro */
+.btn-success-light {
+    background-color: #34c38f;
+    border-color: #34c38f;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-success-light:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+    transform: translateY(-2px);
+}
+
+.btn-success-light:active {
+    background-color: #218838;
+    border-color: #1e7e34;
+    transform: translateY(1px);
+}
+
+/* Botão verde escuro */
+.btn-success-dark {
+    background-color: #1e7e34;
+    border-color: #1e7e34;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-success-dark:hover {
+    background-color: #155724;
+    border-color: #155724;
+    transform: translateY(-2px);
+}
+
+.btn-success-dark:active {
+    background-color: #0e3b27;
+    border-color: #0e3b27;
+    transform: translateY(1px);
+}
+
+
+    .form-group12 {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centraliza horizontalmente o conteúdo */
+    }
+
+    
+    .sancao-opcoes {
+        transition: opacity 0.3s ease, max-height 0.3s ease;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        display: none;
+    }
+    
+    .sancao-opcoes.active {
+        max-height: 500px; /* Ajuste para o tamanho máximo esperado */
+        opacity: 1;
+        display: block;
+    }
+
+
+    /* Ajustes para telas menores */
+@media (max-width: 576px) {
+    /* Reduz o padding das células da tabela */
+    .table td, .table th {
+        padding: 0.3rem;
+    }
+
+    /* Ajusta a largura da coluna de Ações para que o botão não seja cortado */
+    .table .col-acoes {
+        width: 60px; /* Ajuste conforme necessário */
+    }
+
+    /* Reduz o tamanho da fonte para colunas específicas */
+    .table td, .table th {
+        font-size: 0.85rem;
+    }
+
+    /* Ajusta o botão de opções para ser menor */
+    .table .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+</style>
+<style>
+    /* Estilos padrões */
+    .pagination-btn {
+        background-color: #56AB1F;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        font-size: 0.80rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin: 0 2px; /* Adiciona espaçamento horizontal entre os botões */
+    }
+    
+    .pagination-btn:hover {
+        background-color: #27A243;
+        transform: scale(1.05);
+        color:white;
+    }
+    
+    .disabled-btn {
+        background-color: #D5D5D5;
+        color: #A0A0A0;
+        cursor: not-allowed;
+    }
+
+    .pagination .page-item {
+        margin: 0 1px; /* Espaçamento horizontal entre os itens de paginação */
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #27A243;
+        border-color: #27A243;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: #f1f1f1;
+        color: #bbb;
+        cursor: not-allowed;
+    }
+
+    /* Responsividade para dispositivos móveis */
+    @media (max-width: 768px) {
+        .pagination-btn {
+            padding: 6px 10px; /* Diminuir o padding */
+            font-size: 0.70rem; /* Reduzir o tamanho da fonte */
+        }
+
+        .pagination .page-item {
+            margin: 0 1px; /* Menos espaço entre os itens */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pagination-btn {
+            padding: 4px 8px; /* Menor padding para telas menores */
+            font-size: 0.65rem; /* Fonte ainda menor */
+        }
+
+        .pagination .page-item {
+            margin: 0 0.5px; /* Menos espaçamento */
+        }
+    }
+</style>
+
+
+
+{% comment %} ----------------------------------------------------------
+    PARA ABRIR O CHECKBOX DE SANÇÕES DISCIPLINARES
+---------------------------------------------------------- {% endcomment %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sancaoCheckboxes = document.querySelectorAll(".sancao-checkbox");
+
+        // Verifica se existem checkboxes antes de tentar iterar sobre eles
+        if (sancaoCheckboxes.length > 0) {
+            sancaoCheckboxes.forEach(function (checkbox) {
+                const card = checkbox.closest(".card");
+                const opcoes = card ? card.querySelector(".sancao-opcoes") : null; // Garante que card e opcoes não sejam nulos
+
+                if (opcoes) {
+                    // Configura a exibição inicial
+                    if (checkbox.checked) {
+                        opcoes.classList.add("active");
+                    } else {
+                        opcoes.classList.remove("active");
+                    }
+
+                    // Adiciona o evento de mudança
+                    checkbox.addEventListener("change", function () {
+                        if (checkbox.checked) {
+                            opcoes.style.display = "block"; // Garante que está visível antes de animar
+                            setTimeout(() => opcoes.classList.add("active"), 10);
+                        } else {
+                            opcoes.classList.remove("active");
+                            setTimeout(() => (opcoes.style.display = "none"), 300); // Após a transição, oculta
+                        }
+                    });
+                }
+            });
+        } else {
+            console.log('Nenhum checkbox encontrado com a classe ".sancao-checkbox".');
+        }
+    });
+</script>
+
+
+
+  
+{% endblock %}
