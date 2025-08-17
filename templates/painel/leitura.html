@@ -1,0 +1,948 @@
+{% extends "bases/base.html" %}
+{% load static %}
+{% block title %} Projeto de Leitura {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Inclua o Chart.js no seu template base -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Notyf -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<!-- Certifique-se de que o Font Awesome está incluído no seu projeto -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+<script>
+  const notyf = new Notyf({
+    duration: 3500,
+    position: { x: "right", y: "top" },
+    dismissible: true,
+    types: [
+      {
+        type: 'info',
+        background: '#2196F3', // Azul
+        icon: {
+          className: 'fas fa-info-circle',
+          tagName: 'i',
+          text: ''
+        }
+      },
+      {
+        type: 'warning',
+        background: '#FFC107', // Amarelo
+        icon: {
+          className: 'fas fa-exclamation-triangle',
+          tagName: 'i',
+          text: ''
+        }
+      },
+      {
+        type: 'danger',
+        background: '#f44336', // Vermelho
+        icon: {
+          className: 'fas fa-times-circle',
+          tagName: 'i',
+          text: ''
+        }
+      }
+    ]
+  });
+</script>
+
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        notyf.success("{{ message|escapejs }}");
+      {% elif message.tags in 'error danger warning info' %}
+        notyf.open({ type: '{{ message.tags }}', message: "{{ message|escapejs }}" });
+      {% else %}
+        notyf.success("{{ message|escapejs }}");
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</script>
+
+
+<div class="container mt-4" style="max-width: 1500px;">
+
+<!-- Novo Cabeçalho do Painel -->
+<div class="header-panel d-flex align-items-center justify-content-between p-3 rounded shadow-sm mb-4" style="max-width: 1500px; height: 90px; margin: 0 auto; background: linear-gradient(90deg, #f7f9fc, #e3f2fd);">
+
+  <!-- Bloco de Título -->
+  <div class="d-flex flex-column justify-content-center">
+    <h2 class="mb-0 fw-bold" style="font-size: 1.6rem; color: #0d6efd;">📋 Painel de Leitura</h2>
+    <small class="text-secondary" style="font-size: 0.85rem;">Acompanhe leitores e exemplares</small>
+  </div>
+
+  <!-- Bloco de Busca -->
+  <div class="search-box d-flex align-items-center me-3" style="flex: 1; max-width: 350px;">
+    <span style="font-size: 1.2rem; margin-right: 8px;">🔍</span>
+    <input type="text" class="form-control rounded-pill" placeholder="Buscar interno..." style="flex: 1; padding: 6px 15px; border: 1px solid #ced4da;">
+  </div>
+
+  <!-- Bloco de Botões de Ação -->
+  <div class="action-buttons d-flex gap-2">
+    <button class="btn btn-graph d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalGraficos" title="Ver gráficos" style="background-color:#17a2b8; color:#fff; border:none; border-radius: 8px;">
+      📊 <span>Gráficos</span>
+    </button>
+
+    <button class="btn btn-add-user d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalAdicionarInterno" title="Adicionar novo interno" style="background-color:#28a745; color:#fff; border:none; border-radius: 8px;">
+      ＋ <span>Interno</span>
+    </button>
+
+    <button class="btn btn-add-book d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalCadastrarLivro" title="Cadastrar livro" style="background-color:#ffc107; color:#212529; border:none; border-radius: 8px;">
+      📚 <span>Livro</span>
+    </button>
+  </div>
+
+</div>
+
+
+<!-- Abas de Navegação -->
+<ul class="nav nav-tabs mb-3 justify-content-center border-bottom" id="tabelasLeitura" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="ativos-tab" data-toggle="tab" href="#ativos" role="tab">
+      📖 Leitores Ativos <span id="contador-ativos" class="badge" style="display:none; background-color:#81c784; color:#1b5e20;">0</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="espera-tab" data-toggle="tab" href="#espera" role="tab">
+      ⏳ Fila de Espera <span id="contador-espera" class="badge" style="display:none; background-color:#ffd54f; color:#795548;">0</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sairam-tab" data-toggle="tab" href="#sairam" role="tab">
+      📤 Saíram da Leitura <span id="contador-sairam" class="badge" style="display:none; background-color:#ff8a65; color:#bf360c;">0</span>
+    </a>
+  </li>
+</ul>
+
+
+
+  <!-- Conteúdo das Abas -->
+  <div class="tab-content">
+    <!-- Leitores Ativos -->
+    <div class="tab-pane fade show active" id="ativos" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-ativos">
+          <tr>
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Livro Atual</th>
+            <th>Código do livro</th>
+            <th>Ciclo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interno in internos_frente %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>
+              <a href="javascript:void(0);" onclick="abrirModalLivros({{ interno.pessoa.id }})">
+                {{ interno.pessoa.nome_completo }}
+              </a>
+            </td>
+
+            <td>
+                {% if interno.exemplar %}
+                    {{ interno.exemplar.livro.titulo }}
+                {% else %}
+                    Sem livro
+                {% endif %}
+            </td>
+            <td>
+                {% if interno.exemplar %}
+                    {{ interno.exemplar.codigo }}
+                {% else %}
+                    Sem código
+                {% endif %}
+            </td>
+            <td>
+                {% if interno.ciclo %}
+                    {{ interno.ciclo.mes }}/{{ interno.ciclo.ano }}
+                {% else %}
+                    Sem ciclo
+                {% endif %}
+            </td>
+
+            <td class="td-acoes">
+              <div class="d-flex align-items-center gap-2">
+                <!-- Botão Retirar -->
+                <button 
+                  class="btn btn-sm" 
+                  style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px); padding: 0 0.75rem;"
+                  onclick="abrirModalSaida({{ interno.pessoa.id }})"
+                >
+                  Retirar
+                </button>
+
+                <!-- Botão Excluir -->
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center"
+                  style="font-weight: 600; height: calc(1.5em + 0.75rem + 2px); width: 2.5rem;"
+                  onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'frente')"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno na frente de leitura.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fila de Espera -->
+    <div class="tab-pane fade" id="espera" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-espera">
+          <tr>
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Entrada</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interno in fila_espera %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>{{ interno.pessoa.nome_completo }}</td>
+            <td>{{ interno.data_inclusao }}</td>
+            <td class="td-acoes">
+              <div class="d-flex gap-1">
+                <form method="POST" action="{% url 'pedagogia_view' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="pessoa_id" value="{{ interno.pessoa.id }}">
+                  <input type="hidden" name="lista" value="frente">
+                  <button type="submit" class="btn btn-sm btn-success">Mover</button>
+                </form>
+
+                <!-- Botão para Modal de Exclusão -->
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'espera')">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno na fila de espera.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Saíram da Leitura -->
+    <div class="tab-pane fade" id="sairam" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-sairam">
+          <tr>
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Saída</th>
+            <th>Motivo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interno in internos_sairam %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>{{ interno.pessoa.nome_completo }}</td>
+            <td>{{ interno.data_saida }}</td>
+            <td>{{ interno.get_motivo_saida_display }}</td>
+            <td class="td-acoes">
+              <button class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'historico', '{{ interno.id }}')">
+                🗑️
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno saiu da leitura.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Adicionar Interno -->
+<div class="modal fade" id="modalAdicionarInterno" tabindex="-1" role="dialog" aria-labelledby="modalAdicionarInternoLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'pedagogia_view' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Adicionar Interno</h5>
+          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="id_pessoa" class="font-weight-bold text-muted">Selecionar Interno:</label>
+            <input type="text" id="id_pessoa" name="pessoa_id" class="form-control pessoa-selectize" placeholder="Digite o nome ou a matrícula..." autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="id_lista" class="font-weight-bold text-muted">Escolher Lista:</label>
+            <select name="lista" id="id_lista" class="form-control">
+              <option value="frente">Frente de Leitura</option>
+              <option value="espera">Fila de Espera</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Saída (sem mudanças aqui) -->
+<div class="modal fade" id="modalSairLeitura" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="formSaida" method="POST" action="{% url 'pedagogia_view' %}" onsubmit="return enviarFormularioSaida()">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Registrar Saída da Leitura</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="internoId" name="pessoa_id">
+          <div class="form-group">
+            <label for="motivo_saida">Motivo da Saída</label>
+            <select id="motivo_saida" name="motivo_saida" class="form-control" required>
+              <option value="pdi">Por PDI</option>
+              <option value="pediu">Pediu para sair</option>
+              <option value="transferido">Interno Transferido</option>
+              <option value="alvara">Alvará</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="data_saida">Data da Saída</label>
+            <input type="date" id="data_saida" name="data_saida" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Confirmar Saída</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal com Gráficos Highcharts -->
+<div class="modal fade" id="modalGraficos" tabindex="-1" role="dialog" aria-labelledby="modalGraficosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Gráficos de Leitura</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div id="graficoDistribuicao" style="height: 350px;"></div>
+          </div>
+          <div class="col-md-6">
+            <div id="graficoProgresso" style="height: 350px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1" role="dialog" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <form method="POST" action="{% url 'excluir_interno' %}">
+      {% csrf_token %}
+      <input type="hidden" name="pessoa_id" id="modalPessoaId">
+      <input type="hidden" name="lista" id="modalExcluirLista">
+      <input type="hidden" name="historico_id" id="modalHistoricoId">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white py-2">
+          <h5 class="modal-title" id="modalExclusaoLabel">Confirmar Exclusão</h5>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir este registro? Esta ação é irreversível.
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger btn-sm">Sim, excluir</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal ver livro de internos -->
+<div class="modal fade" id="modalLivros" tabindex="-1" aria-labelledby="modalLivrosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLivrosLabel">Livros do Interno</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Livro</th>
+              <th>Código do Exemplar</th>
+              <th>Ciclo</th>
+            </tr>
+          </thead>
+          <tbody id="modalLivrosBody">
+            <!-- Conteúdo será preenchido via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cadastrar Livro / Exemplar -->
+<div class="modal fade" id="modalCadastrarLivro" tabindex="-1" aria-labelledby="modalCadastrarLivroLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cadastrar Livro / Exemplar</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form id="formCadastrarLivro">
+          <!-- Campo oculto para ID do livro selecionado -->
+          <input type="hidden" id="idLivro" name="id_livro">
+
+          <!-- Buscar livro existente -->
+          <div class="mb-3 position-relative">
+            <label for="livroTitulo" class="form-label">Procurar Livro Existente / Título</label>
+            <input type="text" class="form-control" id="livroTitulo" name="titulo" autocomplete="off" placeholder="Digite título do livro...">
+            <ul id="listaSugestoes" class="list-group position-absolute w-100 mt-1" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
+          </div>
+
+          <hr>
+
+          <!-- Campos para cadastrar livro novo, visível apenas se não usar livro existente -->
+          <div id="novoLivroCampos">
+            <div class="mb-3">
+              <label for="livroAutor" class="form-label">Autor</label>
+              <input type="text" class="form-control" id="livroAutor" name="autor" placeholder="Nome do autor">
+            </div>
+          </div>
+
+          <!-- Exemplar -->
+          <div class="mb-3">
+            <label for="exemplarCodigo" class="form-label">Código do Exemplar</label>
+            <input type="text" class="form-control" id="exemplarCodigo" name="codigo" placeholder="Código único do exemplar">
+          </div>
+
+          <button type="submit" class="btn btn-success">Salvar</button>
+        </form>
+        <div id="mensagemLivro" class="mt-2"></div>
+        <div id="totalExemplares" class="mt-2 text-muted"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- JS: Modal de saída -->
+<script>
+    function abrirModalSaida(pessoaId) {
+        document.getElementById("internoId").value = pessoaId;
+
+        const inputData = document.getElementById("data_saida");
+        if (!inputData.value) {  // só preenche se estiver vazio
+            const hoje = new Date().toISOString().split('T')[0];
+            inputData.value = hoje;
+        }
+
+        $('#modalSairLeitura').modal('show');
+    }
+</script>
+<script>
+function enviarFormularioSaida() {
+  const form = document.getElementById("formSaida");
+
+  // Garante que o formulário será submetido normalmente
+  form.submit();
+
+  // Aguarda o redirect acontecer normalmente
+  return true;
+}
+</script>
+<!-- Selectize.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.pessoa-selectize').selectize({
+            valueField: 'id',
+            labelField: 'nome_completo',
+            searchField: ['nome_completo'],
+            options: [],
+            create: false,
+            load: function(query, callback) {
+                if (!query.length) return callback();
+
+                $.ajax({
+                    url: '{% url "pessoa_search" %}',
+                    data: { q: query },
+                    dataType: 'json',
+                    success: function(res) {
+                        callback(res);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  fetch("{% url 'dados_grafico_leitura' %}")
+    .then(response => response.json())
+    .then(data => {
+      // Gráfico 1: Pizza - Distribuição
+      Highcharts.chart('graficoDistribuicao', {
+        chart: {
+          type: 'pie'
+        },
+        title: {
+          text: 'Distribuição Atual dos Internos'
+        },
+        tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        accessibility: {
+          point: {
+            valueSuffix: ''
+          }
+        },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              format: '<b>{point.name}</b>: {point.y}'
+            }
+          }
+        },
+        series: [{
+          name: 'Internos',
+          colorByPoint: true,
+          data: [
+            { name: 'Frente de Leitura', y: data.distribuicao.frente },
+            { name: 'Fila de Espera', y: data.distribuicao.espera },
+            { name: 'Já Saíram', y: data.distribuicao.saida }
+          ]
+        }]
+      });
+
+      // Gráfico 2: Colunas - Progresso
+      Highcharts.chart('graficoProgresso', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Progresso de Leitura por Interno'
+        },
+        xAxis: {
+          categories: ['Interno 1', 'Interno 2', 'Interno 3'],
+          crosshair: true
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: 'Páginas Lidas'
+          }
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                       '<td style="padding:0"><b>{point.y} páginas</b></td></tr>',
+          footerFormat: '</table>',
+          shared: true,
+          useHTML: true
+        },
+        plotOptions: {
+          column: {
+            borderWidth: 0
+          }
+        },
+        series: [{
+          name: 'Leitura',
+          data: data.progresso
+        }]
+      });
+    });
+});
+</script>
+
+<script>
+  function abrirModalExclusao(pessoaId, lista, historicoId = null) {
+  document.getElementById("modalPessoaId").value = pessoaId;
+  document.getElementById("modalExcluirLista").value = lista;
+
+  // Se estiver excluindo do histórico, envie o ID do registro
+  if (historicoId) {
+    document.getElementById("modalHistoricoId").value = historicoId;
+  } else {
+    document.getElementById("modalHistoricoId").value = "";
+  }
+
+  $('#modalExclusao').modal('show');
+}
+
+</script>
+
+<script>
+const inputBusca = document.querySelector('input[placeholder="Buscar interno..."]');
+const urlBuscar = "{% url 'buscar_interno' %}";
+
+
+inputBusca.addEventListener('keyup', function() {
+    const query = this.value.trim();
+
+    const mostrarContadores = query.length > 0;
+
+    if (!query) {
+        // Limpar tabelas e esconder contadores
+        atualizarTabela('ativos', []);
+        atualizarTabela('espera', []);
+        atualizarTabela('sairam', []);
+        document.getElementById('contador-ativos').style.display = 'none';
+        document.getElementById('contador-espera').style.display = 'none';
+        document.getElementById('contador-sairam').style.display = 'none';
+        return;
+    }
+
+    fetch(`${urlBuscar}?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+          atualizarTabela('ativos', data.frente);
+          atualizarTabela('espera', data.espera);
+          atualizarTabela('sairam', data.sairam);
+
+          // Atualizar e mostrar os contadores
+          const contAtivos = document.getElementById('contador-ativos');
+          const contEspera = document.getElementById('contador-espera');
+          const contSairam = document.getElementById('contador-sairam');
+
+          contAtivos.textContent = data.frente.length;
+          contEspera.textContent = data.espera.length;
+          contSairam.textContent = data.sairam.length;
+
+          contAtivos.style.display = mostrarContadores ? 'inline-block' : 'none';
+          contEspera.style.display = mostrarContadores ? 'inline-block' : 'none';
+          contSairam.style.display = mostrarContadores ? 'inline-block' : 'none';
+      })
+      .catch(error => console.error('Erro na busca:', error));
+});
+
+function atualizarTabela(idTabela, dados) {
+    const tbody = document.querySelector(`#${idTabela} tbody`);
+    tbody.innerHTML = ''; // Limpar tabela
+
+    if (dados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">Nenhum resultado encontrado.</td></tr>`;
+        return;
+    }
+
+    dados.forEach((item, index) => {
+        let linha = `<tr>
+            <td>${index + 1}</td>
+            <td style="width:5px;">${item.pessoa__bloco || ''}</td>
+            <td style="width:5px;">${item.pessoa__cela || ''}</td>
+            <td>${item.pessoa__nome_completo}</td>`;
+
+        if(idTabela === 'ativos') {
+            // Substituir os placeholders pelos dados corretos
+            const livroTitulo = item.exemplar__livro__titulo || 'Sem livro';
+            const codigoExemplar = item.exemplar__codigo || 'Sem código';
+            const ciclo = (item.ciclo__mes && item.ciclo__ano) ? `${item.ciclo__mes}/${item.ciclo__ano}` : 'Sem ciclo';
+
+            linha += `<td>${livroTitulo}</td>
+                      <td>${codigoExemplar}</td>
+                      <td>${ciclo}</td>
+                      <td class="td-acoes">
+                        <div class="d-flex align-items-center gap-2">
+                          <button class="btn btn-sm" style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px); padding: 0 0.75rem;" onclick="abrirModalSaida(${item.pessoa__id})">Retirar</button>
+                          <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="font-weight: 600; height: calc(1.5em + 0.75rem + 2px); width: 2.5rem;" onclick="abrirModalExclusao('${item.pessoa__id}', 'frente')">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      </td>`;
+        } 
+        else if(idTabela === 'espera') {
+            const dataInclusao = new Date(item.data_inclusao).toLocaleDateString('pt-BR');
+            linha += `<td>${dataInclusao}</td>
+                      <td class="td-acoes">
+                        <div class="d-flex gap-1">
+                          <form method="POST" action="{% url 'pedagogia_view' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="pessoa_id" value="${item.pessoa__id}">
+                            <input type="hidden" name="lista" value="frente">
+                            <button type="submit" class="btn btn-sm btn-success">Mover</button>
+                          </form>
+                          <button type="button" class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('${item.pessoa__id}', 'espera')">🗑️</button>
+                        </div>
+                      </td>`;
+        } 
+        else if(idTabela === 'sairam') {
+            const dataSaida = new Date(item.data_saida).toLocaleDateString('pt-BR');
+            linha += `<td>${dataSaida}</td>
+                      <td>${item.motivo_saida}</td>
+                      <td class="td-acoes">
+                        <button class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('${item.pessoa__id}', 'historico')">🗑️</button>
+                      </td>`;
+        }
+
+        linha += `</tr>`;
+        tbody.innerHTML += linha;
+    });
+}
+
+
+</script>
+<script>
+  function abrirModalLivros(pessoaId) {
+    fetch(`/leitura/livros-interno/?pessoa_id=${pessoaId}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById("modalLivrosBody");
+            tbody.innerHTML = ""; // limpa conteúdo
+            if(data.livros.length === 0){
+                tbody.innerHTML = "<tr><td colspan='3'>Nenhum livro cadastrado.</td></tr>";
+            } else {
+                data.livros.forEach(l => {
+                    const tr = `<tr>
+                        <td>${l.livro}</td>
+                        <td>${l.codigo_exemplar}</td>
+                        <td>${l.ciclo}</td>
+                    </tr>`;
+                    tbody.innerHTML += tr;
+                });
+            }
+            // Abre o modal (Bootstrap 5)
+            const modal = new bootstrap.Modal(document.getElementById('modalLivros'));
+            modal.show();
+        });
+}
+
+</script>
+<script>
+const inputLivro = document.getElementById("livroTitulo");
+const listaSugestoes = document.getElementById("listaSugestoes");
+
+let timeout = null;
+
+// Função de busca dinâmica
+inputLivro.addEventListener("input", function() {
+    clearTimeout(timeout);
+    const query = this.value.trim();
+
+    // Se vazio, limpa lista e idLivro
+    if (!query) {
+        listaSugestoes.innerHTML = "";
+        document.getElementById("idLivro").value = "";
+        return;
+    }
+
+    // Delay para não fazer requisição a cada letra
+    timeout = setTimeout(() => {
+        fetch("{% url 'buscar_livro' %}?q=" + encodeURIComponent(query))
+            .then(res => res.json())
+            .then(data => {
+                listaSugestoes.innerHTML = "";
+
+                if (data.livros.length === 0) {
+                    listaSugestoes.innerHTML = "<li class='list-group-item'>Nenhum livro encontrado.</li>";
+                    document.getElementById("idLivro").value = "";
+                } else {
+                    data.livros.forEach(l => {
+                        const li = document.createElement("li");
+                        li.classList.add("list-group-item", "list-group-item-action");
+                        li.textContent = `${l.titulo} (${l.autor || "Sem autor"})`;
+                        li.dataset.id = l.id;
+                        li.addEventListener("click", function() {
+                            inputLivro.value = l.titulo;
+                            document.getElementById("livroAutor").value = l.autor || "";
+                            document.getElementById("idLivro").value = l.id;
+                            listaSugestoes.innerHTML = "";
+                        });
+                        listaSugestoes.appendChild(li);
+                    });
+                }
+            });
+    }, 300); // 300ms de delay
+});
+
+// Fechar sugestões ao clicar fora
+document.addEventListener("click", function(e){
+    if(!inputLivro.contains(e.target) && !listaSugestoes.contains(e.target)){
+        listaSugestoes.innerHTML = "";
+    }
+});
+</script>
+
+<script>
+document.getElementById("formCadastrarLivro").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const idLivro = document.getElementById("idLivro")?.value || "";
+    const titulo = document.getElementById("livroTitulo").value.trim();
+    const autor = document.getElementById("livroAutor").value.trim();
+    const codigo = document.getElementById("exemplarCodigo").value.trim();
+    const mensagem = document.getElementById("mensagemLivro");
+    const totalExemplares = document.getElementById("totalExemplares");
+
+    if(!codigo){
+        mensagem.textContent = "O código do exemplar é obrigatório!";
+        mensagem.style.color = "red";
+        return;
+    }
+
+    // Se não houver id_livro, precisa de título para novo livro
+    if(!idLivro && !titulo){
+        mensagem.textContent = "O título do livro é obrigatório!";
+        mensagem.style.color = "red";
+        return;
+    }
+
+    let body = new URLSearchParams({codigo});
+    if(idLivro){
+        body.append("id_livro", idLivro);
+    } else {
+        body.append("titulo", titulo);
+        body.append("autor", autor);
+    }
+
+    fetch("{% url 'cadastrar_livro' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: body
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.erro){
+            mensagem.textContent = data.erro;
+            mensagem.style.color = "red";
+        } else {
+            mensagem.textContent = data.mensagem;
+            mensagem.style.color = "green";
+
+            if(data.total_exemplares !== undefined){
+                totalExemplares.textContent = `Total de exemplares: ${data.total_exemplares}`;
+            }
+
+            // Limpar campos
+            if(!idLivro){
+                document.getElementById("livroTitulo").value = "";
+                document.getElementById("livroAutor").value = "";
+            }
+            document.getElementById("exemplarCodigo").value = "";
+        }
+    })
+    .catch(err => {
+        mensagem.textContent = "Erro ao cadastrar o livro.";
+        mensagem.style.color = "red";
+        console.error(err);
+    });
+});
+
+
+</script>
+
+<style>
+td.td-acoes {
+  white-space: nowrap;
+  width: 1%;
+}
+
+/* Cores de cada aba */
+.thead-ativos {
+  background-color: #a5d6a7; /* Verde suave */
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.thead-espera {
+  background-color: #ffe082; /* Amarelo suave */
+  color: #795548;
+  font-weight: 600;
+}
+
+.thead-sairam {
+  background-color: #ffab91; /* Laranja claro */
+  color: #bf360c;
+  font-weight: 600;
+}
+
+/* Estilo das abas */
+#tabelasLeitura .nav-link {
+  font-weight: 600;
+  border-color: transparent !important;
+  color: #00796b !important;
+}
+
+#tabelasLeitura .nav-link:hover {
+  opacity: 0.85;
+}
+
+#tabelasLeitura .nav-link.active#ativos-tab {
+  background-color: #a5d6a7 !important;
+  color: #1b5e20 !important;
+}
+
+#tabelasLeitura .nav-link.active#espera-tab {
+  background-color: #ffe082 !important;
+  color: #795548 !important;
+}
+
+#tabelasLeitura .nav-link.active#sairam-tab {
+  background-color: #ffab91 !important;
+  color: #bf360c !important;
+}
+
+
+</style>
+
+{% endblock %}

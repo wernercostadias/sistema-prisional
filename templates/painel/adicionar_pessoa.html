@@ -1,0 +1,265 @@
+{% extends 'bases/base.html' %}
+
+{% block title %}Sistema Upaca - Cadastrar Interno{% endblock %}
+{% load static %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<!-- Exibir mensagens de sucesso ou erro -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 4000, // Tempo da notificação na tela
+            position: { x: "right", y: "top" }, // Posição do alerta
+            dismissible: true // Permite fechar manualmente
+        });
+
+        // Exibir mensagens do Django
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% else %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        // Exibir erros do formulário Django
+        {% if form.errors %}
+            notyf.error("Por favor, corrija os erros abaixo.");
+
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    notyf.error("{{ field }}: {{ error|escapejs }}");
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
+<div class="container mt-5">
+
+    <form method="POST" class="mb-4 p-4 border rounded shadow-sm bg-light">
+        {% csrf_token %}
+
+        <!-- Dados Pessoais -->
+        <h4 class="mb-4 text-center text-dark">Cadastrar Interno ao Sistema UPACA</h4>
+        <div class="border p-4 rounded mb-4 shadow-sm bg-white">
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="id_nome_completo" class="text-dark">Nome Completo</label>
+                    <input type="text" name="nome_completo" class="form-control" id="id_nome_completo" placeholder="Digite o nome completo">
+                </div>
+                
+            
+                <div class="col-md-6 form-group mb-3">
+                    <label for="id_cidade" class="text-dark">Cidade</label>
+                    <input type="text" name="cidade"placeholder="Cidade onde o interno reside" class="form-control" id="id_cidade">
+                </div>
+            
+                <div class="col-md-6 form-group mb-3">
+                    <label for="data_nascimento" class="text-dark">Data de Nascimento</label>
+                    <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" value="{{ pessoa.data_nascimento|date:'Y-m-d' }}">
+                </div>
+            
+                <div class="form-group col-md-6">
+                    <label for="{{ form.matricula.id_for_label }}">Matrícula</label>
+                    {{ form.matricula }}
+                </div>
+                
+            
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.data_entrada.id_for_label }}" class="text-dark">Data da Prisão</label>
+                    {{ form.data_entrada }}
+                </div>
+
+                <div class="col-md-6 form-group mb-3">
+                    <label for="id_artigo_criminal" class="text-danger">Artigo Criminal</label>
+                    <input type="text" name="artigo_criminal" class="form-control" id="id_artigo_criminal" placeholder="Ex: Art.129º CPB ">
+                </div>
+            </div>
+        </div>
+
+        <!-- Escolaridade e Trabalho -->
+        {% comment %} <div class="border p-4 rounded mb-4 shadow-sm bg-white">
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.escolaridade.id_for_label }}" class="text-dark">Escolaridade</label>
+                    {{ form.escolaridade }}
+                </div>
+
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.estudando.id_for_label }}" class="text-dark">Estudando na Unidade?</label>
+                    {{ form.estudando }}
+                </div>
+            </div>
+        </div> {% endcomment %}
+
+        <!-- Localização -->
+        <h4 class="mt-4 mb-4 text-center text-success">Qual cela e bloco o interno ficará?</h4>
+        <div class="border p-4 rounded mb-4 shadow-sm bg-white">
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.bloco.id_for_label }}" class="text-success">Bloco</label>
+                    {{ form.bloco }}
+                </div>
+
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.cela.id_for_label }}" class="text-success">Cela</label>
+                    {{ form.cela }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success btn-lg btn-block">Cadastrar</button>
+        </div>
+    </form>
+</div>
+<style>
+    /* Estilo Global */
+body {
+    
+    background-color:rgb(146, 158, 172);
+    color: #333;
+}
+
+h4 {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+
+form .form-group label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    
+}
+
+
+
+
+
+#id_artigo_criminal::placeholder {
+        color:rgb(187, 183, 183) !important; 
+}
+
+#id_matricula::placeholder{
+    color:rgb(187, 183, 183) !important; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Bordas e sombreamento */
+.border {
+    border: 2px solid #4CAF50;
+}
+
+.bg-light {
+    background-color: #f9f9f9;
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.mb-4 {
+    margin-bottom: 20px;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rounded {
+    border-radius: 10px;
+}
+
+/* Efeitos de Hover nos campos */
+input:focus, select:focus, textarea:focus {
+    border-color: #FF5733;
+    box-shadow: 0 0 10px rgba(255, 87, 51, 0.5);
+}
+
+/* Botões */
+.btn {
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-success {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+    transform: scale(1.05);
+}
+
+.btn-lg {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+}
+
+/* Cores dos rótulos */
+.text-primary {
+    color: #007bff;
+}
+
+.text-success {
+    color: #28a745;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-dark {
+    color: #343a40;
+}
+
+/* Efeitos de transição suaves para labels e inputs */
+label {
+    transition: color 0.3s;
+}
+
+input, select, textarea {
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+
+
+</style>
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Tabela Geral de Internos{% endblock %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuários Online</title>
+</head>
+<body>
+    <h1>Usuários Online</h1>
+    <ul>
+        {% for user_status in users_status %}
+            <li>
+                {{ user_status.user.username }} - Online: {{ user_status.is_online }}{% if user_status.ip %} {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+
+{% endblock %}

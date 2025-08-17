@@ -1,0 +1,114 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Sistema Upaca - Tabela Geral de Internos{% endblock %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<br>
+<h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Documentos Diários</h1>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
+
+
+
+
+<div class="container">
+  <div class="card">
+    <p>Folha de Catatal</p>
+  </div>
+  <div class="card">
+    <p>Folha de Castelo</p>
+  </div>
+  <div class="card">
+    <p>Caltelamento de Arma</p>
+  </div>
+  <div class="card">
+    <p>Folha de Ocorrência</p>
+  </div>
+  <div class="card">
+    <p>Folha de Entrada Art.</p>
+  </div>
+  <div class="card">
+    <p>Card 6</p>
+  </div>
+  <div class="card">
+    <p>Card 7</p>
+  </div>
+  <div class="card">
+    <p>Card 8</p>
+  </div>
+</div>
+
+<style>
+/* Propriedades CSS Customizadas */
+@property --a {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg; 
+}
+@property --i {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0; 
+}
+
+/* Estilo do Container */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+  background-color: #F4F6F9; /* Tom escuro moderado */
+}
+
+/* Estilo dos Cards */
+.card {
+  width: 230px;
+  height: 230px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: white;
+  background: linear-gradient(to bottom right, #336666, #666666);
+
+
+
+  border-radius: 30px;
+  border: 5px solid #404040;
+
+
+
+  padding: 10px;
+  mask: 
+    conic-gradient(#000 0 0) content-box,
+    linear-gradient(calc(mod(var(--a),180deg)*var(--i) + var(--_a,45deg)),
+      #0000 30%,#000 40% 60%,#0000 70%) subtract,
+    conic-gradient(#000 0 0) padding-box;
+  transition: --i .5s, --a 0s .5s, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.card.alt {
+  --_a: -45deg;
+}
+
+.card:hover {
+  --i: 1;
+  --a: 15turn; 
+  transform: translateY(-10px); /* Adiciona o efeito de subida */
+  transition: --i 0s, --a 30s linear, transform 0.3s ease;
+}
+</style>
+
+
+
+
+
+
+
+
+{% endblock %}

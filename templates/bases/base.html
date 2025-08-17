@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+{% load notificacao_extras %}
+{% load custom_filters %}
+<html lang="pt-br">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" href="{% static 'imagens/icon.ico' %}" type="image/x-icon"> 
+    
+{% comment %} 
+                         Letras 
+{% endcomment %}
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+
+
+{% comment %} 
+                        Bootstrap 
+{% endcomment %}
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+
+
+</head>
+
+<body>
+
+</div>
+
+    
+<!-- Navbar -->
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Alterna navegação">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'imagens/braco.png' %}" alt="Ícone" style="width: 30px; height: 30px; margin-left: 10px;">
+            UPACA 
+        </a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Inicio <span class="sr-only">(Página atual)</span></a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Tabelas Gerais
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'ver_tabela' %}"><img src="{% static 'imagens/icong.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Lista Geral</a>
+                    <a class="dropdown-item" href="{% url 'lista_personalizada' %}"><img src="{% static 'imagens/icong.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Lista Personalizada</a>
+                    <a class="dropdown-item" href="{% url 'tabela-eletronico' %}"><img src="{% static 'imagens/iconr.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Eletrônicos</a>
+                    <a class="dropdown-item" href="{% url 'tabela_transferidos' %}"><img src="{% static 'imagens/icont.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Transferidos</a>
+                    <a class="dropdown-item" href="{% url 'frentes_de_trabalho' %}">
+                        <img src="{% static 'imagens/colete-refletivo.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Frentes de Trabalho
+                    </a>
+                    
+                    <a class="dropdown-item" href="{% url 'ver_tabela_sancoes' %}"><img src="{% static 'imagens/jugamento.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Sanções Disciplinares</a>
+                    <a class="dropdown-item" href="{% url 'tabela_pdi' %}"><img src="{% static 'imagens/pdi.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Procedimento Disciplinar Interno (PDI)</a>
+                </div>
+            </li>
+
+            {% comment %} <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Psicossocial
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'psicossocial' %}"><img src="{% static 'imagens/assistencia-social.png'%}" alt="Ícone" style="width: 22px; height:25px;margin-right: 8px;">Área Social</a>
+                    <a class="dropdown-item" href="#" style="pointer-events: none; opacity: 0.5;">
+                        <img src="{% static 'imagens/seringa.png' %}" alt="Ícone" style="width: 22px; height: 25px; margin-right: 8px;">Enfermaria
+                    </a>
+                </div>
+            </li> {% endcomment %}
+        </ul>
+        
+        
+        <div class="navbar-nav ml-3" style="background-color: #333; padding: 5px;">
+            <span class="navbar-text" id="clock" style="background:black; color: white;"></span>
+        </div>
+
+
+        
+        {% if user.is_authenticated %}
+        <div class="navbar-nav ml-auto">
+            <span class="navbar-text mr-3">Olá, {{ user.username }}</span>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Minha Conta
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <!-- Link para abrir o offcanvas, organizado como os outros itens -->
+                    {% if user.is_superuser %}
+                        <a href="javascript:void(0)" id="openBtn" class="dropdown-item" style="color:black;">Status</a>
+                    {% endif %}
+                    <a class="dropdown-item" href="{% url 'adicionar_pessoa' %}">Cadastrar Interno</a>
+                    
+                    {% if user.is_superuser %}
+                        <a class="dropdown-item" href="{% url 'create-user' %}">Cadastrar Servidor</a>
+
+                    {% endif %}
+                    
+                    {% comment %} <a class="dropdown-item" href="{% url 'arquivos' %}">Documentos Diários</a>
+                     <a class="dropdown-item" href="{% url 'users-online' %}">Usúarios Online</a>
+                    <div class="dropdown-divider"></div> {% endcomment %}
+                    
+                    <a class="dropdown-item" href="{% url 'configuracoes_pessoais' %}">Alterar Senha</a>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item">Sair</button>
+                    </form>
+                    
+                </div>
+                
+            </li>
+
+        </div>
+        {% else %}
+        <div class="navbar-nav ml-auto">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+        </div>
+
+        {% endif %}
+<!-- Ícone de notificações -->
+<!-- Ícone de notificações com badge -->
+<div class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" 
+       aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell text-white" id="notification-icon"></i>
+        <span id="notification-badge" class="badge badge-success"
+            data-total="{{ qtd_nao_lidas }}"
+            {% if qtd_nao_lidas == 0 %}style="display:none;"{% endif %}>
+            {{ qtd_nao_lidas }}
+        </span>
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-right text-dark notification-dropdown-menu p-0"
+        aria-labelledby="notificationDropdown"
+        style="min-width: 620px; max-height: 620px; overflow: hidden;">
+
+        <!-- Cabeçalho com abas fixas -->
+        <div style="position: sticky; top: 0; background: white; z-index: 10;" class="border-bottom px-3 pt-3 pb-2">
+            <ul class="nav nav-tabs mb-0" id="notificationTabs" role="tablist">
+                {% for tipo, nome in notificacoes_por_tipo.items %}
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ tipo }}"
+                    data-toggle="tab" href="#content-{{ tipo }}" role="tab"
+                    aria-controls="content-{{ tipo }}" aria-selected="{{ forloop.first }}"
+                    data-nao-lidas="{{ qtd_nao_lidas_por_tipo|get_dict_value:tipo }}">
+                        <i class="fas fa-info-circle text-muted mr-1"></i> {{ tipo|tipo_display }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Conteúdo com rolagem -->
+        <div style="max-height: 550px; overflow-y: auto;" class="px-3 py-2">
+            <div class="tab-content" id="notificationTabContent">
+                {% for tipo, notificacoes in notificacoes_por_tipo.items %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="content-{{ tipo }}"
+                    role="tabpanel" aria-labelledby="tab-{{ tipo }}">
+
+                    {% if notificacoes %}
+                        {% for notif in notificacoes %}
+                            <div class="dropdown-item notification-item px-3 py-3 mb-2 rounded position-relative {% if not notif.lida %}bg-light{% endif %}"
+                                data-id="{{ notif.id }}" data-grau="{{ notif.grau }}"
+                                style="background-color: {% if not notif.lida %}#f8f9fa{% else %}#ffffff{% endif %}; border-left: {% if notif.grau == 'importante' %}4px solid #dc3545{% else %}4px solid #6c757d{% endif %};">
+
+                                {% if not notif.lida %}
+                                <button class="mark-read-btn btn btn-sm btn-outline-success position-absolute"
+                                        title="Marcar como lida"
+                                        style="top: 12px; right: 12px; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+
+                                <div class="text-body">
+                                    <strong class="d-block mb-1" style="font-size: 1.1rem; color: #212529;">{{ notif.titulo }}</strong>
+                                    <p class="mb-1" style="font-size: 0.95rem; color: #495057; white-space: pre-wrap;">{{ notif.mensagem }}</p>
+                                    <small style="color: #6c757d;">{{ notif.data_criacao|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="dropdown-item text-center text-muted">Nenhuma notificação de {{ tipo|capfirst }}.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+        <form class="form-inline my-2 my-lg-0" method="get" action="{% url 'ver_tabela' %}">
+            <input class="form-control mr-sm-2" 
+                   type="search" 
+                   name="nome" 
+                   placeholder="Fazer busca por interno na UPACA" 
+                   style="width: 400px; font-size: 1.0rem;">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Pesquisar</button>
+        </form>
+    </div>
+</nav>
+
+
+
+<!-- Link para a área de desconexão -->
+<div id="offcanvas" class="offcanvas">
+    <div class="offcanvas-header">
+        <img src="{% static 'imagens/braco.png' %}" alt="Ícone" style="width: 50px; height: 50px; margin-left: 10px;">
+        <h5>Servidores Online</h5>
+        <button id="closeBtn" class="close-btn">&times;</button>
+    </div>
+    <div class="offcanvas-body">
+        {% if users_status %}
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Servidor</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users_status %}
+                        <tr>
+                            <td class="text-center">{{ user.user.username }}</td>
+                            <td class="text-center">
+                                {% if user.is_online %}
+                                    <span class="badge badge-success">Online</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Offline</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if user.user != request.user %}
+                                    <a href="#" class="btn btn-danger btn-sm" style="margin-left: 10px;"
+                                       data-toggle="modal" data-target="#confirmationModal"
+                                       onclick="setModalData('{{ user.user.username }}', '{% url 'logout_user' user.user.id %}')">
+                                        Desconectar
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-center">Nenhum usuário online.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+<!-- Modal de Confirmação (Bootstrap) -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Tem certeza?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Você está prestes a desconectar o usuário do servidor. Isso não pode ser desfeito.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <a id="confirmLogout" href="#" class="btn btn-danger">Confirmar Desconexão</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Conteúdo principal -->
+<div class="container custom-container">
+        {% block content %}
+        
+        
+        
+        {% endblock %}
+</div>
+
+    <!-- Rodapé -->
+    <footer class="bg-light text-center text-lg-start mt-4 py-3" style='background: linear-gradient(0deg, rgba(0, 0, 0, 0.36) 0%, rgba(0, 0, 0, 0.43) 100%);'>
+        <div class="container"  style="background-color: transparent; ">
+            <p style="color: white;">&copy; 2024 Sistema da Unidade Prisional de Ressocialização de Açailândia (UPACA). 
+            {% comment %} Licença MIT --PROPRIEDADE INTELECTUAL LEI Nº 9.609 , DE 19 DE FEVEREIRO DE 1998.-- Proibido retirar os direitos autorais ou auterar os direitos autorais, Criado por: Werner Costa Dias {% endcomment %}
+            <p style="cursor: pointer; color: #007BFF; font-weight: bold;" onclick="mostrarModal()">
+                Criado por: Werner C. Dias
+            </p>
+            {% comment %} Licença MIT --PROPRIEDADE INTELECTUAL LEI Nº 9.609 , DE 19 DE FEVEREIRO DE 1998.-- Proibido retirar os direitos autorais ou auterar os direitos autorais, Criado por: Werner Costa Dias{% endcomment %}
+            <!-- Modal -->
+            <div id="modalCriador" class="modal" style="display: none;">
+                <div class="modal-content1">
+                    <span class="close1" onclick="fecharModal()">&times;</span>
+                    <img src="{% static 'imagens/digitalizador.webp' %}" alt="Criador" style="max-width: 100%; height: auto; border-radius: 10px;">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+   
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <style>
+        
+    </style>
+    <script>
+        // Função para mostrar o modal
+        function mostrarModal() {
+            const modal = document.getElementById('modalCriador');
+            modal.style.display = 'block'; // Exibe o modal
+        }
+        
+        // Função para fechar o modal
+        function fecharModal() {
+            const modal = document.getElementById('modalCriador');
+            modal.style.display = 'none'; // Oculta o modal
+        }
+    
+        // Fecha o modal se o usuário clicar fora da caixa de conteúdo
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalCriador');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+    
+    
+    <style>
+        
+
+
+        /* Modal da foto de desenho do Werner Digitalizador */
+        #modalCriador {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+            z-index: 1050; /* Garante que o modal fique acima de outros elementos */
+            overflow: hidden;
+            display: none;
+        }
+    
+        /* Estilo do conteúdo do modal */
+        .modal-content1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centraliza o conteúdo */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px; /* Máximo de largura do conteúdo */
+            width: 80%; /* Largura do modal será 80% da tela */
+            box-sizing: border-box;
+        }
+    
+        /* Estilo do botão de fechar */
+        .close1 {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 5px;
+            right: 15px;
+        }
+    
+        .close1:hover,
+        .close1:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .loading {
+            font-family: arial;
+            font-size: 7px;
+            animation: blink 0.9s ease-in-out infinite;
+          }
+          
+          .triangulo {
+            stroke-dasharray: 17;
+            animation: dash 2.5s cubic-bezier(0.35, 0.04, 0.63, 0.95) infinite;
+          }
+          
+          @keyframes dash {
+            to {
+              stroke-dashoffset: 136;
+            }
+          }
+          
+          @keyframes blink {
+            50% {
+              opacity: 0;
+            }
+          }
+
+         
+        
+        
+        /* Estilo da barra de rolagem */
+
+
+        /* Estilo da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 15px; /* Largura da barra de rolagem */
+            height: 8px; /* Altura da barra de rolagem horizontal */
+        }
+        
+        /* Estilo do trilho da barra de rolagem */
+        ::-webkit-scrollbar-track {
+            background-color: #333333; /* Cor do fundo do trilho, mais suave */
+            border-radius: 10px; /* Bordas arredondadas para um visual suave */
+        }
+        
+        /* Estilo do polegar da barra de rolagem */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #56ab2f, #a8e063); /* Gradiente de verde suave */
+            border-radius: 10px; /* Bordas arredondadas no polegar */
+            border: 2px solid #444444; /* Borda sutil para destacar o polegar */
+        }
+        
+        /* Estilo do polegar ao passar o mouse (hover) */
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #a8e063, #56ab2f); /* Inverte o gradiente ao passar o mouse */
+            box-shadow: 0px 0px 8px rgba(86, 171, 47, 0.8); /* Efeito de brilho suave ao passar o mouse */
+        }
+        
+        /* Estilo da barra de rolagem horizontal */
+        ::-webkit-scrollbar-horizontal {
+            height: 10px; /* Aumenta levemente a altura da barra horizontal */
+        }
+        
+        /* Somente no Firefox - barra de rolagem discreta */
+        * {
+            scrollbar-width: thin; /* Largura fina */
+            scrollbar-color: #56ab2f #333333; /* Cor do polegar e do trilho */
+        }
+        body {
+            
+            padding-top: 65px; /* Ajuste conforme a altura do seu navbar */
+        }
+        
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transform: translateY(0); /* Posição inicial visível */
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .notification-item.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Pequena bolinha verde ao lado da aba que recebeu nova notificação */
+        .new-notif-indicator {
+            vertical-align: middle;
+        }
+
+        /* Borda lateral esquerda para destacar */
+        .notification-item[data-grau="importante"] {
+            border-left: 5px solid #dc3545; /* Vermelho tradicional para urgência */
+            background-color: #fff3f3; /* Tom suave */
+        }
+
+        .notification-item[data-grau="geral"] {
+            border-left: 5px solid #6c757d; /* Cinza sutil */
+        }
+
+        .badge-tab {
+            font-size: 0.75rem;
+            padding: 0.2em 0.4em;
+            vertical-align: middle;
+}
+/* Melhor aparência das abas */
+#notificationTabs {
+    border-bottom: 1px solid #dee2e6;
+}
+
+#notificationTabs .nav-link {
+    font-weight: 500;
+    color: #495057;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+    transition: background-color 0.3s ease;
+}
+
+#notificationTabs .nav-link:hover {
+    background-color: #f1f1f1;
+}
+
+#notificationTabs .nav-link.active {
+    background-color: #e9ecef;
+    color: #000;
+    border-bottom: 2px solid transparent;
+    box-shadow: inset 0 -2px 0 0 #198754; /* verde escuro Bootstrap */
+}
+@keyframes vibrar {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(-10deg); }
+  40% { transform: rotate(10deg); }
+  60% { transform: rotate(-8deg); }
+  80% { transform: rotate(8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.bell-alerta {
+  color: #ffc107 !important; /* amarelo (Bootstrap warning) */
+  animation: vibrar 0.6s ease-in-out infinite;
+}
+    </style>
+
+    <script>
+        // Função que seta o nome do usuário e a URL de desconexão no modal
+        function setModalData(username, logoutUrl) {
+            document.getElementById("modal-message").innerText = "Você tem certeza que deseja desconectar " + username + "? Isso não pode ser desfeito.";
+            document.getElementById("confirmLogout").setAttribute("href", logoutUrl);
+        }
+    </script>
+   
+    <script>
+        const showTimeNow = () => {
+            // Selecionando a tag de destino
+            const clockTag = document.getElementById('clock');
+          
+            // Instanciando a classe Date
+            let dateNow = new Date();
+        
+            // Pegando os valores desejados
+            let hh = dateNow.getHours();
+            let mm = dateNow.getMinutes();
+            let ss = dateNow.getSeconds();
+          
+            hh = hh < 10 ? '0'+ hh : hh; 
+            mm = mm < 10 ? '0'+ mm : mm; 
+            ss = ss < 10 ? '0'+ ss : ss; 
+           
+            clockTag.innerText = hh +':' + mm +':' + ss;
+        }
+        
+        // Executando a função a cada 1 segundo
+        showTimeNow();
+        setInterval(showTimeNow, 1000);
+
+
+        
+    </script>
+
+   <audio id="notificationSound" src="/static/sounds/notify.mp3" preload="auto"></audio>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const badgePrincipal = document.getElementById('notification-badge');
+    const dropdownMenu = document.querySelector('.notification-dropdown-menu');
+    const dropdownToggle = document.getElementById('notificationDropdown');
+
+
+    // Controle da paginação por tipo
+    const paginasCarregadas = {};
+    const fimDoConteudo = {};
+    
+
+    // Inicializa pagina 1 e fim false para cada tipo
+    document.querySelectorAll('#notificationTabs a.nav-link').forEach(tabLink => {
+        const tipo = tabLink.id.replace('tab-', '');
+        paginasCarregadas[tipo] = 1;
+        fimDoConteudo[tipo] = false;
+    });
+
+    // Atualiza o badge principal (total não lidas)
+    function atualizarBadgePrincipal() {
+        const totalNaoLidas = Array.from(document.querySelectorAll('.tab-pane'))
+            .reduce((acc, tabContent) => acc + tabContent.querySelectorAll('.dropdown-item.bg-light').length, 0);
+
+        const badge = document.getElementById('notification-badge');
+        const bell = document.getElementById('notification-icon');
+
+        if (badge && bell) {
+            if (totalNaoLidas > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = totalNaoLidas;
+
+                bell.classList.add('bell-alerta');
+            } else {
+                badge.style.display = 'none';
+                bell.classList.remove('bell-alerta');
+            }
+        }
+    }
+
+
+    // Atualiza badges numéricos por aba
+    function atualizarBadgesPorAba() {
+        document.querySelectorAll('#notificationTabs a.nav-link').forEach(tabLink => {
+            const tipo = tabLink.id.replace('tab-', '');
+            const qtdNaoLidas = parseInt(tabLink.dataset.naoLidas || '0');
+
+            let badge = tabLink.querySelector('.badge-tab');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'badge badge-danger badge-tab';
+                badge.style.marginLeft = '5px';
+                badge.style.fontSize = '0.75rem';
+                badge.style.padding = '0.2em 0.4em';
+                badge.style.verticalAlign = 'middle';
+                tabLink.appendChild(badge);
+            }
+
+            if (qtdNaoLidas > 0) {
+                badge.textContent = qtdNaoLidas;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    }
+
+
+    function atualizarTudo() {
+        atualizarBadgesPorAba();
+        atualizarBadgePrincipal();
+    }
+
+    // Controle abas - evitar fechamento do dropdown e mudar abas normalmente
+    document.querySelectorAll('#notificationTabs a.nav-link').forEach(tabLink => {
+        tabLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const target = this.getAttribute('href');
+            document.querySelectorAll('#notificationTabs a.nav-link').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(div => div.classList.remove('show', 'active'));
+
+            this.classList.add('active');
+            document.querySelector(target).classList.add('show', 'active');
+        });
+    });
+    
+    dropdownMenu.addEventListener('scroll', function () {
+        const activeTab = document.querySelector('.tab-pane.show.active');
+        if (!activeTab) return;
+
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
+            const tipo = activeTab.id.replace('content-', '');
+            carregarMaisNotificacoes(tipo);
+        }
+    });
+
+    // Impede que clique dentro do dropdown feche ele
+    dropdownMenu.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    // Função para pegar cookie CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const c = cookie.trim();
+                if (c.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(c.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Marcar como lida
+    dropdownMenu.addEventListener('click', function (e) {
+        if (e.target.closest('.mark-read-btn')) {
+            const btn = e.target.closest('.mark-read-btn');
+            const notificationDiv = btn.closest('.dropdown-item');
+            const notifId = notificationDiv.getAttribute('data-id');
+
+            fetch(`/notificacao/notificacao/mark-as-read/${notifId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove visual de não lido
+                    notificationDiv.classList.remove('bg-light', 'text-dark');
+                    btn.remove();
+
+                    // Atualiza contadores
+                    const tipo = notificationDiv.closest('.tab-pane').id.replace('content-', '');
+                    const tabLink = document.getElementById(`tab-${tipo}`);
+                    
+                    // Atualiza data-nao-lidas da aba
+                    let countTipo = parseInt(tabLink.dataset.naoLidas || '0');
+                    if (countTipo > 0) {
+                        countTipo--;
+                        tabLink.dataset.naoLidas = countTipo;
+                    }
+
+                    // Atualiza data-total do badge principal
+                    let countTotal = parseInt(badgePrincipal.dataset.total || '0');
+                    if (countTotal > 0) {
+                        countTotal--;
+                        badgePrincipal.dataset.total = countTotal;
+                    }
+
+                    // Atualiza badge visual
+                    atualizarTudo();
+                }
+
+            })
+            .catch(() => alert('Erro ao marcar como lida.'));
+        }
+    });
+
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function (event) {
+        if (!dropdownMenu.contains(event.target) && !dropdownToggle.contains(event.target)) {
+            if ($(dropdownToggle).parent().hasClass('show')) {
+                $(dropdownToggle).dropdown('hide');
+            }
+        }
+    });
+
+    // Função para criar elemento "Carregando..."
+    function criarLoadingElement() {
+        const div = document.createElement('div');
+        div.className = 'dropdown-item text-center text-muted loading-notifications';
+        div.textContent = 'Carregando...';
+        return div;
+    }
+
+    // Função para carregar mais notificações via AJAX
+    function carregarMaisNotificacoes(tipo) {
+        if (fimDoConteudo[tipo]) return;
+
+        paginasCarregadas[tipo]++;
+        const tabContent = document.getElementById(`content-${tipo}`);
+        const loadingEl = criarLoadingElement();
+        tabContent.appendChild(loadingEl);
+
+        fetch(`/notificacao/carregar-notificacoes/?tipo=${tipo}&pagina=${paginasCarregadas[tipo]}`)
+            .then(res => res.json())
+            .then(data => {
+                loadingEl.remove();
+
+                if (data.notificacoes.length === 0) {
+                    fimDoConteudo[tipo] = true;
+                    return;
+                }
+
+                data.notificacoes.forEach(notif => {
+                    const div = document.createElement('div');
+                    div.className = 'dropdown-item notification-item px-3 py-3 mb-2 rounded position-relative';
+                    div.setAttribute('data-id', notif.id);
+                    div.setAttribute('data-grau', notif.grau);
+
+                    // Define fundo e borda conforme o status
+                    if (!notif.lida) {
+                        div.style.backgroundColor = '#f8f9fa';  // fundo claro para não lido
+                    } else {
+                        div.style.backgroundColor = '#ffffff';  // fundo branco para lido
+                    }
+
+                    if (notif.grau === 'importante') {
+                        div.style.borderLeft = '4px solid #dc3545';  // vermelho
+                    } else {
+                        div.style.borderLeft = '4px solid #6c757d';  // cinza
+                    }
+
+                    div.innerHTML = `
+                        ${!notif.lida ? `<button class="mark-read-btn btn btn-sm btn-outline-success position-absolute"
+                            title="Marcar como lida"
+                            style="top: 12px; right: 12px; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                            <i class="fas fa-check"></i>
+                        </button>` : ''}
+                        <div class="text-body">
+                            <strong class="d-block mb-1" style="font-size: 1.1rem; color: #212529;">${notif.titulo}</strong>
+                            <p class="mb-1" style="font-size: 0.95rem; color: #495057; white-space: pre-wrap;">${notif.mensagem}</p>
+                            <small style="color: #6c757d;">${notif.data_criacao}</small>
+                        </div>
+                    `;
+                    tabContent.appendChild(div);
+                });
+
+                atualizarTudo();
+            })
+            .catch(() => {
+                loadingEl.textContent = 'Erro ao carregar notificações.';
+            });
+    }
+
+
+    // Detectar scroll próximo do final para carregar mais notificações
+    const scrollContainer = document.querySelector('.notification-dropdown-menu .px-3.py-2');
+    scrollContainer.addEventListener('scroll', function () {
+        const activeTab = scrollContainer.querySelector('.tab-pane.show.active');
+        if (!activeTab) return;
+
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 50) {
+            const tipo = activeTab.id.replace('content-', '');
+            carregarMaisNotificacoes(tipo);
+        }
+    });
+
+    // WebSocket
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsPath = wsScheme + '://' + window.location.host + '/ws/notifications/';
+    const socket = new WebSocket(wsPath);
+    
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.message && data.tipo) {
+            const targetTabContent = document.getElementById(`content-${data.tipo}`);
+            if (!targetTabContent) return;
+
+            const item = document.createElement('div');
+            item.className = 'dropdown-item bg-light text-dark d-flex justify-content-between align-items-start';
+            item.setAttribute('data-id', data.notif_id || '');
+            item.innerHTML = `
+                <div>
+                    <strong>Nova Notificação</strong>
+                    <p style="font-size: 0.85rem; margin-bottom: 0;">${data.message}</p>
+                    <small class="text-muted">agora mesmo</small>
+                </div>
+                <button class="btn btn-sm btn-outline-success mark-read-btn" title="Marcar como lida" style="height: 30px; margin-left: 10px;">
+                    <i class="fas fa-check"></i>
+                </button>
+            `;
+
+            const divider = document.createElement('div');
+            divider.className = 'dropdown-divider';
+
+            targetTabContent.prepend(divider);
+            targetTabContent.prepend(item);
+
+            // Indica nova notificação na aba
+            const tabLink = document.querySelector(`#tab-${data.tipo}`);
+            if (tabLink && !tabLink.querySelector('.new-notif-indicator')) {
+                const indicator = document.createElement('span');
+                indicator.className = 'new-notif-indicator';
+                indicator.style.cssText = `
+                    display: inline-block;
+                    width: 10px;
+                    height: 10px;
+                    background-color: #28a745;
+                    border-radius: 50%;
+                    margin-left: 5px;
+                `;
+                tabLink.appendChild(indicator);
+            }
+
+            atualizarTudo();
+
+            // Som e vibração
+            const audio = document.getElementById('notificationSound');
+            if (audio) {
+                audio.play().catch((err) => {
+                    console.warn('Não foi possível reproduzir o som da notificação:', err);
+                });
+            }
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+        }
+    };
+
+    socket.onopen = () => console.log('Conexão WebSocket aberta.');
+    socket.onclose = () => console.log('Conexão WebSocket fechada.');
+    socket.onerror = (error) => console.error('Erro na conexão WebSocket:', error);
+
+    atualizarTudo();
+});
+
+</script>
+
+
+    
+    
+    
+
+    <script>
+        let lastScrollY = window.scrollY; // Posição inicial do scroll
+            const navbar = document.getElementById("navbar");
+
+            window.addEventListener("scroll", () => {
+                const currentScrollY = window.scrollY;
+
+                if (currentScrollY > lastScrollY) {
+                    // Rolar para baixo - esconde o navbar
+                    navbar.style.transform = "translateY(-100%)";
+                } else {
+                    // Rolar para cima - mostra o navbar
+                    navbar.style.transform = "translateY(0)";
+                }
+
+                lastScrollY = currentScrollY; // Atualiza a última posição do scroll
+            });
+
+    </script>
+        {% comment %} ======================================
+                    OFF CANVAS
+        ====================================== {% endcomment %}
+    <script>
+                  // Seleciona os elementos
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+const offcanvas = document.getElementById("offcanvas");
+
+// Abre o offcanvas
+openBtn.addEventListener("click", () => {
+  offcanvas.classList.add("open");
+});
+
+// Fecha o offcanvas
+closeBtn.addEventListener("click", () => {
+  offcanvas.classList.remove("open");
+});
+
+// Fecha o offcanvas se clicar fora dele
+window.addEventListener("click", (e) => {
+  if (!offcanvas.contains(e.target) && e.target !== openBtn) {
+    offcanvas.classList.remove("open");
+  }
+});
+
+    </script>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    
+</body>
+
+</html>

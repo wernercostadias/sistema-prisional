@@ -1,0 +1,161 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- templates/accounts/configuracoes_pessoais.html -->
+
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const notyf = new Notyf({
+          duration: 6000, // Tempo que a notificação fica visível
+          position: { x: "right", y: "top" }, // Posição da notificação
+          dismissible: true, // Permitir fechar manualmente
+          types: [
+              {
+                  type: 'info',
+                  background: '#17a2b8', // Azul claro (padrão de info)
+                  icon: false
+              }
+          ]
+      });
+
+      {% if messages %}
+          {% for message in messages %}
+              {% if message.tags == 'success' %}
+                  notyf.success("{{ message|escapejs }}");
+              {% elif message.tags == 'error' %}
+                  notyf.error("{{ message|escapejs }}");
+              {% elif message.tags == 'info' %}
+                  notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+              {% else %}
+                  notyf.open({ message: "{{ message|escapejs }}" });
+              {% endif %}
+          {% endfor %}
+      {% endif %}
+  });
+</script>
+
+<div class="container my-5">
+    {% comment %} <h2 class="text-center text-primary mb-4">Alterar Senha</h2> {% endcomment %}
+
+  
+
+    <form method="POST" class="mt-4 shadow p-4 rounded border border-light">
+        {% csrf_token %}
+        
+        <!-- Formulário para alterar senha -->
+        <h3 class="mb-4 text-secondary">Alterar Senha</h3>
+    
+        <!-- Senha atual -->
+        <div class="mb-3">
+            <label for="id_old_password" class="form-label">Senha Atual:</label>
+            <input type="password" name="old_password" autocomplete="current-password" required="" id="id_old_password" class="form-control" placeholder="Digite sua senha atual">
+        </div>
+        
+        <!-- Nova senha -->
+        <div class="mb-3">
+            <label for="id_new_password1" class="form-label">Nova Senha:</label>
+            <input type="password" name="new_password1" autocomplete="new-password" required="" id="id_new_password1" class="form-control" placeholder="Digite a nova senha">
+        </div>
+        
+        <!-- Confirmar nova senha -->
+        <div class="mb-3">
+            <label for="id_new_password2" class="form-label">Confirmar Nova Senha:</label>
+            <input type="password" name="new_password2" autocomplete="new-password" required="" id="id_new_password2" class="form-control" placeholder="Confirme a nova senha">
+        </div>
+    
+        <!-- Botão de alteração da senha -->
+        <button type="submit" name="password_form" class="btn btn-primary w-100 mt-3 py-2">Alterar Senha</button>
+    </form>
+    
+
+<!-- Estilos personalizados dentro da página -->
+<style>
+    /* Título */
+    h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #007bff;
+    }
+
+    h3 {
+        font-size: 1.75rem;
+        font-weight: 500;
+        color: #555;
+    }
+
+    .alert-container {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .btn-close {
+        background: #ff0000;
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-control::placeholder {
+        color: #999;
+        opacity: 1;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0056b3;
+        box-shadow: 0 0 8px rgba(0, 86, 179, 0.4);
+    }
+
+    .form-control:focus::placeholder {
+        color: #0056b3;
+        opacity: 0.8;
+    }
+
+    .form-control:not(:placeholder-shown) {
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+
+    .form-control:focus::placeholder {
+        opacity: 0.6;
+    }
+
+    .shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+        background-color: #0056b3;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #003d7a;
+    }
+
+    .btn-primary:focus {
+        box-shadow: none;
+    }
+</style>
+
+{% endblock %}
