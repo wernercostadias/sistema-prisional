@@ -11,6 +11,7 @@ venv/
 # Arquivos estáticos e de mídia gerados
 /banco_de_dados/staticfiles/
 /banco_de_dados/media/
+/banco_de_dados/static/imagens
 
 # Logs e arquivos temporários
 *.log
