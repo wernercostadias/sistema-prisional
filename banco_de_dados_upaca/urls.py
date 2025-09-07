@@ -11,6 +11,7 @@ urlpatterns = [
     path('leitura/', include('leitura.urls')),
     path('notificacao/', include('notification.urls')),
     path('', include('painel.urls')),
+    path('comunicados/', include('comunicados.urls')),
 ]
 
 # Só serve para desenvolvimento

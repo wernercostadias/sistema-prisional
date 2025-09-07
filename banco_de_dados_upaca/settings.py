@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'painel',
     'accounts',
     'leitura',
+    'comunicados',
     'channels',
     'notification',
     'crispy_forms',

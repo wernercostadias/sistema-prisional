@@ -57,7 +57,22 @@
             <div class="row">
                 <div class="col-md-6 form-group mb-3">
                     <label for="id_nome_completo" class="text-dark">Nome Completo</label>
-                    <input type="text" name="nome_completo" class="form-control" id="id_nome_completo" placeholder="Digite o nome completo">
+
+                    <div id="nome-wrapper" class="position-relative">
+                    <input type="text" 
+                        name="nome_completo" 
+                        class="form-control" 
+                        id="id_nome_completo" 
+                        placeholder="Digite o nome completo" 
+                        autocomplete="new-password"
+                        style="text-transform: uppercase;">
+
+                        <div id="nome-sugestoes" class="dropdown-menu p-0">
+                        <!-- itens via JS -->
+                        </div>
+                        <!-- espaço para mensagem de erro -->
+                        <small id="nome-error" class="text-danger d-none"></small>
+                    </div>
                 </div>
                 
             
@@ -89,20 +104,6 @@
             </div>
         </div>
 
-        <!-- Escolaridade e Trabalho -->
-        {% comment %} <div class="border p-4 rounded mb-4 shadow-sm bg-white">
-            <div class="row">
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.escolaridade.id_for_label }}" class="text-dark">Escolaridade</label>
-                    {{ form.escolaridade }}
-                </div>
-
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.estudando.id_for_label }}" class="text-dark">Estudando na Unidade?</label>
-                    {{ form.estudando }}
-                </div>
-            </div>
-        </div> {% endcomment %}
 
         <!-- Localização -->
         <h4 class="mt-4 mb-4 text-center text-success">Qual cela e bloco o interno ficará?</h4>
@@ -253,10 +254,176 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
+#nome-wrapper { position: relative; }
 
+#nome-sugestoes.dropdown-menu {
+  display: none;                /* controlado pelo JS */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;                     /* faz ocupar toda a largura do wrapper */
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
 
+  /* overrides do Bootstrap */
+  min-width: 0 !important;      /* cancela min-width: 10rem */
+  width: auto !important;       /* respeita left:0 + right:0 */
+  box-sizing: border-box;       /* borda conta na largura */
+}
+</style>
+<style>
+/* Estilo de erro no input */
+.input-error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 8px rgba(220, 53, 69, .7) !important;
+}
+
+/* Animação vibrar */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+.shake {
+  animation: shake 0.4s ease;
+}
+</style>
+<style>
+  #id_nome_completo {
+    text-transform: uppercase; /* transforma o texto digitado */
+  }
+
+  #id_nome_completo::placeholder {
+    text-transform: none; /* mantém o placeholder como está */
+  }
 </style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function () {
+    const $input = $('#id_nome_completo');
+    const $box = $('#nome-sugestoes');
+    const $error = $('#nome-error');
+
+    function alinharDropdown() {
+        $box.css('width', $input.outerWidth());
+    }
+
+    $input.on('input', function () {
+        let query = $(this).val();
+
+        if (query.length === 0) {
+            $input.removeClass('input-error shake');
+            $error.addClass('d-none').text('');
+            $box.hide();
+            return;
+        }
+
+        if (query.length >= 2) {
+            $.ajax({
+                url: "{% url 'autocomplete_nome' %}",
+                data: { term: query },
+                dataType: 'json',
+                success: function (data) {
+                    $box.empty();
+
+                    if (data.length > 0) {
+                        data.forEach(function (item) {
+                            let color = 'text-secondary';
+                            if (item.status === 'ativo') color = 'text-success';
+                            else if (item.status === 'foragido') color = 'text-danger';
+                            else if (item.status === 'inativo') color = 'text-muted';
+
+                            $box.append(
+                                `<div class="dropdown-item ${color}" 
+                                    style="cursor:pointer" 
+                                    data-value="${item.value}" 
+                                    data-status="${item.status}">
+                                    ${item.label}
+                                </div>`
+                            );
+                        });
+
+                        alinharDropdown();
+                        $box.show();
+
+                        // Verifica se existe qualquer cadastro ativo com o mesmo valor
+                        const existeAtivo = data.some(d => d.value.toLowerCase() === query.toLowerCase() && d.status === 'ativo');
+
+                        if (existeAtivo) {
+                            const userUrl = `http://10.110.37.244:8000/tabela/?nome=${encodeURIComponent(query)}`;
+                            const mensagem = `Usuário já cadastrado e ativo! <a href="${userUrl}" target="_blank" style="text-decoration: underline; color: #0d6efd;">Ver cadastro</a>`;
+                            $input.addClass('input-error shake');
+                            $error.removeClass('d-none').html(mensagem);
+                        } else {
+                            $input.removeClass('input-error shake');
+                            $error.addClass('d-none').text('');
+                        }
+                    } else {
+                        $box.hide();
+                        $input.removeClass('input-error shake');
+                        $error.addClass('d-none').text('');
+                    }
+                }
+            });
+        } else {
+            $box.hide();
+        }
+    });
+
+    // Clique na sugestão
+    $(document).on('click', '#nome-sugestoes .dropdown-item', function () {
+        const valor = $(this).data('value');
+        $input.val(valor);
+        $box.hide();
+
+        // Verifica no dropdown completo se existe algum ativo
+        const todosItens = $box.children().map(function() {
+            return { value: $(this).data('value'), status: $(this).data('status') };
+        }).get();
+
+        const existeAtivo = todosItens.some(d => d.value.toLowerCase() === valor.toLowerCase() && d.status === 'ativo');
+
+        if (existeAtivo) {
+            const userUrl = `http://10.110.37.244:8000/tabela/?nome=${encodeURIComponent(valor)}`;
+            const mensagem = `Usuário já cadastrado e ativo! <a href="${userUrl}" target="_blank" style="text-decoration: underline; color: #0d6efd;">Ver cadastro</a>`;
+            $input.addClass('input-error shake');
+            $error.removeClass('d-none').html(mensagem);
+        } else {
+            $input.removeClass('input-error shake');
+            $error.addClass('d-none').text('');
+        }
+    });
+
+    // Fecha ao clicar fora
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#nome-wrapper').length) $box.hide();
+    });
+
+    // Reabre se focar de novo
+    $input.on('focus', function () {
+        if ($input.val().length >= 2 && $box.children().length > 0) {
+            alinharDropdown();
+            $box.show();
+        }
+    });
+
+    // Fecha com ESC
+    $input.on('keydown', function (e) {
+        if (e.key === "Escape") {
+            $box.hide();
+            $input.blur();
+        }
+    });
+
+    $(window).on('resize', alinharDropdown);
+});
+
+</script>
 
 
 

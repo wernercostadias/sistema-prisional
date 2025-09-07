@@ -20,8 +20,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from comunicados.models import Comunicado  # Importa o modelo de comunicados
 
 def login_view(request):
+    comunicados = Comunicado.objects.all()[:5]  # Últimos 5 comunicados
+
     if request.method == "POST":
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
@@ -34,15 +37,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, "Login realizado com sucesso!")
-                return render(request, 'accounts/login.html')  # Mantenha na mesma página
+                return redirect('index')  # Redireciona para a página principal após login
             else:
                 messages.error(request, "Senha incorreta. Tente novamente.")
-                return redirect('login')  # Redireciona para a página de login
         else:
             messages.error(request, "Nome de usuário não encontrado. Tente novamente.")
-            return redirect('login')  # Redireciona para a página de login
 
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login1.html', {'comunicados': comunicados})
 
 def logout_view(request):
     logout(request)
@@ -62,7 +63,6 @@ def create_user(request):
             user.is_active = True  # Garante que o usuário está ativo para login no site
             user.save()
             messages.success(request, f'Conta de servidor "{user.username}" criada com sucesso! O usuário agora pode acessar o site.')
-            
             
             # return redirect('success_page') 
 

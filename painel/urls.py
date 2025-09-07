@@ -7,6 +7,7 @@ urlpatterns = [
     path('remover/<int:id>/', views.remover_pessoa, name='remover_pessoa'),
     
     path('adicionar/', views.adicionar_pessoa_view, name='adicionar_pessoa'),
+    path('autocomplete-nome/', views.autocomplete_nome_view, name='autocomplete_nome'),
     
     path('tabela/', views.ver_tabela_view, name='ver_tabela'),
     

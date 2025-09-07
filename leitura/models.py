@@ -53,6 +53,7 @@ class Leitura(models.Model):
     pessoa = models.ForeignKey("painel.Pessoa", on_delete=models.CASCADE, related_name="leituras")
     livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
     ciclo = models.ForeignKey(CicloLeitura, on_delete=models.CASCADE)
+    exemplar = models.ForeignKey(Exemplar, on_delete=models.SET_NULL, null=True, blank=True)  # <- novo
     data_leitura = models.DateField(auto_now_add=True)
 
     class Meta:

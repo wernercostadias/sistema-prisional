@@ -1,20 +1,41 @@
-{% extends "bases/base.html" %}
-{% load static %}
-{% block title %} Projeto de Leitura {% endblock %}
 
+{% load notificacao_extras %}
+{% load custom_filters %}
+{% load static %}
 {% block content %}
+
+<!-- CSS Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Seu CSS personalizado -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Inclua o Chart.js no seu template base -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Notyf -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
-<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<!-- Certifique-se de que o Font Awesome está incluído no seu projeto -->
+
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+<!-- Notyf -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js (dependência do Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+
+<!-- JS Bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<!-- Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<!-- Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script>
   const notyf = new Notyf({
     duration: 3500,
@@ -67,35 +88,42 @@
 </script>
 
 
-<div class="container mt-4" style="max-width: 1500px;">
+<div class="container mt-4" style="max-width:100%;">
 
-<!-- Novo Cabeçalho do Painel -->
-<div class="header-panel d-flex align-items-center justify-content-between p-3 rounded shadow-sm mb-4" style="max-width: 1500px; height: 90px; margin: 0 auto; background: linear-gradient(90deg, #f7f9fc, #e3f2fd);">
+<!-- Cabeçalho do Painel -->
+<div class="header-panel">
 
-  <!-- Bloco de Título -->
-  <div class="d-flex flex-column justify-content-center">
-    <h2 class="mb-0 fw-bold" style="font-size: 1.6rem; color: #0d6efd;">📋 Painel de Leitura</h2>
-    <small class="text-secondary" style="font-size: 0.85rem;">Acompanhe leitores e exemplares</small>
+  <!-- Bloco de Título Moderno -->
+  <div class="panel-title">
+    <div class="panel-title-text">
+      <h2>📋 Painel de Leitura</h2>
+      <small>Acompanhe leitores e exemplares em tempo real</small>
+    </div>
+    <div class="panel-title-icon">📚</div>
   </div>
 
   <!-- Bloco de Busca -->
-  <div class="search-box d-flex align-items-center me-3" style="flex: 1; max-width: 350px;">
-    <span style="font-size: 1.2rem; margin-right: 8px;">🔍</span>
-    <input type="text" class="form-control rounded-pill" placeholder="Buscar interno..." style="flex: 1; padding: 6px 15px; border: 1px solid #ced4da;">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="form-control" placeholder="Buscar interno...">
   </div>
 
   <!-- Bloco de Botões de Ação -->
-  <div class="action-buttons d-flex gap-2">
-    <button class="btn btn-graph d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalGraficos" title="Ver gráficos" style="background-color:#17a2b8; color:#fff; border:none; border-radius: 8px;">
-      📊 <span>Gráficos</span>
+  <div class="action-buttons">
+    <button class="btn btn-home" onclick="window.location.href='{% url 'index' %}'" title="Ir para Início">
+      🏠 <span>Início</span>
     </button>
 
-    <button class="btn btn-add-user d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalAdicionarInterno" title="Adicionar novo interno" style="background-color:#28a745; color:#fff; border:none; border-radius: 8px;">
+    <button class="btn btn-graph" data-toggle="modal" data-target="#modalGraficos" title="Ver gráficos">
+      <span>Gráficos</span>
+    </button>
+
+    <button class="btn btn-add-user" data-toggle="modal" data-target="#modalAdicionarInterno" title="Adicionar novo interno">
       ＋ <span>Interno</span>
     </button>
 
-    <button class="btn btn-add-book d-flex align-items-center gap-1 px-3 py-1" data-toggle="modal" data-target="#modalCadastrarLivro" title="Cadastrar livro" style="background-color:#ffc107; color:#212529; border:none; border-radius: 8px;">
-      📚 <span>Livro</span>
+    <button class="btn btn-add-book" data-toggle="modal" data-target="#modalCadastrarLivro" title="Cadastrar livro">
+      ＋ <span>Livro</span>
     </button>
   </div>
 
@@ -119,6 +147,11 @@
       📤 Saíram da Leitura <span id="contador-sairam" class="badge" style="display:none; background-color:#ff8a65; color:#bf360c;">0</span>
     </a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" id="livros-tab" data-toggle="tab" href="#livros" role="tab">
+      📚 Catálogo de Livros
+    </a>
+  </li>
 </ul>
 
 
@@ -128,8 +161,19 @@
     <!-- Leitores Ativos -->
     <div class="tab-pane fade show active" id="ativos" role="tabpanel">
       <table class="table table-bordered table-hover">
-        <thead class="thead-ativos">
-          <tr>
+        <thead>
+          <!-- Linha do Total (apenas na última coluna) -->
+          <tr class="thead-total">
+            <th colspan="7"></th>
+            <th class="text-end align-middle">
+              <div class="fw-bold">
+                Total: <span class="badge-total">{{ internos_frente|length }}</span>
+              </div>
+            </th>
+          </tr>
+
+          <!-- Linha normal do cabeçalho -->
+          <tr class="thead-ativos">
             <th style="width: 5px;">Nº</th>
             <th style="width: 5px;">Bloco</th>
             <th style="width: 5px;">Cela</th>
@@ -140,6 +184,7 @@
             <th>Ação</th>
           </tr>
         </thead>
+
         <tbody>
           {% for interno in internos_frente %}
           <tr>
@@ -176,26 +221,30 @@
 
             <td class="td-acoes">
               <div class="d-flex align-items-center gap-2">
+
                 <!-- Botão Retirar -->
                 <button 
-                  class="btn btn-sm" 
-                  style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px); padding: 0 0.75rem;"
+                  class="btn btn-submit d-flex align-items-center gap-2" 
                   onclick="abrirModalSaida({{ interno.pessoa.id }})"
-                >
-                  Retirar
+                  title="Retirar Interno"
+                  style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff;">
+                  <span>Retirar</span>
                 </button>
 
                 <!-- Botão Excluir -->
                 <button 
-                  type="button" 
-                  class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center"
-                  style="font-weight: 600; height: calc(1.5em + 0.75rem + 2px); width: 2.5rem;"
+                  class="btn btn-cancel d-flex align-items-center gap-2" 
                   onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'frente')"
-                >
-                  <i class="fas fa-trash-alt"></i>
+                  title="Excluir Interno"
+                  style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">
+                  🗑️ <span>Excluir</span>
                 </button>
+
               </div>
             </td>
+
+
+
 
 
           </tr>
@@ -228,20 +277,35 @@
             <td>{{ interno.pessoa.nome_completo }}</td>
             <td>{{ interno.data_inclusao }}</td>
             <td class="td-acoes">
-              <div class="d-flex gap-1">
+              <div class="d-flex gap-2">
+
+                <!-- Botão Mover -->
                 <form method="POST" action="{% url 'pedagogia_view' %}">
                   {% csrf_token %}
                   <input type="hidden" name="pessoa_id" value="{{ interno.pessoa.id }}">
                   <input type="hidden" name="lista" value="frente">
-                  <button type="submit" class="btn btn-sm btn-success">Mover</button>
+                  <button type="submit" 
+                          class="btn btn-submit d-flex align-items-center gap-2" 
+                          style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff;"
+                          title="Mover Interno">
+                    🔀 <span>Mover</span>
+                  </button>
                 </form>
 
                 <!-- Botão para Modal de Exclusão -->
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'espera')">
-                  🗑️
+                <button type="button" 
+                        class="btn btn-cancel d-flex align-items-center gap-2" 
+                        onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'espera')"
+                        style="padding: 0.25rem 0.75rem; font-size: 0.85rem;"
+                        title="Excluir Interno">
+                  🗑️ <span>Excluir</span>
                 </button>
+
               </div>
             </td>
+
+
+
           </tr>
           {% empty %}
           <tr><td colspan="4">Nenhum interno na fila de espera.</td></tr>
@@ -285,24 +349,67 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Aba: Livros -->
+    <div class="tab-pane fade" id="livros" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+          <tr>
+            <th style="width: 5%;">Nº</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Total Exemplares</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for livro in livros %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <a href="javascript:void(0);" onclick="abrirModalExemplares({{ livro.id }}, '{{ livro.titulo }}')">
+                {{ livro.titulo }}
+              </a>
+            </td>
+            <td>{{ livro.autor|default:'Sem autor' }}</td>
+            <td>{{ livro.exemplares.count }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum livro cadastrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-
-<!-- Modal: Adicionar Interno -->
+<!-- Modal: Adicionar Interno Modernizado -->
 <div class="modal fade" id="modalAdicionarInterno" tabindex="-1" role="dialog" aria-labelledby="modalAdicionarInternoLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content modal-custom" style="min-height: 400px;"> <!-- aumenta altura -->
       <form method="POST" action="{% url 'pedagogia_view' %}">
         {% csrf_token %}
-        <div class="modal-header">
+        <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
           <h5 class="modal-title">Adicionar Interno</h5>
-          <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="id_pessoa" class="font-weight-bold text-muted">Selecionar Interno:</label>
-            <input type="text" id="id_pessoa" name="pessoa_id" class="form-control pessoa-selectize" placeholder="Digite o nome ou a matrícula..." autocomplete="off">
+        <div class="modal-body position-relative">
+          <!-- Overlay escuro com transição -->
+          <div id="overlaySugestoes" style="
+            display:none; 
+            position:fixed; 
+            top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.5); 
+            z-index:999; 
+            opacity:0; 
+            transition: opacity 0.3s ease;">
           </div>
+
+          <!-- Campo de busca moderno -->
+          <div class="mb-3 position-relative" style="z-index:1000;">
+            <label for="id_pessoa" class="form-label text-muted">Selecionar Interno:</label>
+            <input type="text" id="id_pessoa" name="pessoa_id" class="form-control" placeholder="Digite o nome ou matrícula..." autocomplete="off">
+            <ul id="listaSugestoesInterno" class="list-group position-absolute w-100 mt-1" style="max-height: 200px; overflow-y: auto;"></ul>
+          </div>
+
           <div class="form-group">
             <label for="id_lista" class="font-weight-bold text-muted">Escolher Lista:</label>
             <select name="lista" id="id_lista" class="form-control">
@@ -311,19 +418,19 @@
             </select>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Adicionar</button>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit">Adicionar</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
-<!-- Modal de Saída (sem mudanças aqui) -->
+<!-- Modal de Saída -->
 <div class="modal fade" id="modalSairLeitura" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
       <form id="formSaida" method="POST" action="{% url 'pedagogia_view' %}" onsubmit="return enviarFormularioSaida()">
         {% csrf_token %}
         <div class="modal-header">
@@ -332,8 +439,8 @@
         </div>
         <div class="modal-body">
           <input type="hidden" id="internoId" name="pessoa_id">
-          <div class="form-group">
-            <label for="motivo_saida">Motivo da Saída</label>
+          <div class="form-group mb-3">
+            <label for="motivo_saida" class="font-weight-bold text-muted">Motivo da Saída</label>
             <select id="motivo_saida" name="motivo_saida" class="form-control" required>
               <option value="pdi">Por PDI</option>
               <option value="pediu">Pediu para sair</option>
@@ -342,13 +449,13 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="data_saida">Data da Saída</label>
+            <label for="data_saida" class="font-weight-bold text-muted">Data da Saída</label>
             <input type="date" id="data_saida" name="data_saida" class="form-control">
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-danger">Confirmar Saída</button>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit" style="background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);">Confirmar Saída</button>
         </div>
       </form>
     </div>
@@ -359,26 +466,30 @@
 <!-- Modal com Gráficos Highcharts -->
 <div class="modal fade" id="modalGraficos" tabindex="-1" role="dialog" aria-labelledby="modalGraficosLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-content modal-custom">
+      <div class="modal-header" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: #fff; border-bottom: none;">
         <h5 class="modal-title">Gráficos de Leitura</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6 mb-3">
             <div id="graficoDistribuicao" style="height: 350px;"></div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 mb-3">
             <div id="graficoProgresso" style="height: 350px;"></div>
           </div>
         </div>
       </div>
+      <div class="modal-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Fechar</button>
+      </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal de Confirmação de Exclusão -->
 <div class="modal fade" id="modalExclusao" tabindex="-1" role="dialog" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
@@ -388,15 +499,18 @@
       <input type="hidden" name="pessoa_id" id="modalPessoaId">
       <input type="hidden" name="lista" id="modalExcluirLista">
       <input type="hidden" name="historico_id" id="modalHistoricoId">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white py-2">
+      <div class="modal-content modal-custom">
+        <div class="modal-header" style="background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); color: #fff; border-bottom: none;">
           <h5 class="modal-title" id="modalExclusaoLabel">Confirmar Exclusão</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body">
           Tem certeza que deseja excluir este registro? Esta ação é irreversível.
         </div>
-        <div class="modal-footer py-2">
-          <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancelar</button>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-danger btn-sm">Sim, excluir</button>
         </div>
       </div>
@@ -406,19 +520,21 @@
 
 <!-- Modal ver livro de internos -->
 <div class="modal fade" id="modalLivros" tabindex="-1" aria-labelledby="modalLivrosLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content modal-custom modal-no-gap">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
         <h5 class="modal-title" id="modalLivrosLabel">Livros do Interno</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
       </div>
-      <div class="modal-body">
-        <table class="table table-bordered">
-          <thead>
+      <div class="modal-body p-0">
+        <table class="table table-bordered table-striped m-0">
+          <thead style="background: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%); color: #1b2a49; font-weight: 600;">
             <tr>
               <th>Livro</th>
               <th>Código do Exemplar</th>
               <th>Ciclo</th>
+              <th>Status</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="modalLivrosBody">
@@ -426,17 +542,66 @@
           </tbody>
         </table>
       </div>
+      <div class="modal-footer d-flex justify-content-between align-items-center gap-2 p-2">
+        <!-- Botão para abrir modal de adicionar exemplar -->
+        <button type="button" class="btn btn-success btn-sm" 
+                onclick="abrirModalAdicionar();">
+          ＋ Adicionar / Editar atual
+        </button>
+
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Adicionar Exemplar ao Interno -->
+<div class="modal fade" id="modalAdicionarExemplar" tabindex="-1" aria-labelledby="modalAdicionarExemplarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
+      <form id="formAdicionarExemplar">
+        {% csrf_token %}
+        <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+          <h5 class="modal-title" id="modalAdicionarExemplarLabel">Adicionar Exemplar ao Interno</h5>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="pessoa_id" id="exemplar_pessoa_id">
+
+          <div class="form-group mb-3">
+            <label for="id_livro" class="font-weight-bold text-muted">Livro:</label>
+            <select id="id_livro" name="livro_id" class="form-control">
+              <option value="">Selecione um livro</option>
+              {% for livro in livros %}
+              <option value="{{ livro.id }}">{{ livro.titulo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="id_exemplar" class="font-weight-bold text-muted">Exemplar:</label>
+            <select id="id_exemplar" name="exemplar_id" class="form-control">
+              <option value="">Selecione primeiro o livro</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit btn-sm">Adicionar Exemplar</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <!-- Modal Cadastrar Livro / Exemplar -->
 <div class="modal fade" id="modalCadastrarLivro" tabindex="-1" aria-labelledby="modalCadastrarLivroLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
         <h5 class="modal-title">Cadastrar Livro / Exemplar</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span>&times;</span></button>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
       </div>
       <div class="modal-body">
         <form id="formCadastrarLivro">
@@ -445,7 +610,7 @@
 
           <!-- Buscar livro existente -->
           <div class="mb-3 position-relative">
-            <label for="livroTitulo" class="form-label">Procurar Livro Existente / Título</label>
+            <label for="livroTitulo" class="form-label text-muted">Procurar Livro Existente / Título</label>
             <input type="text" class="form-control" id="livroTitulo" name="titulo" autocomplete="off" placeholder="Digite título do livro...">
             <ul id="listaSugestoes" class="list-group position-absolute w-100 mt-1" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
           </div>
@@ -455,18 +620,22 @@
           <!-- Campos para cadastrar livro novo, visível apenas se não usar livro existente -->
           <div id="novoLivroCampos">
             <div class="mb-3">
-              <label for="livroAutor" class="form-label">Autor</label>
+              <label for="livroAutor" class="form-label text-muted">Autor</label>
               <input type="text" class="form-control" id="livroAutor" name="autor" placeholder="Nome do autor">
             </div>
           </div>
 
           <!-- Exemplar -->
           <div class="mb-3">
-            <label for="exemplarCodigo" class="form-label">Código do Exemplar</label>
+            <label for="exemplarCodigo" class="form-label text-muted">Código do Exemplar</label>
             <input type="text" class="form-control" id="exemplarCodigo" name="codigo" placeholder="Código único do exemplar">
           </div>
 
-          <button type="submit" class="btn btn-success">Salvar</button>
+          <!-- Botões padronizados -->
+          <div class="modal-footer d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-submit">Salvar</button>
+          </div>
         </form>
         <div id="mensagemLivro" class="mt-2"></div>
         <div id="totalExemplares" class="mt-2 text-muted"></div>
@@ -474,6 +643,37 @@
     </div>
   </div>
 </div>
+
+
+<!-- Modal Exemplares -->
+<div class="modal fade" id="modalExemplares" tabindex="-1" aria-labelledby="modalExemplaresLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content modal-custom modal-no-gap">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalExemplaresLabel">Exemplares do Livro</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body p-0">
+        <table class="table table-bordered table-striped m-0">
+          <thead style="background: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%); color: #1b2a49; font-weight: 600;">
+            <tr>
+              <th style="width:5%;">#</th>
+              <th>Código</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="corpoExemplares">
+            <!-- Será preenchido dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer d-flex justify-content-end gap-2 p-2">
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -503,31 +703,103 @@ function enviarFormularioSaida() {
   return true;
 }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById('id_pessoa');
+    const lista = document.getElementById('listaSugestoesInterno');
+    const overlay = document.getElementById('overlaySugestoes');
+    let debounceTimeout = null;
+
+    function showOverlay() {
+        overlay.style.display = 'block';
+        setTimeout(() => { overlay.style.opacity = 1; }, 10);
+    }
+
+    function hideOverlay() {
+        overlay.style.opacity = 0;
+        setTimeout(() => { overlay.style.display = 'none'; }, 0);
+    }
+
+    input.addEventListener('focus', function() {
+        if(lista.children.length > 0) showOverlay();
+    });
+
+    input.addEventListener('input', function() {
+        const query = input.value.trim();
+        lista.innerHTML = '';
+
+        if (!query) {
+            hideOverlay();
+            return;
+        }
+
+        if(debounceTimeout) clearTimeout(debounceTimeout);
+
+        debounceTimeout = setTimeout(() => {
+            fetch("{% url 'pessoa_search' %}?q=" + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => {
+                    lista.innerHTML = '';
+
+                    if(data.length === 0) {
+                        const li = document.createElement('li');
+                        li.textContent = 'Este interno não existe no banco';
+                        li.classList.add('list-group-item', 'text-muted');
+                        li.style.cursor = 'default';
+                        lista.appendChild(li);
+                        showOverlay();
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item.nome_completo + ' (' + item.matricula + ')';
+                        li.classList.add('list-group-item', 'list-group-item-action');
+                        li.style.cursor = 'pointer';
+
+                        li.addEventListener('click', function() {
+                            input.value = item.nome_completo;
+                            hideOverlay();
+
+                            if(!document.getElementById('pessoaIdHidden')) {
+                                const hidden = document.createElement('input');
+                                hidden.type = 'hidden';
+                                hidden.id = 'pessoaIdHidden';
+                                hidden.name = 'pessoa_id';
+                                hidden.value = item.id;
+                                input.closest('form').appendChild(hidden);
+                            } else {
+                                document.getElementById('pessoaIdHidden').value = item.id;
+                            }
+
+                            lista.innerHTML = '';
+                        });
+
+                        lista.appendChild(li);
+                    });
+
+                    if(lista.children.length > 0) showOverlay();
+                });
+        }, 300);
+    });
+
+    document.addEventListener('click', function(event) {
+        if(!input.contains(event.target) && !lista.contains(event.target)) {
+            lista.innerHTML = '';
+            hideOverlay();
+        }
+    });
+});
+</script>
+
+
 <!-- Selectize.js -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
-
-<script type="text/javascript">
+<script>
     $(document).ready(function() {
-        $('.pessoa-selectize').selectize({
-            valueField: 'id',
-            labelField: 'nome_completo',
-            searchField: ['nome_completo'],
-            options: [],
-            create: false,
-            load: function(query, callback) {
-                if (!query.length) return callback();
-
-                $.ajax({
-                    url: '{% url "pessoa_search" %}',
-                    data: { q: query },
-                    dataType: 'json',
-                    success: function(res) {
-                        callback(res);
-                    }
-                });
-            }
-        });
+        $('.pessoa-selectize').selectize({ ... });
     });
 </script>
 
@@ -739,32 +1011,7 @@ function atualizarTabela(idTabela, dados) {
 
 
 </script>
-<script>
-  function abrirModalLivros(pessoaId) {
-    fetch(`/leitura/livros-interno/?pessoa_id=${pessoaId}`)
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.getElementById("modalLivrosBody");
-            tbody.innerHTML = ""; // limpa conteúdo
-            if(data.livros.length === 0){
-                tbody.innerHTML = "<tr><td colspan='3'>Nenhum livro cadastrado.</td></tr>";
-            } else {
-                data.livros.forEach(l => {
-                    const tr = `<tr>
-                        <td>${l.livro}</td>
-                        <td>${l.codigo_exemplar}</td>
-                        <td>${l.ciclo}</td>
-                    </tr>`;
-                    tbody.innerHTML += tr;
-                });
-            }
-            // Abre o modal (Bootstrap 5)
-            const modal = new bootstrap.Modal(document.getElementById('modalLivros'));
-            modal.show();
-        });
-}
 
-</script>
 <script>
 const inputLivro = document.getElementById("livroTitulo");
 const listaSugestoes = document.getElementById("listaSugestoes");
@@ -888,61 +1135,540 @@ document.getElementById("formCadastrarLivro").addEventListener("submit", functio
     });
 });
 
-
 </script>
 
+<script>
+function abrirModalExemplares(livroId, livroTitulo) {
+    const modalTitle = document.getElementById('modalExemplaresLabel');
+    const corpo = document.getElementById('corpoExemplares');
+    corpo.innerHTML = `<tr><td colspan="3">Carregando...</td></tr>`;
+    modalTitle.textContent = `Exemplares do Livro: ${livroTitulo}`;
+
+    fetch(`/leitura/livro-exemplares/${livroId}/`)
+        .then(res => res.json())
+        .then(data => {
+            corpo.innerHTML = "";
+
+            if(data.exemplares.length === 0){
+                corpo.innerHTML = "<tr><td colspan='3'>Nenhum exemplar cadastrado.</td></tr>";
+            } else {
+                data.exemplares.forEach((ex, idx) => {
+                    // Log detalhado para depuração
+                    console.log(`Exemplar ${idx + 1}:`, ex);
+
+                    const tr = document.createElement("tr");
+                      tr.innerHTML = `
+                          <td>${idx + 1}</td>
+                          <td>${ex.codigo}</td>
+                          <td>
+                              ${ex.disponivel 
+                                  ? `<span class="status disponivel">✅ Disponível</span>` 
+                                  : `<span class="status indisponivel">❌ Indisponível</span>
+                                    ${ex.leitor_atual ? `<span class="leitor-badge">Entregue para: ${ex.leitor_atual}</span>` : ''}`
+                              }
+                          </td>
+                      `;
+
+                    corpo.appendChild(tr);
+                });
+            }
+
+            new bootstrap.Modal(document.getElementById('modalExemplares')).show();
+        })
+        .catch(err => {
+            corpo.innerHTML = "<tr><td colspan='3'>Erro ao carregar exemplares.</td></tr>";
+            console.error(err);
+        });
+}
+</script>
+
+
+<script>
+let CURRENT_PESSOA_ID = null;
+const urlRemoverExemplar = "/leitura/leitura/remover-exemplar/";
+// ------------------------------
+// Função para carregar livros do interno via AJAX
+// ------------------------------
+function carregarLivrosDoInterno(pessoaId) {
+    fetch(`/leitura/livros-interno/?pessoa_id=${pessoaId}`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("modalLivrosBody");
+            tbody.innerHTML = "";
+
+            console.log("=== Livros recebidos do backend ===");
+            console.table(data.livros);
+
+            if (data.livros.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5'>Nenhum livro cadastrado.</td></tr>";
+            } else {
+                data.livros.forEach(l => {
+                    console.log(`Livro: ${l.livro}, Código do Exemplar: ${l.codigo_exemplar}, Ciclo: ${l.ciclo}, Status: ${l.status}`);
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${l.livro}</td>
+                        <td>${l.codigo_exemplar}</td>
+                        <td>${l.ciclo}</td>
+                        <td>${l.status}</td>
+                        <td>
+                            <!-- Botão Excluir com estilo igual ao Retirar -->
+                            <button 
+                              class="btn btn-submit d-flex align-items-center gap-2 btn-excluir" 
+                              data-exemplar-codigo="${l.codigo_exemplar}"
+                              style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff; border: none; border-radius: 4px;">
+                              <span>Excluir</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        })
+        .catch(err => console.error("Erro ao carregar livros do interno:", err));
+}
+
+// ------------------------------
+// Event delegation para excluir exemplar
+// ------------------------------
+document.getElementById("modalLivrosBody").addEventListener("click", function(e) {
+    const btnExcluir = e.target.closest(".btn-excluir"); // sobe até o botão
+    if (!btnExcluir) return;
+
+    const codigoExemplar = btnExcluir.getAttribute("data-exemplar-codigo");
+    if (!codigoExemplar) { alert("Exemplar não definido."); return; }
+    if (!CURRENT_PESSOA_ID) { alert("Pessoa não definida."); return; }
+
+    if (confirm("Deseja realmente excluir este exemplar?")) {
+        const formData = new FormData();
+        formData.append("pessoa_id", CURRENT_PESSOA_ID);
+        formData.append("exemplar_codigo", codigoExemplar);
+
+        fetch(urlRemoverExemplar, {
+            method: "POST",
+            headers: { "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(resp => {
+            if (resp.success) {
+                carregarLivrosDoInterno(CURRENT_PESSOA_ID);
+            } else {
+                alert(resp.erro || "Erro ao excluir exemplar.");
+            }
+        })
+        .catch(err => console.error("Erro ao excluir exemplar:", err));
+    }
+});
+// ------------------------------
+// Abrir modal
+// ------------------------------
+function abrirModalLivros(pessoaId) {
+    CURRENT_PESSOA_ID = pessoaId;
+    document.getElementById('exemplar_pessoa_id').value = pessoaId;
+    carregarLivrosDoInterno(pessoaId);
+    $('#modalLivros').modal('show');
+}
+
+// Abrir modal de adicionar exemplar sem bloquear o modal de livros
+function abrirModalAdicionar() {
+    document.getElementById('exemplar_pessoa_id').value = CURRENT_PESSOA_ID;
+
+    $('#modalAdicionarExemplar').modal({
+        backdrop: false,  // não cria overlay que bloqueia o outro modal
+        keyboard: true,
+        show: true
+    });
+
+    // Aumenta o z-index para ficar na frente visualmente
+    $('#modalAdicionarExemplar').css('z-index', 1060);
+}
+
+// ------------------------------
+// Popular exemplares no modal de adicionar
+// ------------------------------
+document.getElementById('id_livro').addEventListener('change', function() {
+    const livroId = this.value;
+    const exemplarSelect = document.getElementById('id_exemplar');
+    exemplarSelect.innerHTML = '<option value="">Carregando...</option>';
+
+    if (livroId) {
+        fetch(`/leitura/livro-exemplares/${livroId}/`)
+        .then(res => res.json())
+        .then(data => {
+            exemplarSelect.innerHTML = '<option value="">Selecione um exemplar</option>';
+            if (data.exemplares.length === 0) {
+                exemplarSelect.innerHTML = '<option value="">Nenhum exemplar disponível</option>';
+            } else {
+                data.exemplares.forEach(ex => {
+                    exemplarSelect.innerHTML += `<option value="${ex.id}">${ex.codigo} (${ex.disponivel ? 'Disponível' : 'Indisponível'})</option>`;
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao carregar exemplares:", err);
+            exemplarSelect.innerHTML = '<option value="">Erro ao carregar exemplares</option>';
+        });
+    } else {
+        exemplarSelect.innerHTML = '<option value="">Selecione primeiro o livro</option>';
+    }
+});
+
+// ------------------------------
+// Submissão AJAX para adicionar exemplar
+// ------------------------------
+// Função para logar o estado dos modais
+function logModais() {
+    const modais = [
+        {id: 'modalLivros', name: 'Modal Livros'},
+        {id: 'modalAdicionarExemplar', name: 'Modal Adicionar Exemplar'}
+    ];
+
+    modais.forEach(m => {
+        const el = document.getElementById(m.id);
+        console.log(`${m.name} aberto?`, $(el).hasClass('show'));
+        console.log(`${m.name} z-index?`, window.getComputedStyle(el).zIndex);
+    });
+}
+
+
+// Submissão AJAX para adicionar exemplar com logs
+document.getElementById('formAdicionarExemplar').addEventListener('submit', function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch("{% url 'adicionar_exemplar_interno' %}", {
+        method: 'POST',
+        headers: {'X-CSRFToken': formData.get('csrfmiddlewaretoken')},
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.sucesso) {  // <- aqui precisa bater com o JsonResponse
+            // Fecha o modal de adicionar
+            $('#modalAdicionarExemplar').modal('hide');
+
+            // Atualiza a lista de livros do modal principal
+            carregarLivrosDoInterno(CURRENT_PESSOA_ID);
+
+            // Limpa selects do modal de adicionar
+            document.getElementById('id_livro').value = '';
+            document.getElementById('id_exemplar').innerHTML = '<option value="">Selecione primeiro o livro</option>';
+        } else {
+            alert(data.erro || "Erro ao adicionar exemplar.");
+        }
+    })
+    .catch(err => console.error("Erro ao adicionar exemplar:", err));
+});
+</script>
+
+
+
 <style>
-td.td-acoes {
-  white-space: nowrap;
-  width: 1%;
+/* ========================
+   CABEÇALHO DO PAINEL
+   ======================== */
+.header-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  height: 90px;
+  border-radius: 0.75rem;
+  background: #f8f9fa; /* fundo suave, quase branco */
+  color: #1a237e;       /* fonte azul escura */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* Cores de cada aba */
+/* ========================
+   BLOCO DE TÍTULO
+   ======================== */
+.panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #ffffff; /* fundo leve */
+  border-left: 6px solid #1a237e; /* destaque azul */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.panel-title-text h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #1a237e; /* azul escuro */
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.05);
+}
+
+.panel-title-text small {
+  font-size: 0.9rem;
+  color: #283593; /* azul mais suave */
+}
+
+.panel-title-icon {
+  font-size: 2.5rem;
+  color: #1a237e;
+}
+
+/* ========================
+   BUSCA
+   ======================== */
+.search-box {
+  display: flex;
+  align-items: center;
+  max-width: 350px;
+  flex: 1;
+  margin-right: 1.5rem; /* adiciona espaçamento para os botões */
+}
+
+.search-box .search-icon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  color: #1a237e;
+}
+
+.search-box input.form-control {
+  flex: 1;
+  padding: 6px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 50px;
+  background: #ffffff;
+  color: #1a237e;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* ========================
+   BOTOES DE AÇÃO
+   ======================== */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #0d1b5b !important; /* azul mais forte e contrastante */
+  background: #e9ecef; /* fundo leve */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+/* Hover */
+.action-buttons .btn:hover {
+  background: #f1f3f5; /* leve destaque no hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Botões de ação positiva (verde) */
+.btn-add-user, .btn-add-book {
+  color: #fff;
+  background: #43a047; /* verde */
+}
+
+/* Botões de destaque azul */
+.btn-home, .btn-graph {
+  color: #fff;
+  background: #1a237e;
+}
+
+
+
+/* ========================
+   TABELAS E BADGES
+   ======================== */
+td.td-acoes { white-space: nowrap; width: 1%; }
+
+/* Cabeçalhos de tabela */
+.thead-ativos, .thead-espera, .thead-sairam, .thead-livros {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Gradiente azul para ativos */
 .thead-ativos {
-  background-color: #a5d6a7; /* Verde suave */
-  color: #1b5e20;
-  font-weight: 600;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
 }
 
+/* Verde para status positivos */
 .thead-espera {
-  background-color: #ffe082; /* Amarelo suave */
-  color: #795548;
-  font-weight: 600;
+  background: #43a047;
 }
 
+/* Cinza escuro para saíram */
 .thead-sairam {
-  background-color: #ffab91; /* Laranja claro */
-  color: #bf360c;
-  font-weight: 600;
+  background: #212121;
 }
 
-/* Estilo das abas */
+/* Azul suave para livros */
+.thead-livros {
+  background: #283593;
+}
+
+/* Linha do total */
+.thead-total th {
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Badge total */
+.badge-total {
+  background: rgba(255,255,255,0.9);
+  color: #1a237e;
+  font-size: 1.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Badges de status */
+.badge-ativos { background-color: #43a047; }
+.badge-espera { background-color: #283593; }
+.badge-sairam { background-color: #212121; color: #fff; }
+
+.badge-contador {
+    display: inline-block;
+    min-width: 24px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* ========================
+   ABAS
+   ======================== */
 #tabelasLeitura .nav-link {
   font-weight: 600;
   border-color: transparent !important;
-  color: #00796b !important;
+  color: #1a237e !important;
+  transition: all 0.3s ease;
 }
 
-#tabelasLeitura .nav-link:hover {
-  opacity: 0.85;
-}
+#tabelasLeitura .nav-link:hover { opacity: 0.85; }
 
-#tabelasLeitura .nav-link.active#ativos-tab {
-  background-color: #a5d6a7 !important;
-  color: #1b5e20 !important;
+#tabelasLeitura .nav-link.active#ativos-tab,
+#tabelasLeitura .nav-link.active#livros-tab {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%) !important;
+  color: #fff !important;
 }
 
 #tabelasLeitura .nav-link.active#espera-tab {
-  background-color: #ffe082 !important;
-  color: #795548 !important;
+  background: #43a047 !important;
+  color: #fff !important;
 }
 
 #tabelasLeitura .nav-link.active#sairam-tab {
-  background-color: #ffab91 !important;
-  color: #bf360c !important;
+  background: #212121 !important;
+  color: #fff !important;
 }
 
+/* ========================
+   BOTOES
+   ======================== */
+.action-buttons .btn {
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
 
+/* Gradientes dos botões */
+.btn-graph, .btn-add-book { 
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+}
+
+.btn-add-user { 
+  background: #43a047;
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+/* ========================
+   MODAIS
+   ======================== */
+.modal-custom {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-custom .modal-header {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  color: #fff;
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+}
+
+.modal-footer .btn {
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-cancel { background: #212121; color: #fff; }
+.btn-submit { background: #43a047; color: #fff; }
+
+.modal-footer .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+/* ========================
+   STATUS
+   ======================== */
+.status.disponivel { 
+  color: #43a047; font-weight: 500; 
+  font-size: 0.8em; 
+}
+.status.indisponivel { 
+  color: #212121; font-weight: 500; 
+  font-size: 0.8em; 
+}
+.leitor-badge { 
+  display: inline-block; 
+  margin-left: 8px; 
+  padding: 2px 6px; 
+  font-size: 0.9em; 
+  background-color: #f0f0f0; 
+  color: #333; 
+  border-radius: 12px; font-weight: 500; }
+
+.container{
+  background:#f0f0f0;
+}
 </style>
+
+
 
 {% endblock %}

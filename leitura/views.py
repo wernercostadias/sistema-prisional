@@ -20,14 +20,12 @@ def pedagogia_view(request):
     internos_frente = FrenteDeLeitura.objects.select_related("pessoa", "exemplar", "ciclo").order_by('-data_inicio', '-id')
     fila_espera = FilaDeEspera.objects.select_related("pessoa").order_by('-data_inclusao')
     internos_sairam = HistoricoLeitura.objects.select_related("pessoa").order_by('-data_saida', '-id')
+    livros = Livro.objects.prefetch_related("exemplares").all().order_by("titulo")
 
     mes_atual, ano_atual = timezone.now().month, timezone.now().year
     ciclo_atual, _ = CicloLeitura.objects.get_or_create(mes=mes_atual, ano=ano_atual)
-    livro_inicial = Livro.objects.first()
 
     # 🔍 Print do livro e ciclo atual de cada pessoa na frente de leitura
-# Print do livro e ciclo atual de cada pessoa na frente de leitura
-# Print do exemplar, código e ciclo
     for interno in internos_frente:
         if interno.exemplar:
             livro_titulo = interno.exemplar.livro.titulo
@@ -42,7 +40,6 @@ def pedagogia_view(request):
             ciclo_info = "Sem ciclo"
 
         print(f"PESSOA: {interno.pessoa.nome_completo} | LIVRO: {livro_titulo} | CÓDIGO: {codigo_exemplar} | CICLO: {ciclo_info}")
-
 
     if request.method == "POST":
         pessoa_id = request.POST.get("pessoa_id")
@@ -62,7 +59,6 @@ def pedagogia_view(request):
                 pessoa=pessoa,
                 defaults={
                     "data_inicio": timezone.now().date(),
-                    "livro": livro_inicial,
                     "ciclo": ciclo_atual,
                 }
             )
@@ -101,11 +97,120 @@ def pedagogia_view(request):
         "internos_frente": internos_frente,
         "fila_espera": fila_espera,
         "internos_sairam": internos_sairam,
+        "livros": livros,
     })
 
 
 
+# views.py
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
+from .models import FrenteDeLeitura, Exemplar, CicloLeitura
+from painel.models import Pessoa
+
+
+@require_POST
+def adicionar_exemplar_interno(request):
+    pessoa_id = request.POST.get("pessoa_id")
+    exemplar_id = request.POST.get("exemplar_id")
+
+    pessoa = get_object_or_404(Pessoa, id=pessoa_id)
+    exemplar = get_object_or_404(Exemplar, id=exemplar_id)
+
+    # ciclo atual
+    mes, ano = now().month, now().year
+    ciclo, _ = CicloLeitura.objects.get_or_create(mes=mes, ano=ano)
+
+    # cria ou atualiza frente de leitura
+    frente, created = FrenteDeLeitura.objects.get_or_create(
+        pessoa=pessoa,
+        defaults={"exemplar": exemplar, "ciclo": ciclo}
+    )
+
+    if not created:
+        frente.exemplar = exemplar
+        frente.ciclo = ciclo
+        frente.save()
+
+    # marcar exemplar como indisponível
+    exemplar.disponivel = False
+    exemplar.save()
+
+    return JsonResponse({
+        "sucesso": True,  # necessário bater com JS
+        "livro": exemplar.livro.titulo,
+        "codigo": exemplar.codigo,
+        "ciclo": str(ciclo),
+        "pessoa": pessoa.nome_completo
+    })
+
+
+@require_POST
+def remover_exemplar_interno(request):
+    pessoa_id = request.POST.get("pessoa_id")
+    codigo_exemplar = request.POST.get("exemplar_codigo")
+
+    if not pessoa_id or not codigo_exemplar:
+        return JsonResponse({"success": False, "erro": "Dados incompletos."})
+
+    try:
+        pessoa = Pessoa.objects.get(id=pessoa_id)
+        exemplar = Exemplar.objects.get(codigo=codigo_exemplar)
+    except (Pessoa.DoesNotExist, Exemplar.DoesNotExist):
+        return JsonResponse({"success": False, "erro": "Pessoa ou exemplar não encontrado."})
+
+    # 1️⃣ Tentar remover da FrenteDeLeitura (ciclo atual)
+    try:
+        frente = FrenteDeLeitura.objects.get(pessoa=pessoa, exemplar=exemplar)
+        frente.exemplar = None
+        frente.save()
+        exemplar.disponivel = True
+        exemplar.save()
+        return JsonResponse({"success": True, "exemplar_codigo": codigo_exemplar})
+    except FrenteDeLeitura.DoesNotExist:
+        # 2️⃣ Tentar remover do histórico de leituras (Leitura)
+        leituras = Leitura.objects.filter(pessoa=pessoa, exemplar=exemplar)
+        if leituras.exists():
+            leituras.delete()  # remove registro de leitura antigo
+            exemplar.disponivel = True
+            exemplar.save()
+            return JsonResponse({"success": True, "exemplar_codigo": codigo_exemplar})
+        else:
+            return JsonResponse({"success": False, "erro": "Exemplar não atribuído a esta pessoa."})
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from .models import Exemplar, FrenteDeLeitura, CicloLeitura
+from django.utils.timezone import now
+
+@require_GET
+def livro_exemplares(request, livro_id):
+    exemplares = Exemplar.objects.filter(livro_id=livro_id).select_related("livro")
+    mes, ano = now().month, now().year
+    ciclo_atual, _ = CicloLeitura.objects.get_or_create(mes=mes, ano=ano)
+
+    dados = []
+    for ex in exemplares:
+        leitor = None
+        # busca na frente de leitura se alguém está lendo este exemplar no ciclo atual
+        try:
+            frente = FrenteDeLeitura.objects.get(exemplar=ex, ciclo=ciclo_atual)
+            leitor = frente.pessoa.nome_completo
+        except FrenteDeLeitura.DoesNotExist:
+            leitor = None
+
+        dados.append({
+            "id": ex.id,
+            "codigo": ex.codigo,
+            "disponivel": ex.disponivel,
+            "leitor_atual": leitor
+        })
+
+    return JsonResponse({"exemplares": dados})
+
 
 
 @require_POST
@@ -234,11 +339,9 @@ def buscar_interno(request):
         "sairam": internos_sairam,
     })
 
-
 from django.views.decorators.http import require_GET
 from django.http import JsonResponse
-from .models import Leitura
-from .models import FrenteDeLeitura
+from .models import Leitura, FrenteDeLeitura, CicloLeitura
 
 @require_GET
 def listar_livros_interno(request):
@@ -246,16 +349,42 @@ def listar_livros_interno(request):
     if not pessoa_id:
         return JsonResponse({"erro": "ID da pessoa não enviado"}, status=400)
     
-    # Pegando todos os exemplares que a pessoa leu no ciclo atual
-    leituras = FrenteDeLeitura.objects.filter(pessoa_id=pessoa_id).select_related("exemplar__livro", "ciclo")
-    
     dados = []
-    for f in leituras:
+
+    # 1️⃣ Frente de Leitura (ciclo atual)
+    try:
+        frente = FrenteDeLeitura.objects.select_related("exemplar__livro", "ciclo", "pessoa").get(pessoa_id=pessoa_id)
+        if frente.exemplar:
+            dados.append({
+                "livro": frente.exemplar.livro.titulo,
+                "codigo_exemplar": frente.exemplar.codigo,
+                "ciclo": f"{frente.ciclo.mes}/{frente.ciclo.ano}",
+                "status": "Ativo",
+                "leitor_atual": frente.pessoa.nome_completo  # mostra quem está lendo agora
+            })
+    except FrenteDeLeitura.DoesNotExist:
+        frente = None
+
+    # 2️⃣ Leituras anteriores (todos os ciclos, exceto o atual)
+    ciclo_atual = frente.ciclo if frente else None
+    leituras = Leitura.objects.filter(pessoa_id=pessoa_id)
+    if ciclo_atual:
+        leituras = leituras.exclude(ciclo=ciclo_atual)
+    leituras = leituras.select_related("livro", "ciclo", "exemplar", "pessoa")
+
+    for l in leituras:
         dados.append({
-            "livro": f.exemplar.livro.titulo if f.exemplar else "Sem livro",
-            "codigo_exemplar": f.exemplar.codigo if f.exemplar else "Sem código",
-            "ciclo": f"{f.ciclo.mes}/{f.ciclo.ano}" if f.ciclo else "Sem ciclo"
+            "livro": l.livro.titulo,
+            "codigo_exemplar": l.exemplar.codigo if l.exemplar else "-",
+            "ciclo": f"{l.ciclo.mes}/{l.ciclo.ano}",
+            "status": "Concluído",
+            "leitor_atual": l.pessoa.nome_completo  # opcional: quem leu anteriormente
         })
+
+    # 🔹 Log para debug no console do backend
+    for i, item in enumerate(dados):
+        print(f"[{i}] Livro: {item['livro']}, Código: {item['codigo_exemplar']}, Ciclo: {item['ciclo']}, Status: {item['status']}, Leitor atual: {item['leitor_atual']}")
+
     return JsonResponse({"livros": dados})
 
 

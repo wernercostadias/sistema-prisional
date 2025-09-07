@@ -530,6 +530,30 @@ def adicionar_pessoa_view(request):
     return render(request, 'painel/adicionar_pessoa.html', {'form': form})
 
 
+from django.http import JsonResponse
+from django.db.models import Q
+from .models import Pessoa
+
+def autocomplete_nome_view(request):
+    query = request.GET.get('term', '')
+    if query:
+        pessoas = Pessoa.objects.filter(
+            Q(nome_completo__icontains=query)
+        ).values('nome_completo', 'status')[:10]
+
+        resultados = []
+        for pessoa in pessoas:
+            resultados.append({
+                'label': f"{pessoa['nome_completo']} ({pessoa['status']})",  # para exibir
+                'value': pessoa['nome_completo'],  # valor real que deve ir para o input
+                'status': pessoa['status']
+            })
+
+        return JsonResponse(resultados, safe=False)
+
+    return JsonResponse([], safe=False)
+
+
 
 @login_required
 def remover_pessoa(request, id):
@@ -1607,11 +1631,16 @@ def tabela_eletronico(request):
 
 
 from django.http import JsonResponse
+from django.db.models import Q
 
 def pessoa_search(request):
-    q = request.GET.get('q', '')
+    q = request.GET.get('q', '').strip()
+    
+    if not q:
+        return JsonResponse([], safe=False)
+    
     pessoas = Pessoa.objects.filter(
-        nome_completo__icontains=q
+        Q(nome_completo__icontains=q) | Q(matricula__icontains=q)
     ).exclude(
         transferencia__transferencia_ativa=True
     ).exclude(
@@ -1621,14 +1650,12 @@ def pessoa_search(request):
     results = [{
         'id': pessoa.id,
         'nome_completo': pessoa.nome_completo,
+        'matricula': pessoa.matricula or '-',
         'bloco': pessoa.bloco or '-',
         'cela': pessoa.cela or '-'
     } for pessoa in pessoas]
 
     return JsonResponse(results, safe=False)
-
-
-
 
 
 def excluir_eletronico(request, id):
