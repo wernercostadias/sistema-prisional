@@ -10,7 +10,9 @@
 
     <!-- Link para o arquivo CSS -->
 
-    
+    <!-- Exibição de mensagens com Notyf -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     
     <style>
         /* Importação de fontes */
@@ -286,32 +288,120 @@
                 left: 0;
                 width: 100%;
                 pointer-events: none;
-            }
+            } 
 
-            .gorro-natal {
+           .gorro-natal {
                 position: absolute;
                 top: -13px; /* Ajuste conforme necessário */
                 left: 101%;
                 transform: translateX(-50%) scaleX(-1) rotate(-30deg); /* Inverte a imagem e gira para a esquerda */
                 transform-origin: top center; /* Gira a partir do topo central */
                 width: 55px; /* Ajuste o tamanho do gorro */
-              }
+              } 
               
               
             
 </style>
-    
+<style>
+    /* Estilo para garantir que o ícone fique à direita */
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ajustando o ícone para aparecer à direita do campo */
+    .input-group-text {
+        cursor: pointer;
+        padding: 0 10px;
+        position: absolute;
+        right: 1px;
+        top:45px;
+        border-radius: 5px;  /* Adicionando bordas arredondadas para o ícone */
+        transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+        color:#f1f1f1;
+        background: #035569;
+    }
+
+
+
+    #togglePassword:hover{
+        background:rgb(2, 52, 65);
+    }
+
+    /* Adicionando o estilo de borda e espaçamento no campo */
+    .passwordinput {
+        padding-right: 40px; /* Deixa espaço para o ícone */
+    }
+
+    body > main > div > form > div.mensagens > div{
+
+        color:#f1f1f1 !important;
+        font-size:15px;
+        background: #12252B !important;
+    }
+</style>
     
     
 </head>
 <body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const notyf = new Notyf({
+                duration: 3500, // Duração padrão
+                position: { x: "right", y: "top" }, // Posição da notificação
+                dismissible: true, // Permitir fechar manualmente
+                types: [
+                    {
+                        type: 'info',
+                        background: '#17a2b8', // Cor azul para mensagens informativas
+                        icon: false
+                    }
+                ]
+            });
+    
+            let hasError = false; // Variável para verificar se há erro
+            let isLogoutMessage = false; // Verifica se a mensagem é de logout
+    
+            // Exibe as mensagens do Django no Notyf
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        if ("{{ message|escapejs }}" === "Você foi desconectado, o sistema UPACA estará aqui sempre para ajudar você!") {
+                            // Se for a mensagem de logout, aumenta a duração
+                            notyf.success("{{ message|escapejs }}", { duration: 5000 });
+                            isLogoutMessage = true;
+                        } else {
+                            notyf.success("{{ message|escapejs }}");
+                        }
+                    {% elif message.tags == 'error' %}
+                        notyf.error("{{ message|escapejs }}");
+                        hasError = true; // Define que houve um erro
+                    {% elif message.tags == 'info' %}
+                        notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                    {% else %}
+                        notyf.open({ message: "{{ message|escapejs }}" });
+                    {% endif %}
+                {% endfor %}
+    
+                // Se NÃO for erro e não for a mensagem de logout, redireciona para o index após 1,5 segundos
+                if (!hasError && !isLogoutMessage) {
+                    setTimeout(function () {
+                        window.location.href = '{% url "index" %}';
+                    }, 1500);
+                }
+            {% endif %}
+        });
+    </script>
+    
+    
     <canvas class="snowverlay"></canvas>
     <div class="container">
+        
         <!-- Área de apresentação no lado esquerdo -->
         <div class="apresentacao">
             <div class="texto-apresentacao">
-                <div class="austin">Sistema de Inteligência UPACA</div>
-                <img src="{% static 'imagens/gorrodenatal1.png' %}" class="gorro-natal" alt="Gorro de Natal">
+                <div class="austin">SISTEMA UPACA</div>
+                {% comment %} <img src="{% static 'imagens/gorrodenatal1.png' %}" class="gorro-natal" alt="Gorro de Natal"> {% endcomment %}
                 <div class="austin1">Unidade Prisional de Ressocialização de Açailândia</div>
             </div>
             <div class="logo">
@@ -323,31 +413,25 @@
         <form method="POST" class="form-entrada">
             {% csrf_token %}
             {% load crispy_forms_tags %}
-
-            <!-- Exibição de mensagens -->
-            {% if messages %}
-                <div class="mensagens">
-                    {% for message in messages %}
-                        <div class="alert 
-                            {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
             
             <div class="form-group">
                 <div id="div_id_username" class="mb-3">
                     <label for="id_username" class="form-label requiredField">
-                        ⭐ Servidor<span class="asteriskField"></span>
+                        🆔 Usuário<span class="asteriskField"></span>
                     </label>
                     <input type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" class="textinput form-control" required="" id="id_username">
                 </div>
                 <div id="div_id_password" class="mb-3">
                     <label for="id_password" class="form-label requiredField">
-                        ⭐ Senha<span class="asteriskField"></span>
+                        🔑 Senha<span class="asteriskField"></span>
                     </label>
-                    <input type="password" name="password" autocomplete="current-password" class="passwordinput form-control" required="" id="id_password">
+                    <div class="input-group">
+                        <input type="password" name="password" autocomplete="current-password" class="passwordinput form-control" required="" id="id_password">
+                        <!-- Ícone de visibilidade à direita do campo -->
+                        <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                            Ver Senha
+                        </span>
+                    </div>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary w-100 py-2 mt-3">Entrar</button>
@@ -362,170 +446,190 @@
     </footer>
 </body>
 
+
 <script>
-    const CANVAS_HEIGHT = 0.6;
-const SNOWFLAKE_AMOUNT = 50;
-const SNOWFLAKE_SIZE = {
-	min: 1,
-	max: 4
-};
-const SNOWFLAKE_SPEED = {
-	min: 0.2,
-	max: 1.2
-};
-const CANVAS_SELECTOR = ".snowverlay";
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordField = document.getElementById("id_password");
 
-let animationFrame;
+    togglePassword.addEventListener("click", function () {
+        // Alterna entre 'password' e 'text' no tipo do campo
+        const type = passwordField.type === "password" ? "text" : "password";
+        passwordField.type = type;
 
-// Shared utilities
-const setupCanvas = () => {
-	const canvas = document.querySelector(CANVAS_SELECTOR);
-	const ctx = canvas.getContext("2d");
-	if (!ctx) {
-		return null;
-	}
+        // Alterna o ícone de visibilidade
+        togglePassword.textContent = type === "password" ? "Ver Senha" : "Ocultar Senha";
 
-	const setCanvasSize = () => {
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight * CANVAS_HEIGHT;
-	};
-
-	setCanvasSize();
-	window.addEventListener("resize", setCanvasSize);
-
-	return { canvas, ctx };
-};
-
-const createSnowflake = (canvas, isAnimated = true, index = 0) => ({
-	x: Math.random() * canvas.width,
-	y: isAnimated
-		? -20 - (index * canvas.height) / SNOWFLAKE_AMOUNT
-		: Math.random() * canvas.height,
-	size:
-		Math.random() * (SNOWFLAKE_SIZE.max - SNOWFLAKE_SIZE.min) +
-		SNOWFLAKE_SIZE.min,
-	speed:
-		Math.random() * (SNOWFLAKE_SPEED.max - SNOWFLAKE_SPEED.min) +
-		SNOWFLAKE_SPEED.min,
-	opacity: isAnimated ? null : Math.random() * 0.5 + 0.2
-});
-// Função que desenha um floco de neve no contexto de desenho (ctx)
-const drawSnowflake = (ctx, flake, canvas) => {
-    // Inicia um novo caminho de desenho
-    ctx.beginPath();
-    
-    // Define a cor do floco de neve com base na opacidade
-    // Se a opacidade não estiver definida no floco, ela será calculada
-    // Quanto maior o floco, menor a opacidade, mais transparente ele será
-    ctx.fillStyle = `rgba(255, 255, 255, ${
-        flake.opacity ?? 1 - flake.y / canvas.height // opacidade baseada na posição Y
-    })`;
-
-    // Desenha um círculo (floco de neve) com as coordenadas e tamanho fornecidos
-    ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2); 
-
-    // Preenche o círculo com a cor definida (branco com a opacidade calculada)
-    ctx.fill();
-};
-
-// Função para renderizar a neve estática (sem animação)
-const renderStaticSnow = () => {
-    // Configura o canvas chamando a função setupCanvas()
-    const setup = setupCanvas();
-    
-    // Se a configuração do canvas falhar (setup não existir), sai da função
-    if (!setup) return;
-    
-    // Desestruturação para obter o canvas e o contexto de desenho (ctx)
-    const { canvas, ctx } = setup;
-
-    // Cria flocos de neve e os desenha no canvas
-    Array(SNOWFLAKE_AMOUNT)  // Cria um array com o número de flocos de neve
-        .fill(undefined) // Preenche o array com valores indefinidos
-        .map(() => createSnowflake(canvas, false)) // Cria os flocos de neve
-        .forEach((flake) => drawSnowflake(ctx, flake, canvas)); // Desenha cada floco de neve no canvas
-};
-
-// Função para iniciar a animação de neve
-const startSnowAnimation = () => {
-    // Configura o canvas
-    const setup = setupCanvas();
-    
-    // Se a configuração do canvas falhar, sai da função
-    if (!setup) {
-        return;
-    }
-
-    // Desestruturação para obter o canvas e o contexto de desenho (ctx)
-    const { canvas, ctx } = setup;
-
-    // Cria os flocos de neve com animação
-    const snowflakes = Array(SNOWFLAKE_AMOUNT)
-        .fill(undefined)  // Preenche o array com valores indefinidos
-        .map((_event, index) => createSnowflake(canvas, true, index)); // Cria os flocos de neve com animação
-
-    // Função que será chamada para cada quadro da animação
-    const animate = () => {
-        // Limpa o canvas para o próximo quadro
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Atualiza a posição de cada floco de neve e os desenha
-        snowflakes.forEach((flake) => {
-            // Atualiza a posição vertical (y) do floco de neve
-            flake.y += flake.speed;
-            
-            // Movimento horizontal baseado na posição Y do floco (efeito de ondulação)
-            flake.x += Math.sin(flake.y / 30) * 0.5;
-
-            // Se o floco de neve passar do fundo da tela, ele volta para o topo e muda sua posição horizontal
-            if (flake.y > canvas.height) {
-                flake.y = 0; // Volta para o topo
-                flake.x = Math.random() * canvas.width; // Posiciona aleatoriamente na largura
-            }
-
-            // Desenha o floco de neve com a posição e tamanho atualizados
-            drawSnowflake(ctx, flake, canvas);
-        });
-
-        // Chama a função de animação no próximo quadro
-        animationFrame = requestAnimationFrame(animate);
-    };
-
-    // Inicia a animação
-    animate();
-
-    // Retorna uma função para cancelar a animação
-    return () => {
-        cancelAnimationFrame(animationFrame); // Cancela a animação quando chamada
-    };
-};
-
-// Função de inicialização
-const init = () => {
-    // Verifica as preferências do usuário sobre movimentos animados
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    
-    // Função que lida com a mudança da preferência do usuário sobre animações
-    const handleMotionPreference = (event) => {
-        // Se o usuário preferir menos movimento (ou seja, animação estática), renderiza neve estática
-        if (event.matches) {
-            renderStaticSnow();
+        // Muda a cor de fundo do span com base no tipo da senha
+        if (type === "password") {
+            togglePassword.style.backgroundColor = "#075265";
+            togglePassword.style.color = '#f1f1f1';
         } else {
-            // Caso contrário, inicia a animação de neve
-            startSnowAnimation();
+            togglePassword.style.backgroundColor = "#075265";  
         }
+    });
+</script>
+
+<script>
+        const CANVAS_HEIGHT = 0.6;
+    const SNOWFLAKE_AMOUNT = 50;
+    const SNOWFLAKE_SIZE = {
+        min: 1,
+        max: 4
+    };
+    const SNOWFLAKE_SPEED = {
+        min: 0.2,
+        max: 1.2
+    };
+    const CANVAS_SELECTOR = ".snowverlay";
+
+    let animationFrame;
+
+
+    const setupCanvas = () => {
+        const canvas = document.querySelector(CANVAS_SELECTOR);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+            return null;
+        }
+
+        const setCanvasSize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight * CANVAS_HEIGHT;
+        };
+
+        setCanvasSize();
+        window.addEventListener("resize", setCanvasSize);
+
+        return { canvas, ctx };
     };
 
-    // Adiciona um ouvinte para mudanças nas preferências do usuário sobre movimento
-    mediaQuery.addEventListener("change", handleMotionPreference);
+    const createSnowflake = (canvas, isAnimated = true, index = 0) => ({
+        x: Math.random() * canvas.width,
+        y: isAnimated
+            ? -20 - (index * canvas.height) / SNOWFLAKE_AMOUNT
+            : Math.random() * canvas.height,
+        size:
+            Math.random() * (SNOWFLAKE_SIZE.max - SNOWFLAKE_SIZE.min) +
+            SNOWFLAKE_SIZE.min,
+        speed:
+            Math.random() * (SNOWFLAKE_SPEED.max - SNOWFLAKE_SPEED.min) +
+            SNOWFLAKE_SPEED.min,
+        opacity: isAnimated ? null : Math.random() * 0.5 + 0.2
+    });
+
+    const drawSnowflake = (ctx, flake, canvas) => {
+        
+        ctx.beginPath();
+        
+        
+        ctx.fillStyle = `rgba(255, 255, 255, ${
+            flake.opacity ?? 1 - flake.y / canvas.height
+        })`;
+
     
-    // Executa a função logo que a página é carregada, usando o estado atual das preferências
-    handleMotionPreference(mediaQuery);
-};
+        ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2); 
 
-// Espera a página ser totalmente carregada e, então, chama a função init
-document.addEventListener("DOMContentLoaded", init);
+        
+        ctx.fill();
+    };
 
-</script>
+
+    const renderStaticSnow = () => {
+        
+        const setup = setupCanvas();
+        
+        
+        if (!setup) return;
+        
+    
+        const { canvas, ctx } = setup;
+
+        
+        Array(SNOWFLAKE_AMOUNT) 
+            .fill(undefined) 
+            .map(() => createSnowflake(canvas, false)) 
+            .forEach((flake) => drawSnowflake(ctx, flake, canvas)); 
+    };
+
+
+    const startSnowAnimation = () => {
+        // Configura o canvas
+        const setup = setupCanvas();
+        
+    
+        if (!setup) {
+            return;
+        }
+
+    
+        const { canvas, ctx } = setup;
+
+        
+        const snowflakes = Array(SNOWFLAKE_AMOUNT)
+            .fill(undefined) 
+            .map((_event, index) => createSnowflake(canvas, true, index)); 
+
+    
+        const animate = () => {
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            
+            snowflakes.forEach((flake) => {
+            
+                flake.y += flake.speed;
+                
+                
+                flake.x += Math.sin(flake.y / 30) * 0.5;
+
+                
+                if (flake.y > canvas.height) {
+                    flake.y = 0; 
+                    flake.x = Math.random() * canvas.width; 
+                }
+
+                drawSnowflake(ctx, flake, canvas);
+            });
+
+        
+            animationFrame = requestAnimationFrame(animate);
+        };
+
+        
+        animate();
+
+        
+        return () => {
+            cancelAnimationFrame(animationFrame);
+        };
+    };
+
+
+    const init = () => {
+        
+        const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        
+        
+        const handleMotionPreference = (event) => {
+            
+            if (event.matches) {
+                renderStaticSnow();
+            } else {
+                
+                startSnowAnimation();
+            }
+        };
+
+    
+        mediaQuery.addEventListener("change", handleMotionPreference);
+        
+        
+        handleMotionPreference(mediaQuery);
+    };
+
+
+    document.addEventListener("DOMContentLoaded", init);
+
+</script> 
 
 {% endblock %}

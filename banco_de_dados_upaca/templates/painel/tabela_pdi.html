@@ -1,4 +1,5 @@
 {% extends 'bases/base.html' %}
+ItsFunAndGames776(I)!?
 {% load static %}
 {% block title %}Sistema Upaca - Tela Inicial{% endblock %}
 
@@ -10,10 +11,35 @@
 <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
 <!-- Carregar primeiro o jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Boxicons CDN -->
 <!-- Font Awesome CDN -->
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 3500, // Tempo que a notificação fica visível
+            position: { x: "right", y: "top" }, // Posição da notificação
+            dismissible: true // Permitir fechar manualmente
+        });
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% else %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
 
 
 
@@ -23,94 +49,90 @@
     <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;">
         <img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Procedimento Disciplinar Interno - PDI
     </h1>
-    
-
-    {% if messages %}
-    <div class="alert alert-dismissible fade show" role="alert">
-        {% for message in messages %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
-    </div>
-
-
-{% endif %}
-<div class="col mb-3">
-    <div class="container mt-3">
-        <form method="GET" class="row g-2">
-            <!-- Filtro por Pessoa -->
-            <div class="col-md-3">
-                <label for="filterPessoa" class="form-label text-dark">Pessoa</label>
-                <input type="text" name="pessoa" id="filterPessoa" class="form-control form-control-sm bg-light text-dark border-secondary" placeholder="Digite o nome" value="{{ request.GET.pessoa }}">
-            </div>
-
-            <!-- Filtro por Natureza -->
-            <div class="col-md-1">
-                <label for="filterNatureza" class="form-label text-dark">Natureza</label>
-                <select name="natureza" id="filterNatureza" class="form-select form-select-sm bg-light text-dark border-secondary">
-                    <option value="">Todas</option>
-                    <option value="leve" {% if request.GET.natureza == "leve" %}selected{% endif %}>Leve</option>
-                    <option value="media" {% if request.GET.natureza == "media" %}selected{% endif %}>Média</option>
-                    <option value="grave" {% if request.GET.natureza == "grave" %}selected{% endif %}>Grave</option>
-                </select>
-            </div>
-
-            <!-- Filtro por Descrição -->
-            <div class="col-md-3">
-                <label for="filterDescricao" class="form-label text-dark">Descrição</label>
-                <input type="text" name="descricao" id="filterDescricao" class="form-control form-control-sm bg-light text-dark border-secondary" placeholder="Descrição..." value="{{ request.GET.descricao }}">
-            </div>
-
-            <!-- Filtro por Data -->
-            <div class="col-md-2">
-                <label for="filterData" class="form-label text-dark">Data</label>
-                <input type="date" name="data" id="filterData" class="form-control form-control-sm bg-light text-dark border-secondary" value="{{ request.GET.data }}">
-            </div>
-
-            <!-- Filtro por Resultado -->
-            <div class="col-md-2">
-                <label for="filterResultado" class="form-label text-dark">Resultado</label>
-                <select name="resultado" id="filterResultado" class="form-select form-select-sm bg-light text-dark border-secondary">
-                    <option value="">Todos</option>
-                    <option value="andamento" {% if request.GET.resultado == "andamento" %}selected{% endif %}>Andamento</option>
-                    <option value="condenado" {% if request.GET.resultado == "condenado" %}selected{% endif %}>Condenado</option>
-                    <option value="sobrestado" {% if request.GET.resultado == "sobrestado" %}selected{% endif %}>Sobrestado</option>
-                </select>
-            </div>
-            <!-- Filtro e Ordenação por Letra -->
-            <div class="col-md-2 mt-3">
-                <div class="form-check">
-                    <input type="checkbox" name="ordenar_por_letra" id="filterPorLetra" class="form-check-input" value="1" {% if request.GET.ordenar_por_letra == "1" %}checked{% endif %}>
-                    <label class="form-check-label text-dark" for="filterPorLetra">Ordenar lista de A-Z</label>
+    <div class="col mb-3">
+        <div class="container mt-3">
+            <form method="GET" class="row g-2">
+                <!-- Pessoa -->
+                <div class="col-md-3">
+                    <label for="filterPessoa" class="form-label text-dark">Pessoa</label>
+                    <input type="text" name="pessoa" id="filterPessoa" class="form-control form-control-sm bg-light text-dark border border-dark rounded-3" placeholder="Digite o nome" value="{{ request.GET.pessoa }}">
                 </div>
-            </div>
-            <!-- Botões -->
-            <div class="col-md-12 mt-3 d-flex justify-content-end">
-                <button type="submit" class="btn btn-outline-primary btn-sm mr-2">Aplicar Filtros</button>
-                <a href="{% url 'tabela_pdi' %}" class="btn btn-outline-secondary btn-sm mr-2">Limpar Filtros</a>
-                <button type="button" 
-                        class="btn btn-outline-success btn-sm" 
-                        data-toggle="modal" 
-                        data-target="#pdiModal"
-                        {% if not user.is_superuser %}
-                            disabled 
-                            data-toggle="tooltip" 
-                            title="Você não tem permissão"
-                        {% endif %}>
-                    Cadastrar PDI
-                </button>
 
+                <!-- Natureza -->
+                <div class="col-md-2">
+                    <label for="filterNatureza" class="form-label text-dark">Natureza</label>
+                    <select name="natureza" id="filterNatureza" class="form-select form-select-sm bg-light text-dark border border-dark rounded-3">
+                        <option value="">Todas</option>
+                        <option value="leve" {% if request.GET.natureza == "leve" %}selected{% endif %}>Leve</option>
+                        <option value="media" {% if request.GET.natureza == "media" %}selected{% endif %}>Média</option>
+                        <option value="grave" {% if request.GET.natureza == "grave" %}selected{% endif %}>Grave</option>
+                    </select>
+                </div>
 
-            </div>
+                <!-- Resultado -->
+                <div class="col-md-2">
+                    <label for="filterResultado" class="form-label text-dark">Resultado</label>
+                    <select name="resultado" id="filterResultado" class="form-select form-select-sm bg-light text-dark border border-dark rounded-3">
+                        <option value="">Todos</option>
+                        <option value="andamento" {% if request.GET.resultado == "andamento" %}selected{% endif %}>Andamento</option>
+                        <option value="condenado" {% if request.GET.resultado == "condenado" %}selected{% endif %}>Condenado</option>
+                        <option value="sobrestado" {% if request.GET.resultado == "sobrestado" %}selected{% endif %}>Sobrestado</option>
+                    </select>
+                </div>
 
-        </form>
+                <!-- Status PDI -->
+                <div class="col-md-2">
+                    <label for="filterStatusPDI" class="form-label text-dark">Status PDI</label>
+                    <select name="status_pdi" id="filterStatusPDI" class="form-select form-select-sm bg-light text-dark border border-dark rounded-3">
+                        <option value="">Todos</option>
+                        <option value="em_vigor" {% if request.GET.status_pdi == "em_vigor" %}selected{% endif %}>Em Vigor</option>
+                        <option value="expirado" {% if request.GET.status_pdi == "expirado" %}selected{% endif %}>Expirado</option>
+                    </select>
+                </div>
+
+                <!-- Ordenar por Letra -->
+                <div class="col-md-1 d-flex align-items-end">
+                    <div class="form-check">
+                        <input type="checkbox" name="ordenar_por_letra" id="filterPorLetra" class="form-check-input" value="1" {% if request.GET.ordenar_por_letra == "1" %}checked{% endif %}>
+                        <label class="form-check-label text-dark" for="filterPorLetra">A-Z</label>
+                    </div>
+                </div>
+
+                <!-- Ordenar por Expiração -->
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="form-check">
+                        <input type="checkbox" name="ordenar_por_expiracao" id="filterPorExpiracao" class="form-check-input" value="1" {% if request.GET.ordenar_por_expiracao == "1" %}checked{% endif %}>
+                        <label class="form-check-label text-dark" for="filterPorExpiracao">Expiração</label>
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="col-md-12 mt-3 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-outline-primary btn-sm me-2">Aplicar Filtros</button>
+                    <a href="{% url 'tabela_pdi' %}" class="btn btn-outline-secondary btn-sm me-2">Limpar Filtros</a>
+                    <button type="button" 
+                            class="btn btn-outline-success btn-sm" 
+                            data-toggle="modal" 
+                            data-target="#pdiModal"
+                            {% if not user.is_superuser %} 
+                                disabled 
+                                data-toggle="tooltip" 
+                                title="Você não tem permissão"
+                            {% endif %}>
+                        Cadastrar PDI
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+    
 
 
     <div class="col">
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th class="text-center">#</th>
                     <th class="text-center">Nº PDI</th>
                     <th class="text-center">Nº Oco.</th>
                     <th class="text-center">Pessoa</th>
@@ -127,11 +149,28 @@
             <tbody>
                 {% for pdi_info in pd_is_info %}
                     <tr>
+                        <td class="text-center">{{ forloop.counter0|add:page_obj.start_index }}</td>
                         <td class="text-center">{{ pdi_info.pdi.numero_pdi }}</td>
                         <td class="text-center">{{ pdi_info.pdi.numero_ocorrencia }}</td>
                         <td class="text-center">{{ pdi_info.pdi.pessoa.nome_completo }}</td>
-                        <td class="text-center">{{ pdi_info.pdi.get_natureza_display }}</td>
-                        <td class="text-center descricao-wrap">{{ pdi_info.pdi.descricao }}</td>
+                        <td class="text-center">
+                            <span class="natureza 
+                                {% if pdi_info.pdi.get_natureza_display == 'Leve' %}natureza-leve{% endif %}
+                                {% if pdi_info.pdi.get_natureza_display == 'Média' %}natureza-media{% endif %}
+                                {% if pdi_info.pdi.get_natureza_display == 'Grave' %}natureza-grave{% endif %}
+                            ">
+                                {{ pdi_info.pdi.get_natureza_display }}
+                            </span>
+                        </td>
+                        
+                        
+                        
+                        
+                        <td class="text-center descricao-wrap" style="font-size: 12px; max-width: 150px; word-wrap: break-word; white-space: normal;">
+                            {{ pdi_info.pdi.descricao }}
+                        </td>
+                        
+
 
                         <td class="text-center">{{ pdi_info.pdi.data_inicio|date:"d/m/Y H:i" }}</td>
                         <td class="text-center">
@@ -150,38 +189,87 @@
                         </td>
                         
                         <td class="text-center">
-                            {{ pdi_info.dias_restantes }}
-                        </td>
-                        <td class="text-center">
-                            <span class="
-                                {% if pdi_info.pdi.get_resultado_display == 'Condenado' %}
-                                    text-danger fw-bold
-                                {% elif pdi_info.pdi.get_resultado_display == 'Andamento' %}
-                                    text-primary fw-bold
-                                {% elif pdi_info.pdi.get_resultado_display == 'Sobrestado' %}
-                                    text-warning fw-bold
+                            {% if pdi_info.dias_restantes %}
+                                {% if pdi_info.dias_restantes == "Expira Hoje" %}
+                                    <span class="text-warning">{{ pdi_info.dias_restantes }}</span>  <!-- Amarelo para expira hoje -->
+                                {% elif "dias restantes" in pdi_info.dias_restantes %}
+                                    <span class="text-success">{{ pdi_info.dias_restantes }}</span>  <!-- Verde para dias restantes -->
                                 {% else %}
-                                    text-muted fw-bold
+                                    <span class="text-danger">{{ pdi_info.dias_restantes }}</span>  <!-- Vermelho para expirado -->
                                 {% endif %}
-                            ">
-                                {{ pdi_info.pdi.get_resultado_display }}
-                            </span>
-                        </td>
-                        
-                        
-                        <td class="text-center">
-                            {% if user.is_superuser %}
-                                <!-- Botão para abrir o modal de edição -->
-                                <button class="btn btn-custom" data-toggle="modal" data-target="#editModal{{ pdi_info.pdi.id }}">
-                                    Editar
-                                </button>
                             {% else %}
-                                <!-- Mensagem de permissão negada -->
-                                <span style="font-size:12px;">Você não tem permissão.</span>
+                                <span class="text-muted">Não definido</span> <!-- Caso não exista informação sobre dias restantes -->
                             {% endif %}
                         </td>
                         
                         
+                        
+                        <td class="text-center">
+                            <mark class="px-1 py-0.5 fw-bold 
+                                {% if pdi_info.pdi.get_resultado_display == 'Condenado' %}
+                                    bg-danger text-white
+                                {% elif pdi_info.pdi.get_resultado_display == 'Andamento' %}
+                                    bg-primary text-white
+                                {% elif pdi_info.pdi.get_resultado_display == 'Sobrestado' %}
+                                    bg-warning text-dark
+                                {% else %}
+                                    bg-secondary text-white
+                                {% endif %}
+                            " style="border-radius: 10px 0px 10px 0px; font-size: 0.875rem;">
+                                {{ pdi_info.pdi.get_resultado_display }}
+                            </mark>
+                        </td>
+                        
+                        
+                        
+                        
+<td style="vertical-align: middle; text-align: center;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+        {% if user.is_superuser %}
+            <!-- Botão de edição -->
+            <button
+                class="btn btn-sm btn-primary"
+                style="
+                    padding: 3px 6px;
+                    border: none;
+                    box-shadow: none;
+                    outline: none;
+                "
+                data-toggle="modal"
+                data-target="#editModal{{ pdi_info.pdi.id }}"
+                title="Editar"
+            >
+                <i class="fas fa-edit"></i>
+            </button>
+
+            <!-- Botão de exclusão -->
+            <form
+                method="POST"
+                action="{% url 'apagar_pdi' pdi_info.pdi.id %}"
+                style="margin: 0;"
+                onsubmit="return confirm('Tem certeza que deseja apagar este PDI?');"
+            >
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="btn btn-sm btn-danger"
+                    style="
+                        padding: 3px 6px;
+                        border: none;
+                        box-shadow: none;
+                        outline: none;
+                    "
+                    title="Apagar"
+                >
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        {% else %}
+            <span style="font-size:12px;">Você não tem permissão.</span>
+        {% endif %}
+    </div>
+</td>
+
                     </tr>
 
                     <!-- Modal para edição -->
@@ -258,7 +346,8 @@
                     
                                         <div class="form-row">
                                             <div class="form-group col-sm-6">
-                                                <label for="natureza">Natureza</label>
+                                                <label for="
+                                                ">Natureza</label>
                                                 <select name="natureza" class="form-control" required>
                                                     <option value="" {% if not pdi_info.pdi.natureza %}selected{% endif %}>Selecione a natureza</option>
                                                     <option value="leve" {% if pdi_info.pdi.natureza == 'leve' %}selected{% endif %}>Leve</option>
@@ -279,10 +368,7 @@
                     
                                         <!-- Botões para Salvar e Apagar -->
                                         <button type="submit" class="btn btn-primary">Salvar</button>
-                                        <!-- Botão de apagar -->
-                                        <button type="button" class="btn btn-danger" onclick="document.getElementById('action_type').value = 'delete'; if(confirm('Tem certeza que deseja apagar este PDI?, Essa ação é irreversível.')) { this.form.submit(); }">
-                                            Apagar
-                                        </button>
+                                        
                                     </form>
                                 </div>
                             </div>
@@ -298,24 +384,47 @@
             </tbody>
         </table>
 
-        <div class="pagination-wrapper">
-            <div class="pagination">
-                <span class="step-links">
-                    {% if page_obj.has_previous %}
-                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page=1">Primeira</a>
-                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
-                    {% endif %}
+        <div class="pagination-wrapper d-flex justify-content-center mt-3">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page=1">
+                            « Primeira
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.previous_page_number }}">
+                            ‹ Anterior
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">« Primeira</span></li>
+                    <li class="page-item disabled"><span class="page-link">‹ Anterior</span></li>
+                {% endif %}
         
-                    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
         
-                    {% if page_obj.has_next %}
-                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
-                        <a href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.paginator.num_pages }}">Última</a>
-                    {% endif %}
-                </span>
-            </div>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.next_page_number }}">
+                            Próxima ›
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in filtros.items %}{{ key }}={{ value }}&{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                            Última »
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Próxima ›</span></li>
+                    <li class="page-item disabled"><span class="page-link">Última »</span></li>
+                {% endif %}
+            </ul>
         </div>
-        
         
     <div>
 
@@ -554,6 +663,7 @@
         padding: 5px;
     }
 
+    
 
     /* Estilo para a linha da tabela */
 tr {
@@ -590,11 +700,6 @@ table {
 }
 
     
-
-    
-    
-
-
 
 
 
@@ -746,30 +851,32 @@ table {
     background-color: #0056b3;
     border-color: #0056b3;
 }
-/* Botão personalizado */
+/* Botão personalizado simples e pequeno */
 .btn-custom {
-    background-color: #007bff; /* Cor de fundo personalizada */
-    color: white; /* Cor do texto */
-    border: 2px solid #0056b3; /* Borda mais suave e com contraste */
-    border-radius: 30px; /* Bordas arredondadas para um design mais moderno */
-    padding: 5px 12px; /* Espaçamento interno para deixar o botão mais 'gordinho' */
-    font-size: 14px; /* Tamanho da fonte */
-    font-weight: 600; /* Negrito no texto */
-    transition: background-color 0.3s, transform 0.3s; /* Efeitos de transição */
+    background-color:rgba(1, 16, 32, 0.43); /* Cor de fundo azul */
+    color: white; /* Texto branco */
+    border: 1px dashed rgb(0, 123, 31) ; /* Sem borda padrão */
+
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 5px 15px; /* Menos espaçamento para um botão pequeno */
+    font-size: 12px; /* Tamanho da fonte pequeno */
+    font-weight: 600; /* Peso da fonte */
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transição suave */
+    cursor: pointer; /* Cursor pointer */
 }
 
 /* Efeito de foco e hover */
 .btn-custom:hover, .btn-custom:focus {
-    background-color: #0056b3; /* Cor de fundo ao passar o mouse ou focar */
-    border-color: #004085; /* Cor da borda ao passar o mouse ou focar */
-    transform: translateY(-2px); /* Pequeno efeito de elevação */
+    background-color:rgb(7, 22, 1); /* Cor mais escura ao passar o mouse */
+    transform: scale(1.05); /* Aumenta um pouco o tamanho */
+    color: white;
 }
 
 /* Efeito ao clicar */
 .btn-custom:active {
-    background-color: #003366; /* Cor de fundo ao clicar */
-    border-color: #002244; /* Cor da borda ao clicar */
-    transform: translateY(0); /* Retorno ao estado original */
+    background-color:rgb(1, 2, 0); /* Cor mais escura quando clicado */
+    transform: scale(0.98); /* Diminui um pouco o tamanho ao clicar */
+    box-shadow:none !important;
 }
 
 
@@ -842,6 +949,31 @@ table {
 .table th {
     white-space: nowrap; /* Evita quebra de linha no título da coluna */
 }
+
+.natureza-leve {
+    background-color: #d4edda; /* Um verde suave */
+    color: #155724; /* Texto verde escuro */
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.natureza-media {
+    background-color: #fff3cd; /* Um amarelo suave */
+    color: #856404; /* Texto amarelo escuro */
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.natureza-grave {
+    background-color: #f8d7da; /* Um vermelho suave */
+    color: #721c24; /* Texto vermelho escuro */
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
 
 </style>
 

@@ -6,6 +6,9 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <!-- Scripts Bootstrap -->
 
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <style>
     body {
         background-color: #f4f6f9;
@@ -148,17 +151,33 @@
     
 
 </style>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 3000, // Tempo que a notificação fica visível
+            position: { x: "right", y: "top" }, // Posição da notificação
+            dismissible: true // Permitir fechar manualmente
+        });
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% else %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
 <br>
 <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Sanções Disciplinares</h1>
 <div class="container">
-    <!-- Filtros -->
-        {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
     <div class="col mb-3">
         <form method="get" class="form-inline mb-4" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
             <div class="form-group" style="flex: 1; min-width: 150px;">
@@ -205,6 +224,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th class="text-center">#</th>
                             <th class="text-center">Nome do Interno</th>
                             <th class="text-center">Tipo de Sanção</th>
                             <th class="text-center">Descrição</th>
@@ -219,6 +239,7 @@
                     <tbody>
                         {% for sancao in sancoes_detalhadas %}
                             <tr id="sancao_{{ sancao.sancao.id }}">
+                                <td class="text-center">{{ forloop.counter0|add:page_obj.start_index }}</td>
                                 <td>{{ sancao.sancao.pessoa.nome_completo }}</td>
                                 <td>{{ sancao.sancao.get_tipo_display }}</td>
                                 <td>{{ sancao.sancao.descricao }}</td>
@@ -312,26 +333,25 @@
 
 <!-- Script para atualização do tempo restante -->
 <script>
-    function atualizarTempoRestante(sancaoId) {
-        fetch(`/atualizar-tempo-restante/${sancaoId}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.tempo_restante) {
-                    document.getElementById(`tempo_restante_${sancaoId}`).innerText = data.tempo_restante;
+   // Atualiza o tempo restante de todas as sanções
+function atualizarTodosTempos() {
+    fetch(`/atualizar-tempos-restantes/`)
+        .then(response => response.json())
+        .then(data => {
+            data.sancoes.forEach(sancao => {
+                const elemento = document.getElementById(`tempo_restante_${sancao.id}`);
+                if (elemento) {
+                    elemento.innerText = sancao.tempo_restante;
                 }
-            })
-            .catch(error => console.error('Erro ao atualizar tempo restante:', error));
-    }
+            });
+        })
+        .catch(error => console.error('Erro ao atualizar tempos restantes:', error));
+}
 
-    document.addEventListener("DOMContentLoaded", function() {
-        {% for sancao in sancoes_detalhadas %}
-            {% if sancao.tempo_restante != "Sanção finalizada" %}
-                setInterval(function() {
-                    atualizarTempoRestante({{ sancao.sancao.id }});
-                }, 1000); 
-            {% endif %}
-        {% endfor %}
-    });
+document.addEventListener("DOMContentLoaded", function () {
+    setInterval(atualizarTodosTempos, 10000); // Atualiza a cada 10 segundos
+});
+
 </script>
 
 <!-- Scripts do Bootstrap -->

@@ -8,6 +8,127 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <!-- CSS do Choices.js -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<style>
+    @media screen and (max-width: 600px) {
+        .tabela {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            font-size: 12px;
+            
+        }
+    
+        .tabela th,
+        .tabela td {
+            padding: 6px;
+            font-size: 10px;
+            text-align: center;
+            min-width:280px;
+        }
+    
+        .tabela th {
+            font-size: 9px;
+            padding: 5px;
+        }
+    
+        .tabela td img {
+            width: 12px;
+            height: 12px;
+            margin-top: -5px;
+        }
+    
+        .tabela-btn-opcao {
+            padding: 3px 8px;
+            font-size: 10px;
+        }
+    
+        .tabela td i {
+            font-size: 14px;
+        }
+    
+        /* Torna a tabela responsiva ao transformar em formato de "cartões" */
+        .tabela thead {
+            display: none; /* Esconde os cabeçalhos da tabela */
+        }
+    
+        .tabela tbody tr {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .tabela tbody tr td {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+    
+        .tabela tbody tr td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+        }
+    }
+    
+    
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const notyf = new Notyf({
+            duration: 3500, // Tempo de exibição da notificação
+            position: { x: "right", y: "top" }, // Posição da notificação
+            dismissible: true, // Permitir fechar manualmente
+            types: [
+                {
+                    type: 'info',
+                    background: '#17a2b8', // Cor azul para mensagens informativas
+                    icon: false
+                }
+            ]
+        });
+
+        let hasError = false; // Verifica se há erro no formulário
+
+        // Exibe os erros de formulário no Notyf
+        {% if form_errors %}
+            {% for field, errors in form_errors.items %}
+                {% for error in errors %}
+                    notyf.error("{{ error|escapejs }}");
+                    hasError = true;
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+        // Exibe as mensagens do Django no Notyf
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                    hasError = true;
+                {% elif message.tags == 'info' %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% else %}
+                    notyf.open({ message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
 
 <div class="container">
     
@@ -16,29 +137,6 @@
     <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 20px; font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 80px; height: 80px; margin-right: 10px;">Eletrônicos Cadastrados</h1>
 
 
-
-    
-    
-    
-    
-    {% if form_errors %}
-    {% for field, errors in form_errors.items %}
-        {% for error in errors %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% endif %}
-
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
     <div class="col mb-2 p-2 rounded" style="background-color: #f9f9f9; border: 1px solid #ddd;">
         <!-- Formulário de filtro -->
         <form method="get" class="d-flex flex-wrap gap-2">

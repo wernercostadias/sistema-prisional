@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.dateparse import parse_datetime
 from django.forms.models import inlineformset_factory
 from .models import Pessoa, Sancao, Eletronico, PDI
-
+from django.core.validators import RegexValidator
 class PessoaForm(forms.ModelForm):
     ESTUDANDO_CHOICES = [
         ('nao_estuda', 'Não'),
@@ -15,7 +15,6 @@ class PessoaForm(forms.ModelForm):
         ('ensino_superior', 'Ensino Superior'),
     ]
 
-
     ESCOLARIDADE_CHOICES = [
         ('1', 'Fundamental Incompleto'),
         ('2', 'Fundamental Completo'),
@@ -24,21 +23,28 @@ class PessoaForm(forms.ModelForm):
         ('5', 'Superior Incompleto'),
         ('6', 'Superior Completo'),
     ]
-    
-    
 
     # Campos existentes
     nome_completo = forms.CharField(required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-    idade = forms.IntegerField(required=False, widget=forms.NumberInput(attrs={"class": "form-control"}))
+    data_nascimento = forms.DateField(required=False,widget=forms.DateInput(attrs={"class": "form-control", "type": "date"})
+    )
     data_entrada = forms.DateField(required=False, widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}))
-    
+    matricula = forms.CharField(
+    required=False,
+    widget=forms.TextInput(attrs={
+        "class": "form-control",
+        "placeholder": "Digite a matrícula"
+    }),
+    validators=[
+        RegexValidator(regex=r'^\d{1,30}$', message="A matrícula deve conter apenas números (até 10 dígitos).")
+    ]
+)
+
     escolaridade = forms.ChoiceField(
         choices=ESCOLARIDADE_CHOICES,
         required=False,
         widget=forms.Select(attrs={"class": "form-control"})
     )
-
-    
 
     estudando = forms.ChoiceField(
         choices=ESTUDANDO_CHOICES,
@@ -68,13 +74,6 @@ class PessoaForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-control"})
     )
 
-    # Adicionando o campo frente_trabalho
-    frente_trabalho = forms.ChoiceField(
-        choices=Pessoa.FrenteDeTrabalho.choices,  # Usar diretamente do modelo
-        required=False,
-        label="Frente de Trabalho",
-        widget=forms.Select(attrs={"class": "form-control"})
-    )
 
     # Adicionando o campo saiu_temporariamente
     saiu_temporariamente = forms.BooleanField(
@@ -83,11 +82,19 @@ class PessoaForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
 
+     # Adicionando o campo albergado
+    albergado = forms.BooleanField(
+        required=False,
+        label="Albergado",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
     class Meta:
         model = Pessoa
         fields = [
             'nome_completo',
-            'idade',
+            'data_nascimento',
+            'matricula',
             'data_entrada',
             'escolaridade',
             'estudando',
@@ -95,12 +102,9 @@ class PessoaForm(forms.ModelForm):
             'cidade',
             'bloco',
             'cela',
-            'frente_trabalho',
             'saiu_temporariamente',
+            'albergado',  # Adicionando o campo albergado
         ]
-
-    
-
 
 class TransferenciaForm(forms.ModelForm):
     transferencia_ativa = forms.BooleanField(
@@ -140,6 +144,8 @@ class SancaoForm(forms.ModelForm):
         ('sem_castelo', 'Sem Castelo'),
         ('sem_visita_intima', 'Sem Visita Íntima'),
         ('sem_visita_social', 'Sem Visita Social'),
+        ('isolamento_preventivo', 'Isolamento Preventivo'),
+        ('isolamento_reflexao', 'Isolamento Reflexão'),
     ]
 
     # Campo para escolher o tipo de sanção
@@ -254,10 +260,7 @@ class PDIForm(forms.ModelForm):
             self.fields['data_fim'].initial = self.instance.data_fim
             self.fields['pessoa'].initial = self.instance.pessoa  # Preenche o campo com o valor atual da instância
             self.fields['resultado'].initial = self.instance.resultado
-
-
-
-            
+       
 from django.core.exceptions import ValidationError
 
 class EletronicoForm(forms.ModelForm):
@@ -313,3 +316,14 @@ class EletronicoForm(forms.ModelForm):
         return cleaned_data
 
 
+from django import forms
+from .models import FrenteDeTrabalho
+
+class FrenteDeTrabalhoForm(forms.ModelForm):
+    class Meta:
+        model = FrenteDeTrabalho
+        fields = ['pessoa', 'frente_trabalho', 'data_inicio', 'numero_portaria_admissao', 'data_retroacao']
+        widgets = {
+            'data_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'data_retroacao': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: "Segoe UI", sans-serif;
+            font-size: 11px;
+            color: #222;
+            margin: 0;
+        }
+
+        .cabecalho {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .cabecalho h1 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .cabecalho small {
+            font-size: 10px;
+            color: #555;
+        }
+
+        .linha-divisoria {
+            border-top: 1px solid #ccc;
+            margin: 10px 0 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #f1f1f1;
+            font-size: 11px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        th:nth-child(1), td:nth-child(1) { width: 8%; }
+        th:nth-child(2), td:nth-child(2) { width: 8%; }
+        th:nth-child(3), td:nth-child(3) { width: 50%; }
+        th:nth-child(4), td:nth-child(4) { width: 34%; }
+
+        .rodape {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cabecalho">
+        <h1>Lista Personalizada de Internos</h1>
+        <small>Sistema de Gerenciamento Prisional - Penitenciária de Açailândia</small><br>
+        <small>Relatório gerado por: <strong>{{ usuario }}</strong> em <strong>{{ data_hora }}</strong></small>
+    </div>
+
+    <div class="linha-divisoria"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Bloco</th>
+                <th>Cela</th>
+                <th>Nome Completo</th>
+                <th>Setores</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pessoa in pessoas %}
+            <tr>
+                <td>{{ pessoa.bloco }}</td>
+                <td>{{ pessoa.cela }}</td>
+                <td>{{ pessoa.nome|upper }}</td>
+                <td>{{ pessoa.destino }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

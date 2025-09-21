@@ -18,24 +18,48 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 
+from comunicados.models import Comunicado  # Importa o modelo de comunicados
+
+from django.utils import timezone
+from datetime import timedelta
 def login_view(request):
+    comunicados_qs = Comunicado.objects.order_by('-criado_em')[:5]  # últimos 5
+    comunicados = list(comunicados_qs)  # transforma em lista para poder adicionar atributos
+
+    now = timezone.now()
+    two_days_ago = now - timedelta(days=2)
+
+    for comunicado in comunicados:
+        comunicado.is_new = comunicado.criado_em >= two_days_ago
+
     if request.method == "POST":
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        user = authenticate(request, username=username, password=password)
+        
+        user_exists = User.objects.filter(username=username).exists()
 
-        if user is not None:
-            login(request, user)
-            messages.success(request, "Login realizado com sucesso!")
-            return redirect('home')  # Redirecione para a página inicial ou outro destino
+        if user_exists:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Login realizado com sucesso!")
+                return redirect('index')
+            else:
+                messages.error(request, "Senha incorreta. Tente novamente.")
         else:
-            # Se o login falhar, informe o usuário e mantenha o formulário
-            messages.error(request, "Nome de usuário ou senha incorretos. Tente novamente.")
-    
-    return render(request, 'login.html')
+            messages.error(request, "Nome de usuário não encontrado. Tente novamente.")
+
+    return render(request, 'accounts/login1.html', {'comunicados': comunicados})
 
 
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "Você foi desconectado, o sistema UPACA estará aqui sempre para ajudar você!")
+    return redirect('login')
 
 # Função que verifica se o usuário é admin
 def is_admin(user):
@@ -172,8 +196,7 @@ def users_online_view(request):
     return render(request, 'accounts/users_online.html')
 
 
-def user_logged_out(request):
-    return render(request, 'accounts/user_logged_out.html')
+
 
 
 from django.shortcuts import get_object_or_404, redirect

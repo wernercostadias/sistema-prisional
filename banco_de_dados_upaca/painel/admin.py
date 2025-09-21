@@ -1,41 +1,46 @@
 # painel/admin.py
 from django.contrib import admin
-from .models import Pessoa, HistoricoAlteracao, Transferencia, Sancao, Eletronico, PDI, Notification  # Importando Notification
+from .models import Pessoa, HistoricoAlteracao, Transferencia, Sancao, Eletronico, PDI, FrenteDeTrabalho
 
 from .forms import PessoaForm  # Importando o formulário
 from django.contrib.admin.models import LogEntry
-# Administrador de Notificação
-class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'titulo', 'tipo', 'data_criacao', 'lida')
-    list_filter = ('tipo', 'lida', 'data_criacao')
-    search_fields = ('usuario__username', 'titulo', 'mensagem')
-    ordering = ('-data_criacao',)
-    actions = ['marcar_como_lida']
 
-    def marcar_como_lida(self, request, queryset):
-        queryset.update(lida=True)
-    marcar_como_lida.short_description = "Marcar como lida"
-
-admin.site.register(Notification, NotificationAdmin)
 
 # Criando uma classe de admin personalizada para o modelo Pessoa
 class PessoaAdmin(admin.ModelAdmin):
     form = PessoaForm
-    list_display = ('nome_completo', 'idade', 'data_entrada', 'bloco', 'cela',)
-    list_filter = ('bloco', 'cela', 'escolaridade', 'estudando',)
-    search_fields = ('nome_completo', 'idade', 'artigo_criminal', 'cidade')
+    list_display = ('nome_completo', 'matricula', 'data_nascimento', 'data_entrada', 'bloco', 'cela', 'status', 'tem_transferencia_ativa', 'saiu_temporariamente', 'albergado')
+    list_filter = ('bloco', 'cela', 'escolaridade', 'estudando', 'status', 'tem_transferencia_ativa', 'saiu_temporariamente', 'albergado')
+    search_fields = ('nome_completo', 'matricula', 'data_nascimento', 'artigo_criminal', 'cidade', 'status')
     ordering = ('nome_completo',)
+    readonly_fields = ('created_at',)
+    actions = ['marcar_como_inativo', 'marcar_como_ativo']
+
     fieldsets = (
         (None, {
-            'fields': ('nome_completo', 'idade', 'data_entrada', 'bloco', 'cela')
+            'fields': ('nome_completo', 'matricula', 'data_nascimento', 'data_entrada', 'status')
         }),
-        ('Detalhes adicionais', {
-            'fields': (
-                'escolaridade', 'estudando',
-                'artigo_criminal', 'cidade'
-            ),
+        ('Localização', {
+            'fields': ('bloco', 'cela', 'cidade')
+        }),
+        ('Atividades', {
+            'fields': ('escolaridade', 'estudando')
+        }),
+        ('Situação Penal', {
+            'fields': ('artigo_criminal', 'tem_transferencia_ativa', 'saiu_temporariamente', 'albergado')
+        }),
+        ('Outros', {
+            'fields': ('created_at',)
         }),
     )
+
+    def marcar_como_inativo(self, request, queryset):
+        queryset.update(status='inativo')
+    marcar_como_inativo.short_description = "Marcar como Inativo"
+
+    def marcar_como_ativo(self, request, queryset):
+        queryset.update(status='ativo')
+    marcar_como_ativo.short_description = "Marcar como Ativo"
 
     def is_sancao_ativa(self, obj):
         return obj.is_sancao_ativa()
@@ -113,3 +118,99 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 admin.site.register(LogEntry, LogEntryAdmin)
 
+from django.contrib import admin
+from django.utils.html import format_html
+from .models import FrenteDeTrabalho
+
+@admin.register(FrenteDeTrabalho)
+class FrenteDeTrabalhoAdmin(admin.ModelAdmin):
+    # Colunas exibidas na lista
+    list_display = (
+        'pessoa',
+        'frente_trabalho_formatado',
+        'data_inicio',
+        'numero_portaria_admissao',
+        'numero_portaria_revogacao',
+        'data_retroacao',
+        'data_revogacao',
+        'status',
+        'link_pdf_revogacao',
+    )
+
+    # Campos que serão links para abrir o detalhe
+    list_display_links = ('pessoa', 'frente_trabalho_formatado')
+
+    # Filtros avançados na lateral
+    list_filter = (
+        'frente_trabalho',
+        'status',
+        ('data_inicio', admin.DateFieldListFilter),
+        ('data_revogacao', admin.DateFieldListFilter),
+    )
+
+    # Pesquisa por campos relacionais e texto
+    search_fields = ('pessoa__nome_completo', 'numero_portaria_admissao', 'numero_portaria_revogacao')
+
+    # Campos editáveis na edição do objeto
+    fields = (
+        'pessoa',
+        'frente_trabalho',
+        'data_inicio',
+        'numero_portaria_admissao',
+        'numero_portaria_revogacao',
+        'data_retroacao',
+        'data_revogacao',
+        'status',
+        'pdf_revogacao',
+    )
+
+    # Ordenação padrão da lista
+    ordering = ('-data_inicio',)
+
+    # Paginação na lista para melhorar performance e visual
+    list_per_page = 30
+
+    # Campos somente leitura (exemplo: numero_portaria_revogacao é gerado no save)
+    readonly_fields = ('numero_portaria_revogacao', 'status', 'link_pdf_revogacao')
+
+    # Campos em formato dinâmico para exibir artigos e links
+    def frente_trabalho_formatado(self, obj):
+        # Usa o método do modelo para mostrar a frente com artigo
+        return obj.get_frente_trabalho_com_artigo()
+    frente_trabalho_formatado.short_description = 'Frente de Trabalho'
+
+    def link_pdf_revogacao(self, obj):
+        if obj.pdf_revogacao:
+            return format_html('<a href="{}" target="_blank">Ver PDF</a>', obj.pdf_revogacao.url)
+        return "-"
+    link_pdf_revogacao.short_description = 'PDF Revogação'
+
+    # Para melhorar a visualização, pode usar cores no status
+    def status_colored(self, obj):
+        color = 'green' if obj.status == obj.ATIVO else 'red'
+        return format_html(
+            '<strong><span style="color: {};">{}</span></strong>',
+            color,
+            obj.get_status_display()
+        )
+    status_colored.short_description = 'Status'
+    status_colored.admin_order_field = 'status'
+
+    # Substituir o campo status na list_display pela versão colorida
+    list_display = (
+        'pessoa',
+        'frente_trabalho_formatado',
+        'data_inicio',
+        'numero_portaria_admissao',
+        'numero_portaria_revogacao',
+        'data_retroacao',
+        'data_revogacao',
+        'status_colored',
+        'link_pdf_revogacao',
+    )
+
+    # Permitindo edição rápida de alguns campos direto da lista (opcional)
+    list_editable = ('data_revogacao',)
+
+    # Campos com filtros por data mais detalhados
+    date_hierarchy = 'data_inicio'

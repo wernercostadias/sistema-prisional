@@ -26,10 +26,10 @@ SECRET_KEY = 'django-insecure-rr7&h6s*%p+cxojdxf$74%f^_+zjn^n)or6#4(zthhm4g*rl5=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.110.37.178', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['10.110.37.244', 'localhost', '127.0.0.1']
 
 LOGIN_REDIRECT_URL = '/'  # Redireciona para a página inicial após o login
-
+from django.contrib.messages import constants as messages
 
 # Ignorar RuntimeWarnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -46,45 +46,39 @@ INSTALLED_APPS = [
     #apps
     'painel',
     'accounts',
+    'leitura',
+    'comunicados',
+    'channels',
+    'notification',
     'crispy_forms',
     'crispy_bootstrap5',
     'widget_tweaks',
+    'ckeditor',
 ]
 
 
+ASGI_APPLICATION = 'banco_de_dados_upaca.asgi.application'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'django_debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
+
 
 
 # Define que a sessão expira ao fechar o navegador
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Define a duração da sessão (em segundos)
-SESSION_COOKIE_AGE = 3600  # 1 hora
-
+SESSION_COOKIE_AGE = 50000
 MEDIA_URL = '/media/'  # URL para acessar os arquivos de mídia na web
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Caminho no sistema para armazenar arquivos
 
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -111,7 +105,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'accounts.context_processors.users_online',
-                'painel.context_processors.notificacoes_context',
+                'notification.context_processors.notificacoes_context',
+
             ],
         },
     },
@@ -169,7 +164,7 @@ LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
@@ -185,12 +180,13 @@ LANGUAGES = [
 STATIC_URL = '/static/'
 
 # Para o ambiente de produção, configure o diretório onde os arquivos estáticos serão armazenados
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Para diretórios adicionais de estáticos
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Diretório para coletar os arquivos estáticos
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-if DEBUG:
-    STATICFILES_DIRS.append(BASE_DIR / 'static')
+STATICFILES_DIRS.append(BASE_DIR / 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

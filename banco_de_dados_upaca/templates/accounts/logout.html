@@ -1,7 +1,13 @@
 <ul class="nav">
     {% if user.is_authenticated %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+            <!-- Formulário de logout -->
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="nav-link" style="background: none; border: none; color: inherit; font-size: inherit; cursor: pointer;">
+                    Sair
+                </button>
+            </form>
         </li>
     {% else %}
         <li class="nav-item">
@@ -9,8 +15,3 @@
         </li>
     {% endif %}
 </ul>
-
-
-
-
-

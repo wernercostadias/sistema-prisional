@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema UPACA - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-section {
+            flex: 1;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .news-section {
+            flex: 1;
+            padding: 40px;
+            background: #ffffff;
+            border-left: 1px solid #e0e0e0;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+        
+        .logo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-header h1 {
+            color: #1a237e;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .logo-header h2 {
+            color: #5c6bc0;
+            font-size: 18px;
+            font-weight: normal;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #5c6bc0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+        }
+        
+        .input-group {
+            display: flex;
+        }
+        
+        .input-group input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-left: none;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            cursor: pointer;
+            color: #5c6bc0;
+            font-weight: 500;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-button:hover {
+            background: #283593;
+        }
+        
+        .date-display {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .news-header {
+            color: #1a237e;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8eaf6;
+        }
+        
+        .news-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f5f7ff;
+            border-radius: 8px;
+            border-left: 4px solid #3949ab;
+        }
+        
+        .news-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .news-title {
+            color: #1a237e;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .news-content {
+            color: #444;
+            line-height: 1.5;
+        }
+        
+        .news-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #3949ab;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .news-link:hover {
+            text-decoration: underline;
+        }
+        
+        .version {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .news-section {
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+    <style>
+    /* Estilos para a seção de notícias */
+    .news-section {
+        flex: 1;
+        padding: 40px;
+        background: #ffffff;
+        border-left: 1px solid #e0e0e0;
+        overflow-y: auto;
+        max-height: 700px;
+    }
+    
+    .news-header {
+        color: #1a237e;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e8eaf6;
+        font-size: 1.8rem;
+    }
+    
+    .news-item {
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f5f7ff;
+        border-radius: 8px;
+        border-left: 4px solid #3949ab;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .news-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .news-date {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .news-title {
+        color: #1a237e;
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .news-content {
+        color: #444;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+    
+    .news-link {
+        display: inline-block;
+        margin-top: 10px;
+        color: #3949ab;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .news-link:hover {
+        color: #1a237e;
+        text-decoration: underline;
+    }
+    
+    .no-comunicados {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 20px;
+    }
+    
+    .version {
+        text-align: center;
+        margin-top: 30px;
+        color: #999;
+        font-size: 12px;
+    }
+    
+    /* Estilos para o modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 700px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        padding: 20px;
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        color: white;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        position: relative;
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        padding-right: 30px;
+    }
+    
+    .modal-date {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        color: #fff;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .close:hover {
+        color: #f0f0f0;
+    }
+    
+    .modal-body {
+        padding: 25px;
+        overflow-y: auto;
+        line-height: 1.6;
+        color: #333;
+        flex-grow: 1;
+    }
+    
+    .modal-body p {
+        margin-bottom: 15px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        background: #f5f5f5;
+        border-top: 1px solid #e0e0e0;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        text-align: right;
+    }
+    
+    .modal-close-btn {
+        padding: 10px 20px;
+        background: #1a237e;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    
+    .modal-close-btn:hover {
+        background: #283593;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .news-section {
+            padding: 20px;
+            border-left: none;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+        }
+    }
+
+
+    .version, .credits {
+    font-size: 0.85rem;
+    color: #6c757d; /* cinza suave */
+    text-align: center;
+    margin-top: 5px;
+}
+.badge-novo {
+    display: inline-block;
+    position: relative;
+    background: linear-gradient(145deg, #ff3b30, #ff5c4d);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 16px;
+    margin-left: 8px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: default;
+
+    /* Sombra externa pulsante */
+    box-shadow: 0 2px 6px rgba(255, 59, 48, 0.6), 0 0 8px rgba(255, 59, 48, 0.4);
+    animation: glowPulse 1.5s infinite alternate;
+    
+    /* Brilho no texto */
+    text-shadow: 0 0 2px #fff, 0 0 4px #ff3b30, 0 0 6px #ff5c4d;
+    overflow: hidden;
+}
+
+/* Reflexo passando sobre o texto */
+.badge-novo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.0) 100%);
+    transform: skewX(-20deg);
+    animation: shine 2s infinite;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 2px 6px rgba(255, 59, 48, 0.6), 0 0 8px rgba(255, 59, 48, 0.4); }
+    50% { box-shadow: 0 4px 14px rgba(255, 59, 48, 1), 0 0 20px rgba(255, 59, 48, 0.8); }
+    100% { box-shadow: 0 2px 6px rgba(255, 59, 48, 0.6), 0 0 8px rgba(255, 59, 48, 0.4); }
+}
+
+@keyframes shine {
+    0% { left: -75%; }
+    50% { left: 125%; }
+    100% { left: 125%; }
+}
+
+
+
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Seção de Login -->
+        <div class="login-section">
+            <div class="logo-header">
+                <h1>Sistema UPACA</h1>
+                <h2>Unidade Prisional de Ressocialização de Açailândia</h2>
+            </div>
+            
+            <!-- Exibir mensagens -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Formulário de login -->
+            <form method="POST" class="form-entrada">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <div id="div_id_username" class="mb-3">
+                        <label for="id_username" class="form-label requiredField">
+                            Usuário<span class="asteriskField">*</span>
+                        </label>
+                        <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" class="textinput form-control" required id="id_username" placeholder="Digite seu usuário">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div id="div_id_password" class="mb-3">
+                        <label for="id_password" class="form-label requiredField">
+                            Senha<span class="asteriskField">*</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="password" name="password" autocomplete="current-password" class="passwordinput form-control" required id="id_password" placeholder="Digite sua senha">
+                            <!-- Ícone de visibilidade à direita do campo -->
+                            <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                Ver Senha
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-button">Entrar</button>
+            </form>
+            
+            <div class="date-display">
+                {% now "d \d\e F \d\e Y" %}
+
+            </div>
+        </div>
+        
+        <!-- Seção de Notícias/Atualizações -->
+        <div class="news-section">
+            <h2 class="news-header">Comunicados</h2>
+
+            {% for comunicado in comunicados %}
+            <div class="news-item">
+                <div class="news-date">
+                    {{ comunicado.data|date:"d \d\e F \d\e Y" }}
+                    {% if comunicado.is_new %}
+                        <span class="badge-novo">Recente</span>
+                    {% endif %}
+                </div>
+
+                <h3 class="news-title">{{ comunicado.titulo }}</h3>
+                <div class="news-content">
+                    {{ comunicado.conteudo|truncatewords_html:20|safe }}
+                </div>
+                <a href="#" class="news-link leia-mais-btn" data-comunicado-id="{{ comunicado.id }}">
+                    Leia mais
+                </a>
+            </div>
+            {% empty %}
+            <p class="no-comunicados">Nenhum comunicado disponível.</p>
+            {% endfor %}
+
+            <!-- Modal para exibir comunicado completo -->
+            <div id="comunicadoModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modalTitulo"></h2>
+                        <span class="modal-date" id="modalData"></span>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body" id="modalConteudo"></div>
+                    <div class="modal-footer">
+                        <button class="modal-close-btn">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Script para alternar visibilidade da senha
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('id_password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Alterar texto do botão
+            this.textContent = type === 'password' ? 'Ver Senha' : 'Ocultar Senha';
+        });
+        
+        // Focar no campo de usuário ao carregar a página
+        document.getElementById('id_username').focus();
+    </script>
+<script>
+const comunicadosData = {
+    {% for comunicado in comunicados %}
+    {{ comunicado.id }}: {
+        titulo: "{{ comunicado.titulo|escapejs }}",
+        data: "{{ comunicado.data|date:'d \\d\\e F \\d\\e Y' }}",
+        conteudo: `{{ comunicado.conteudo|escapejs }}`,
+        is_new: {{ comunicado.is_new|yesno:"true,false" }}
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+
+const modal = document.getElementById('comunicadoModal');
+const modalTitulo = document.getElementById('modalTitulo');
+const modalData = document.getElementById('modalData');
+const modalConteudo = document.getElementById('modalConteudo');
+const closeBtn = document.querySelector('.close');
+const closeModalBtn = document.querySelector('.modal-close-btn');
+const leiaMaisBtns = document.querySelectorAll('.leia-mais-btn');
+
+function abrirModal(comunicadoId) {
+    const comunicado = comunicadosData[comunicadoId];
+    if (comunicado) {
+        modalTitulo.textContent = comunicado.titulo;
+
+        // Adiciona badge "novo" se is_new for true
+        modalData.innerHTML = comunicado.data;
+        if (comunicado.is_new === true) {
+            modalData.innerHTML += ' <span class="badge-novo">Recente</span>';
+        }
+
+        modalConteudo.innerHTML = comunicado.conteudo;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function fecharModal() {
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+leiaMaisBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        abrirModal(this.getAttribute('data-comunicado-id'));
+    });
+});
+
+closeBtn.addEventListener('click', fecharModal);
+closeModalBtn.addEventListener('click', fecharModal);
+
+window.addEventListener('click', function(e) {
+    if (e.target === modal) fecharModal();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.style.display === 'block') fecharModal();
+});
+</script>
+
+<script>
+const comunicadosData = {
+    {% for comunicado in comunicados %}
+    {{ comunicado.id }}: {
+        titulo: "{{ comunicado.titulo|escapejs }}",
+        data: "{{ comunicado.data|date:'d \\d\\e F \\d\\e Y' }}",
+        conteudo: `{{ comunicado.conteudo|escapejs }}`
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+};
+</script>
+</body>
+</html>

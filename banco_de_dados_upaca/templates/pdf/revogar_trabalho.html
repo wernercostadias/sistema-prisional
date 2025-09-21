@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+   
+</head>
+<body>
+<div class="table-container">
+    <img class="imagem-center" src="data:image/png;base64,{{ img_seap_base64 }}" class="logo">
+    <div class="header">
+        <img src="data:image/png;base64,{{ img_seap_base64 }}" class="logo">
+        <div>
+            <p><strong>ESTADO DO MARANHÃO</strong></p>
+            <p><strong>SECRETARIA DE ESTADO DE ADMINISTRAÇÃO PENITENCIÁRIA</strong></p>
+            <p><strong>UNIDADE PRISIONAL DE RESSOCIALIZAÇÃO DE AÇAILÂNDIA</strong></p>
+        </div>
+    </div>
+    <br><br><br>
+    <h2 class="center">PORTARIA DE REVOGAÇÃO DE TRABALHO Nº {{ numero_portaria_revogacao }}</h2>
+
+    <div class="texto-diretor">
+        O Diretor RICKSON TED ARAUDO PAVÃO, no uso de suas atribuições legais conferidas pelo Art. 37, § 1 da Lei 7.210/84 e pelo Decreto Estadual nº 27.640/11,
+    </div>
+
+    <br><br>
+    <h2 class="center">RESOLVE:</h2>
+    <br><br>
+    <div class="ART1"> 
+        Art. 1º REVOGAR  a Portaria nº {{numero_portaria_admissao}} de {{data_inicio}}, na qual foi nomeado o (a) reeducando,  {{ pessoa }},  matrícula nº {{pessoa.matricula}}, a exercer atividade laborativa {{ frente_trabalho }} da UPR de Açailândia/MA.
+    </div> 
+
+    <br><br>
+
+    <div class="ART2">
+        Art. 2º Esta portaria entra em vigor a partir da data de sua publicação, retroagindo os seus efeitos a partir do dia {{ data_retroacao }}
+    </div>
+
+    <br><br>
+
+    <div class="ciencia">
+        DÉ-SE CIÊNCIA E CUMPRA-SE.
+    </div>
+    <br><br>
+    <div class="data">
+        Açailândia-MA, {{ data_hoje }}
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+
+    <div class="rodape">
+        <img src="data:image/png;base64,{{ img_logo_base64 }}" class="imagem-rodape">
+    </div>
+    <div class="baixo-do-rodape">
+    Rua 04 nº 000 Bairro Vila Progresso II CEP: 65930-000<br>
+    Email: upaca@seap.ma.gov.br / www.seap.ma.gov.br
+    </div>
+
+</body>
+
+<style>
+    body { 
+    font-family: Arial, sans-serif;
+    font-size: 16px; }
+
+    .table-container{
+        width: 100%;
+        margin: 0 auto; /* Centraliza o conteúdo horizontalmente */
+    }
+
+    @page {
+        size: 210mm 297mm; /* Largura e altura da página */
+        margin: 8mm 20mm 8mm 20mm; /* Margem de 35mm apenas no eixo X (esquerda e direita) e 20mm no eixo Y (topo e base) */
+    }
+    
+    .header { 
+    text-align: left; 
+    font-size:15px;
+ }
+    
+    .header p { 
+    margin: 2px 0;
+    transform: translate(15px, 15px); /* Mover 15px para a direita e 6px para baixo */
+}
+   
+    .logo{ 
+    float: left; width: 70px; 
+}
+    
+    .title{ 
+    font-size: 16px; 
+    font-weight: bold; 
+}
+    
+    .content{ 
+    margin-top: 20px; 
+}
+    
+    .center{
+    text-align:center; font-size:16px;
+    }
+
+    .ART1, .ART2{
+        font-size:16px;
+        line-height: 1.5; /* Aumenta o espaçamento entre as linhas */
+        letter-spacing: 0.04rem; /* Ajusta o espaçamento entre as letras */
+        text-align: justify; /* Alinhamento justificado */
+        word-wrap: break-word; /* Permite a quebra de palavras para caber no container */
+    }
+
+    .texto-diretor {
+        text-indent: 3em; /*  tamanho do recuo desejado */
+        font-size:16px;
+        line-height: 1.5; /*  espaçamento entre as linhas */
+        letter-spacing: 0.04rem; /* Ajusta o espaçamento entre as letras */
+        text-align: justify; /* Alinhamento justificado */
+        word-wrap: break-word; /* Permite a quebra de palavras  */
+    }
+
+    .ciencia{
+        text-indent: 6em; /*  tamanho do recuo desejado */
+    }
+
+    .data{
+        text-align:right;
+    }
+
+    .imagem-center {
+        position: absolute;         /* Posiciona a imagem de forma absoluta */
+        bottom: 218px;               /* Coloca a imagem a 20px do fundo da página */
+        left: 50%;                  /* Centraliza a imagem horizontalmente */
+        transform: translateX(-50%); /* Ajusta para realmente centralizar a imagem */
+        opacity: 0.1;               /* Ajuste a opacidade conforme necessário */
+        width: 370px;           /* Ajuste o tamanho máximo da imagem */
+        height: auto;               /* Mantém a proporção da imagem */
+    }
+
+    /* Estilo do Rodapé */
+.rodape {
+    width: 760px;
+    height: 30px;
+    background-color:rgba(36, 36, 36, 0.18); /* Cor escura para o rodapé */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left:-65px;
+}
+
+/* Estilo para a logo no rodapé */
+.imagem-rodape {
+    width:130px;
+    display:center;
+    
+}
+
+/* Estilo da seção abaixo do rodapé */
+.baixo-do-rodape {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Estilo para o texto no baixo-do-rodape */
+.baixo-do-rodape p {
+    margin: 5px 0;
+}
+</style>
+</html>

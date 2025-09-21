@@ -1,0 +1,2242 @@
+
+{% load notificacao_extras %}
+{% load custom_filters %}
+{% load static %}
+{% block content %}
+
+<!-- CSS Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Seu CSS personalizado -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- Notyf -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js (dependência do Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+
+<!-- JS Bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Highcharts -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<!-- Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<!-- Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+  const notyf = new Notyf({
+    duration: 3500,
+    position: { x: "right", y: "top" },
+    dismissible: true,
+    types: [
+      {
+        type: 'info',
+        background: '#2196F3', // Azul
+        icon: {
+          className: 'fas fa-info-circle',
+          tagName: 'i',
+          text: ''
+        }
+      },
+      {
+        type: 'warning',
+        background: '#FFC107', // Amarelo
+        icon: {
+          className: 'fas fa-exclamation-triangle',
+          tagName: 'i',
+          text: ''
+        }
+      },
+      {
+        type: 'danger',
+        background: '#f44336', // Vermelho
+        icon: {
+          className: 'fas fa-times-circle',
+          tagName: 'i',
+          text: ''
+        }
+      }
+    ]
+  });
+</script>
+
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        notyf.success("{{ message|escapejs }}");
+      {% elif message.tags in 'error danger warning info' %}
+        notyf.open({ type: '{{ message.tags }}', message: "{{ message|escapejs }}" });
+      {% else %}
+        notyf.success("{{ message|escapejs }}");
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</script>
+
+
+<div class="container mt-4" style="max-width:100%;">
+
+<!-- Cabeçalho do Painel -->
+<div class="header-panel">
+
+  <!-- Bloco de Título Moderno -->
+  <div class="panel-title">
+    <div class="panel-title-text">
+      <h2>        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h2a4 4 0 014 4v2M12 3v4M6 7h12"/>
+        </svg> Painel de Leitura</h2>
+      <small>Acompanhe leitores e exemplares em tempo real</small>
+    </div>
+    <div class="panel-title-icon">📚</div>
+  </div>
+
+  <!-- Bloco de Busca -->
+  <div class="search-box">
+    <span class="search-icon">      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+        <circle cx="11" cy="11" r="8" stroke-width="2"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"/>
+      </svg></span>
+    <input type="text" class="form-control" placeholder="Buscar interno...">
+  </div>
+
+  <!-- Bloco de Botões de Ação -->
+  <div class="action-buttons">
+    
+    <!-- Botão Início -->
+    <button class="btn btn-home" onclick="window.location.href='{% url 'index' %}'" title="Ir para Início">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10h16V10"/>
+      </svg>
+      <span>Início</span>
+    </button>
+
+    <!-- Botão Interno -->
+    <button class="btn btn-add-user" data-toggle="modal" data-target="#modalAdicionarInterno" title="Adicionar novo interno">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      <span>Interno</span>
+    </button>
+
+    <!-- Botão Livro -->
+    <button class="btn btn-add-book" data-toggle="modal" data-target="#modalCadastrarLivro" title="Cadastrar livro">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h14v16H3z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 4h2a1 1 0 011 1v14a1 1 0 01-1 1h-2"/>
+        <line x1="10" y1="4" x2="10" y2="20" stroke-width="1.5" stroke="#000" />
+      </svg>
+      <span>Livro</span>
+    </button>
+
+    <!-- Botão Ciclos -->
+    <button class="btn btn-cycles" data-toggle="modal" data-target="#modalCiclos" title="Ver Ciclos">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="black" viewBox="0 0 24 24" width="24" height="24">
+        <rect x="3" y="4" width="18" height="16" rx="2"/>
+        <path d="M3 10h18M8 2v4M16 2v4"/>
+      </svg>
+      <span>Ciclos</span>
+    </button>
+
+    <!-- Botão Gráficos -->
+    <button class="btn btn-graph" data-toggle="modal" data-target="#modalGraficos" title="Ver gráficos">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m4 6V9m4 8v-4"/>
+      </svg>
+      <span>Gráficos</span>
+    </button>
+  </div>
+</div>
+
+
+<!-- Abas de Navegação -->
+<ul class="nav nav-tabs mb-3 justify-content-center border-bottom" id="tabelasLeitura" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="ativos-tab" data-toggle="tab" href="#ativos" role="tab">
+      📖 Leitores Ativos <span id="contador-ativos" class="badge" style="display:none; background-color:#81c784; color:#1b5e20;">0</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="espera-tab" data-toggle="tab" href="#espera" role="tab">
+      ⏳ Fila de Espera <span id="contador-espera" class="badge" style="display:none; background-color:#ffd54f; color:#795548;">0</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="sairam-tab" data-toggle="tab" href="#sairam" role="tab">
+      📤 Saíram da Leitura <span id="contador-sairam" class="badge" style="display:none; background-color:#ff8a65; color:#bf360c;">0</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="livros-tab" data-toggle="tab" href="#livros" role="tab">
+      📚 Catálogo de Livros
+    </a>
+  </li>
+</ul>
+
+
+
+  <!-- Conteúdo das Abas -->
+  <div class="tab-content">
+    <!-- Leitores Ativos -->
+    <div class="tab-pane fade show active" id="ativos" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead><!-- Botão Sortear Livros -->
+          <button class="btn btn-primary" data-toggle="modal" data-target="#modalSortearLivros">
+              Sortear Livros
+          </button>
+          <!-- Linha do Total (apenas na última coluna) -->
+          <tr class="thead-total">
+            <th colspan="7"></th>
+            <th class="text-end align-middle">
+              <div class="fw-bold">
+                Total: <span class="badge-total">{{ internos_frente|length }}</span>
+              </div>
+            </th>
+          </tr>
+
+          <!-- Linha normal do cabeçalho -->
+          <tr class="thead-ativos">
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Livro Atual</th>
+            <th>Código do livro</th>
+            <th>Ciclo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for interno in internos_frente %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>
+              <a href="javascript:void(0);" onclick="abrirModalLivros({{ interno.pessoa.id }})">
+                {{ interno.pessoa.nome_completo }}
+              </a>
+            </td>
+
+            <td>
+                {% if interno.exemplar %}
+                    {{ interno.exemplar.livro.titulo }}
+                {% else %}
+                    Sem livro
+                {% endif %}
+            </td>
+            <td>
+                {% if interno.exemplar %}
+                    {{ interno.exemplar.codigo }}
+                {% else %}
+                    Sem código
+                {% endif %}
+            </td>
+            <td>
+                {% if interno.ciclo %}
+                    {{ interno.ciclo.numero }}/{{ interno.ciclo.ano }}
+                {% else %}
+                    Sem ciclo
+                {% endif %}
+            </td>
+
+
+            <td class="td-acoes">
+              <div class="d-flex align-items-center gap-2">
+
+                <!-- Botão Retirar -->
+                <button 
+                  class="btn btn-submit d-flex align-items-center gap-2" 
+                  onclick="abrirModalSaida({{ interno.pessoa.id }})"
+                  title="Retirar Interno"
+                  style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff;">
+                  <span>Retirar</span>
+                </button>
+
+                <!-- Botão Excluir -->
+                <button 
+                  class="btn btn-cancel d-flex align-items-center gap-2" 
+                  onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'frente')"
+                  title="Excluir Interno"
+                  style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">
+                  🗑️ <span>Excluir</span>
+                </button>
+
+              </div>
+            </td>
+
+
+
+
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno na frente de leitura.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fila de Espera -->
+    <div class="tab-pane fade" id="espera" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-espera">
+          <tr>
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Entrada</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interno in fila_espera %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>{{ interno.pessoa.nome_completo }}</td>
+            <td>{{ interno.data_inclusao }}</td>
+            <td class="td-acoes">
+              <div class="d-flex gap-2">
+
+                <!-- Botão Mover -->
+                <form method="POST" action="{% url 'pedagogia_view' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="pessoa_id" value="{{ interno.pessoa.id }}">
+                  <input type="hidden" name="lista" value="frente">
+                  <button type="submit" 
+                          class="btn btn-submit d-flex align-items-center gap-2" 
+                          style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff;"
+                          title="Mover Interno">
+                    🔀 <span>Mover</span>
+                  </button>
+                </form>
+
+                <!-- Botão para Modal de Exclusão -->
+                <button type="button" 
+                        class="btn btn-cancel d-flex align-items-center gap-2" 
+                        onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'espera')"
+                        style="padding: 0.25rem 0.75rem; font-size: 0.85rem;"
+                        title="Excluir Interno">
+                  🗑️ <span>Excluir</span>
+                </button>
+
+              </div>
+            </td>
+
+
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno na fila de espera.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Saíram da Leitura -->
+    <div class="tab-pane fade" id="sairam" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-sairam">
+          <tr>
+            <th style="width: 5px;">Nº</th>
+            <th style="width: 5px;">Bloco</th>
+            <th style="width: 5px;">Cela</th>
+            <th>Nome</th>
+            <th>Saída</th>
+            <th>Motivo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interno in internos_sairam %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ interno.pessoa.bloco }}</td>
+            <td>{{ interno.pessoa.cela }}</td>
+            <td>{{ interno.pessoa.nome_completo }}</td>
+            <td>{{ interno.data_saida }}</td>
+            <td>{{ interno.get_motivo_saida_display }}</td>
+            <td class="td-acoes">
+              <button class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('{{ interno.pessoa.id }}', 'historico', '{{ interno.id }}')">
+                🗑️
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum interno saiu da leitura.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Aba: Livros -->
+    <div class="tab-pane fade" id="livros" role="tabpanel">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+          <tr>
+            <th style="width: 5%;">Nº</th>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Total Exemplares</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for livro in livros %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <a href="javascript:void(0);" onclick="abrirModalExemplares({{ livro.id }}, '{{ livro.titulo }}')">
+                {{ livro.titulo }}
+              </a>
+            </td>
+            <td>{{ livro.autor|default:'Sem autor' }}</td>
+            <td>{{ livro.exemplares.count }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Nenhum livro cadastrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Modal: Adicionar Interno Modernizado -->
+<div class="modal fade" id="modalAdicionarInterno" tabindex="-1" role="dialog" aria-labelledby="modalAdicionarInternoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content modal-custom" style="min-height: 400px;"> <!-- aumenta altura -->
+      <form method="POST" action="{% url 'pedagogia_view' %}">
+        {% csrf_token %}
+        <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+          <h5 class="modal-title">Adicionar Interno</h5>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body position-relative">
+          <!-- Overlay escuro com transição -->
+          <div id="overlaySugestoes" style="
+            display:none; 
+            position:fixed; 
+            top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.5); 
+            z-index:999; 
+            opacity:0; 
+            transition: opacity 0.3s ease;">
+          </div>
+
+          <!-- Campo de busca moderno -->
+          <div class="mb-3 position-relative" style="z-index:1000;">
+            <label for="id_pessoa" class="form-label text-muted">Selecionar Interno:</label>
+            <input type="text" id="id_pessoa" name="pessoa_id" class="form-control" placeholder="Digite o nome ou matrícula..." autocomplete="off">
+            <ul id="listaSugestoesInterno" class="list-group position-absolute w-100 mt-1" style="max-height: 200px; overflow-y: auto;"></ul>
+          </div>
+
+          <div class="form-group">
+            <label for="id_lista" class="font-weight-bold text-muted">Escolher Lista:</label>
+            <select name="lista" id="id_lista" class="form-control">
+              <option value="frente">Frente de Leitura</option>
+              <option value="espera">Fila de Espera</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit">Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Saída -->
+<div class="modal fade" id="modalSairLeitura" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
+      <form id="formSaida" method="POST" action="{% url 'pedagogia_view' %}" onsubmit="return enviarFormularioSaida()">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Registrar Saída da Leitura</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="internoId" name="pessoa_id">
+          <div class="form-group mb-3">
+            <label for="motivo_saida" class="font-weight-bold text-muted">Motivo da Saída</label>
+            <select id="motivo_saida" name="motivo_saida" class="form-control" required>
+              <option value="pdi">Por PDI</option>
+              <option value="pediu">Pediu para sair</option>
+              <option value="transferido">Interno Transferido</option>
+              <option value="alvara">Alvará</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="data_saida" class="font-weight-bold text-muted">Data da Saída</label>
+            <input type="date" id="data_saida" name="data_saida" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit" style="background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);">Confirmar Saída</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal com Gráficos Highcharts -->
+<div class="modal fade" id="modalGraficos" tabindex="-1" role="dialog" aria-labelledby="modalGraficosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content modal-custom">
+      <div class="modal-header" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title">Gráficos de Leitura</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div id="graficoDistribuicao" style="height: 350px;"></div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div id="graficoProgresso" style="height: 350px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1" role="dialog" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <form method="POST" action="{% url 'excluir_interno' %}">
+      {% csrf_token %}
+      <input type="hidden" name="pessoa_id" id="modalPessoaId">
+      <input type="hidden" name="lista" id="modalExcluirLista">
+      <input type="hidden" name="historico_id" id="modalHistoricoId">
+      <div class="modal-content modal-custom">
+        <div class="modal-header" style="background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); color: #fff; border-bottom: none;">
+          <h5 class="modal-title" id="modalExclusaoLabel">Confirmar Exclusão</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja excluir este registro? Esta ação é irreversível.
+        </div>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger btn-sm">Sim, excluir</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal ver livro de internos -->
+<div class="modal fade" id="modalLivros" tabindex="-1" aria-labelledby="modalLivrosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content modal-custom modal-no-gap">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalLivrosLabel">Livros do Interno</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body p-0">
+        <table class="table table-bordered table-striped m-0">
+          <thead style="background: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%); color: #1b2a49; font-weight: 600;">
+            <tr>
+              <th>Livro</th>
+              <th>Código do Exemplar</th>
+              <th>Ciclo</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="modalLivrosBody">
+            <!-- Conteúdo será preenchido via JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer d-flex justify-content-between align-items-center gap-2 p-2">
+        <!-- Botão para abrir modal de adicionar exemplar -->
+        <button type="button" class="btn btn-success btn-sm" 
+                onclick="abrirModalAdicionar();">
+          ＋ Adicionar Exemplar
+        </button>
+
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Adicionar Exemplar ao Interno -->
+<div class="modal fade" id="modalAdicionarExemplar" tabindex="-1" aria-labelledby="modalAdicionarExemplarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
+      <form id="formAdicionarExemplar">
+        {% csrf_token %}
+        <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+          <h5 class="modal-title" id="modalAdicionarExemplarLabel">Adicionar Exemplar ao Interno</h5>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="pessoa_id" id="exemplar_pessoa_id">
+
+          <div class="form-group mb-3">
+            <label for="id_livro" class="font-weight-bold text-muted">Livro:</label>
+            <select id="id_livro" name="livro_id" class="form-control">
+              <option value="">Selecione um livro</option>
+              {% for livro in livros %}
+              <option value="{{ livro.id }}">{{ livro.titulo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="id_exemplar" class="font-weight-bold text-muted">Exemplar:</label>
+            <select id="id_exemplar" name="exemplar_id" class="form-control">
+              <option value="">Selecione primeiro o livro</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="id_ciclo" class="font-weight-bold text-muted">Ciclo:</label>
+          <select id="id_ciclo" name="ciclo_id" class="form-control">
+              <option value="">Ciclo Indefinido</option>
+              {% if frente and frente.ciclo %}
+                <option value="{{ frente.ciclo.id }}" selected>
+                  Ciclo {{ frente.ciclo.numero }}/{{ frente.ciclo.ano }}
+                </option>
+              {% endif %}
+          </select>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-submit btn-sm">Adicionar Exemplar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cadastrar Livro / Exemplar -->
+<div class="modal fade" id="modalCadastrarLivro" tabindex="-1" aria-labelledby="modalCadastrarLivroLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title">Cadastrar Livro / Exemplar</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form id="formCadastrarLivro">
+          <!-- Campo oculto para ID do livro selecionado -->
+          <input type="hidden" id="idLivro" name="id_livro">
+
+          <!-- Buscar livro existente -->
+          <div class="mb-3 position-relative">
+            <label for="livroTitulo" class="form-label text-muted">Procurar Livro Existente / Título</label>
+            <input type="text" class="form-control" id="livroTitulo" name="titulo" autocomplete="off" placeholder="Digite título do livro...">
+            <ul id="listaSugestoes" class="list-group position-absolute w-100 mt-1" style="z-index: 1000; max-height: 200px; overflow-y: auto;"></ul>
+          </div>
+
+          <hr>
+
+          <!-- Campos para cadastrar livro novo, visível apenas se não usar livro existente -->
+          <div id="novoLivroCampos">
+            <div class="mb-3">
+              <label for="livroAutor" class="form-label text-muted">Autor</label>
+              <input type="text" class="form-control" id="livroAutor" name="autor" placeholder="Nome do autor">
+            </div>
+          </div>
+
+          <!-- Exemplar -->
+          <div class="mb-3">
+            <label for="exemplarCodigo" class="form-label text-muted">Código do Exemplar</label>
+            <input type="text" class="form-control" id="exemplarCodigo" name="codigo" placeholder="Código único do exemplar">
+          </div>
+
+          <!-- Botões padronizados -->
+          <div class="modal-footer d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-submit">Salvar</button>
+          </div>
+        </form>
+        <div id="mensagemLivro" class="mt-2"></div>
+        <div id="totalExemplares" class="mt-2 text-muted"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Exemplares -->
+<div class="modal fade" id="modalExemplares" tabindex="-1" aria-labelledby="modalExemplaresLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content modal-custom modal-no-gap">
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalExemplaresLabel">Exemplares do Livro</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body p-0">
+        <table class="table table-bordered table-striped m-0">
+          <thead style="background: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%); color: #1b2a49; font-weight: 600;">
+            <tr>
+              <th style="width:5%;">#</th>
+              <th>Código</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="corpoExemplares">
+            <!-- Será preenchido dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer d-flex justify-content-end gap-2 p-2">
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ciclos -->
+<div class="modal fade" id="modalCiclos" tabindex="-1" aria-labelledby="modalCiclosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 900px;">
+    <div class="modal-content modal-custom modal-no-gap">
+
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalCiclosLabel">Ciclos de Leitura</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+
+      <div class="modal-body p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="m-0">Filtrar por Ano:</h6>
+          <div class="anos-filtro d-flex"></div>
+        </div>
+
+        <div class="ciclos-container d-flex flex-wrap gap-2">
+          <!-- Cards serão inseridos aqui via JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-end gap-2 p-2">
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal para definir datas de ciclo -->
+<div class="modal fade" id="modalDefinirCiclo" tabindex="-1" aria-labelledby="modalDefinirCicloLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-custom modal-no-gap">
+
+      <div class="modal-header" style="background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalDefinirCicloLabel">Definir Ciclo</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+
+      <div class="modal-body p-3">
+        <!-- Input oculto para enviar o ciclo real ao backend -->
+        <input type="hidden" id="inputCicloId">
+
+        <!-- Inputs de número e ano invisíveis -->
+        <div class="form-group mb-2" style="display:flex; gap:8px; display:none;">
+          <div style="flex:1;">
+            <label>Número do Ciclo</label>
+            <input type="number" id="inputNumero" class="form-control" min="1" max="12" readonly>
+          </div>
+          <div style="flex:1;">
+            <label>Ano</label>
+            <input type="number" id="inputAno" class="form-control" min="2000" max="2100" readonly>
+          </div>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Data de Início</label>
+          <input type="date" id="inputInicio" class="form-control">
+        </div>
+
+        <div class="form-group mb-3">
+          <label>Data de Fim</label>
+          <input type="date" id="inputFim" class="form-control">
+        </div>
+      </div>
+
+
+
+      <div class="modal-footer d-flex justify-content-end gap-2 p-2">
+        <button id="btnSalvarCiclo" class="btn btn-primary btn-sm">Salvar</button>
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Fechar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de Confirmação de Sorteio -->
+<div class="modal fade" id="modalSortearLivros" tabindex="-1" role="dialog" aria-labelledby="modalSortearLivrosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content modal-custom">
+      <div class="modal-header" style="background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: #fff; border-bottom: none;">
+        <h5 class="modal-title" id="modalSortearLivrosLabel">Confirmar Sorteio</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que deseja sortear livros para todos os internos que estão sem exemplar?
+      </div>
+      <div class="modal-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-cancel btn-sm" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success btn-sm" id="confirmarSortearLivros">Sim, sortear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function avancarCicloTodos(numeroCiclo, ano) {
+    fetch("/leitura/leitura/avancar-ciclos-ajax/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ciclo: numeroCiclo, ano: ano })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success") {
+            alert(data.mensagem); // você pode usar Notyf aqui
+            carregarCiclos(ano); // atualiza os cards
+
+            // Mostra no console os motivos de não avançar
+            if(data.motivos && data.motivos.length) {
+                console.group("Motivos dos ciclos não avançados");
+                data.motivos.forEach(item => {
+                    console.log(`${item.nome}: ${item.motivo}`);
+                });
+                console.groupEnd();
+            }
+        } else {
+            alert(data.mensagem);
+        }
+    })
+    .catch(err => console.error(err));
+}
+</script>
+
+
+<script>
+const anoAtual = new Date().getFullYear();
+let anoSelecionado = anoAtual;
+
+// Gerar filtros de anos
+function gerarFiltrosAno() {
+    const filtroContainer = document.querySelector(".anos-filtro");
+    filtroContainer.innerHTML = "";
+
+    for (let i = 0; i < 3; i++) {
+        const ano = anoAtual - i;
+        const btn = document.createElement("button");
+
+        btn.className = "ano-btn";
+        btn.textContent = ano;
+
+        // Adiciona destaque no ano selecionado
+        if (ano === anoSelecionado) {
+            btn.classList.add("ano-btn-selected");
+        }
+
+        btn.onclick = () => {
+            anoSelecionado = ano;
+            carregarCiclos(anoSelecionado);
+            gerarFiltrosAno(); // Atualiza destaque
+        };
+
+        filtroContainer.appendChild(btn);
+    }
+
+    // Injeta CSS se ainda não existir
+    if (!document.getElementById("anos-filtro-style")) {
+        const style = document.createElement("style");
+        style.id = "anos-filtro-style";
+        style.textContent = `
+            .anos-filtro { display:flex; gap:8px; margin-bottom:16px; }
+            .ano-btn {
+                padding:6px 14px;
+                border-radius:10px;
+                border: 1px solid #d1d5db; /* cinza claro */
+                background: #f9fafb; 
+                color: #1f2937; /* quase preto */
+                font-family: 'Inter', sans-serif;
+                font-weight:600;
+                cursor:pointer;
+                transition: all 0.2s ease;
+            }
+            .ano-btn:hover {
+                background: #eef2ff; /* leve azul de hover */
+                border-color: #2563eb;
+                color:black;
+            }
+            .ano-btn-selected {
+                background: #2563eb; /* azul principal */
+                color: #fff;
+                border-color: #1d4ed8;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function carregarCiclos(ano = anoAtual) {
+  function parseDateBR(d) {
+    if (!d) return null;
+    const p = d.split('/');
+    return new Date(+p[2], +p[1] - 1, +p[0]);
+  }
+
+  const container = document.querySelector(".ciclos-container");
+  if (!container) return;
+
+  // Injeta CSS uma vez
+  if (!document.getElementById("ciclos-modern-style")) {
+    const css = `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+      :root {
+        --card:#fff; --muted:#6b7280;
+        --accent:#245bd9; --success:#13824b; --danger:#b91c1c;
+      }
+      .ciclos-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+          gap: 12px; /* reduz o gap para melhor encaixe */
+          width: 870px;
+          margin: 0 auto; /* centraliza */
+      }
+
+      .ciclo-modern-card {
+          display: flex;
+          align-items: stretch;
+          gap: 12px; /* reduz gap interno para melhor aproveitamento */
+          background: var(--card);
+          border-radius: 12px;
+          padding: 12px; /* ajusta padding para caber melhor */
+          border: 1px solid rgba(16, 24, 40, 0.05);
+          box-shadow: 0 4px 10px rgba(16, 24, 40, 0.05);
+          transition: all 0.25s ease;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.95em;
+          width: 279px; /* define largura fixa baseada nas medidas que você passou */
+          height: 125px; /* define altura fixa */
+          box-sizing: border-box; /* garante padding dentro da largura */
+      }
+
+      .ciclo-modern-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(16,24,40,0.12);
+      }
+      .ciclo-badge {
+        width:70px; height:70px; border-radius:50%;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        font-weight:700; font-size:1rem; color:#fff;
+        line-height:1.2; flex-shrink:0;
+      }
+      .ciclo-badge span:first-child { font-size:1.1rem; }
+      .ciclo-badge span:last-child { font-size:0.75rem; font-weight:500; }
+      .ciclo-body { flex:1; display:flex; flex-direction:column; justify-content:space-between; }
+      .ciclo-header { display:flex; justify-content:flex-end; }
+      .status-pill { padding:4px 8px; border-radius:999px; font-size:0.75rem; font-weight:600; }
+      .is-active .status-pill { background:#e6f4ea; color:var(--success); }
+      .is-past .status-pill { background:#fdecea; color:var(--danger); }
+      .is-upcoming .status-pill { background:#eaf2fd; color:var(--accent); }
+      .ciclo-meta {
+        font-size:0.85rem; color:var(--muted);
+        display:flex; flex-direction:column; gap:6px; align-items:center;
+      }
+      .ciclo-meta span {
+        background:#f3f4f6; padding:5px 8px; border-radius:6px; font-weight:500;
+        text-align:center; min-width:90px;
+      }
+      .ciclo-actions {
+        display:flex; flex-direction:column; gap:8px; justify-content:center;
+      }
+      .action-btn {
+        width:42px; height:42px; border:none; border-radius:8px;
+        display:grid; place-items:center;
+        background:#f9fafb; cursor:pointer; transition:.2s;
+      }
+      .action-btn:hover:not(:disabled) { background:#eef2ff; transform:scale(1.05); }
+      .action-btn:disabled { opacity:.4; cursor:not-allowed; }
+      .action-btn svg { width:20px; height:20px; }
+    `;
+    const style = document.createElement("style");
+    style.id = "ciclos-modern-style";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  fetch(`/leitura/listar-ciclos/?ano=${ano}`)
+    .then(r => r.json())
+    .then(data => {
+      container.innerHTML = "";
+      const ciclosMap = {};
+      data.ciclos.forEach(c => ciclosMap[c.numero] = c);
+
+      const hoje = new Date();
+      let cicloParaAvancar = null;
+
+      for (let i = 1; i <= 12; i++) {
+        const ciclo = ciclosMap[i];
+        if (!ciclo) continue;
+        const inicio = parseDateBR(ciclo.inicio);
+        const fim = parseDateBR(ciclo.fim);
+        if (inicio && fim) {
+          if (hoje >= inicio && hoje <= fim) { cicloParaAvancar = ciclo.numero; break; }
+          else if (hoje > fim) cicloParaAvancar = ciclo.numero;
+        }
+      }
+
+      for (let i = 1; i <= 12; i++) {
+        const ciclo = ciclosMap[i] || {};
+        const inicio = parseDateBR(ciclo.inicio);
+        const fim = parseDateBR(ciclo.fim);
+
+        let status = "";
+        if (inicio && fim) {
+          if (hoje >= inicio && hoje <= fim) status = "is-active";
+          else if (hoje > fim) status = "is-past";
+          else status = "is-upcoming";
+        }
+
+        const card = document.createElement("div");
+        card.className = `ciclo-modern-card ${status}`;
+
+        const badge = document.createElement("div");
+        badge.className = "ciclo-badge";
+        if(status === "is-active"){
+          badge.style.background = "var(--success)";
+        } else {
+          badge.style.background = "linear-gradient(135deg,#2b6be6,#1f4bd6)";
+        }
+        badge.innerHTML = `<span>${i}º</span><span>Ciclo</span>`;
+
+        const body = document.createElement("div");
+        body.className = "ciclo-body";
+        body.innerHTML = `
+          <div class="ciclo-header">
+            <span class="status-pill">
+              ${status === "is-active" ? "Em Vigor" : status === "is-past" ? "Concluído" : status === "is-upcoming" ? "Programado" : "—"}
+            </span>
+          </div>
+          <div class="ciclo-meta">
+            <span>${ciclo.inicio || "-"}</span>
+            <span>${ciclo.fim || "-"}</span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "ciclo-actions";
+        const svgCalendar = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>`;
+        const svgForward = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>`;
+
+        const btnEdit = document.createElement("button");
+        btnEdit.className = "action-btn";
+        btnEdit.innerHTML = svgCalendar;
+        btnEdit.onclick = () => abrirModalDefinirCiclo(ciclo.id || null, i, ano);
+
+        const btnAdvance = document.createElement("button");
+        btnAdvance.className = "action-btn";
+        btnAdvance.innerHTML = svgForward;
+        const habilitarAvancar = (ano === anoAtual && (i === cicloParaAvancar || status === "is-active"));
+
+        btnAdvance.disabled = !habilitarAvancar;
+        btnAdvance.onclick = () => avancarCicloTodos(i, ano);
+
+        actions.appendChild(btnEdit);
+        actions.appendChild(btnAdvance);
+
+        card.appendChild(badge);
+        card.appendChild(body);
+        card.appendChild(actions);
+        container.appendChild(card);
+      }
+    });
+}
+
+
+
+
+// Abrir modal para criar ou editar ciclo, intercalando modais
+window.abrirModalDefinirCiclo = function(cicloId = null, numero = null, ano = null) {
+    const modalCiclos = $("#modalCiclos");
+    const modalDefinir = $("#modalDefinirCiclo");
+    const inputCicloId = modalDefinir.find("#inputCicloId")[0];
+    const inputNumero = modalDefinir.find("#inputNumero")[0];
+    const inputAno = modalDefinir.find("#inputAno")[0];
+    const inputInicio = modalDefinir.find("#inputInicio")[0];
+    const inputFim = modalDefinir.find("#inputFim")[0];
+
+    // Fecha modal de ciclos temporariamente
+    modalCiclos.modal("hide");
+
+    // Carrega dados do ciclo, se houver
+    if (cicloId) {
+        fetch(`/leitura/detalhar-ciclo/${cicloId}/`)
+            .then(res => res.json())
+            .then(data => {
+                inputCicloId.value = cicloId;
+                inputNumero.value = data.numero;
+                inputAno.value = data.ano;
+                inputInicio.value = data.inicio;
+                inputFim.value = data.fim;
+                modalDefinir.modal("show");
+            });
+    } else {
+        inputCicloId.value = "";
+        inputNumero.value = numero;
+        inputAno.value = ano;
+        inputInicio.value = "";
+        inputFim.value = "";
+        modalDefinir.modal("show");
+    }
+
+    // Ao fechar o modal de definir, reabre o modal de ciclos
+    modalDefinir.off("hidden.bs.modal").on("hidden.bs.modal", function () {
+        modalCiclos.modal("show");
+    });
+};
+
+// Salvar ciclo
+document.getElementById("btnSalvarCiclo").addEventListener("click", () => {
+    const modal = document.getElementById("modalDefinirCiclo");
+    const data = {
+        ciclo_id: modal.querySelector("#inputCicloId").value,
+        numero: modal.querySelector("#inputNumero").value,
+        ano: modal.querySelector("#inputAno").value,
+        inicio: modal.querySelector("#inputInicio").value,
+        fim: modal.querySelector("#inputFim").value,
+    };
+
+    fetch("/leitura/leitura/definir-ciclo/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new URLSearchParams(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.sucesso) {
+            $("#modalDefinirCiclo").modal("hide");
+            carregarCiclos(data.ano); // Atualiza lista de ciclos mantendo ano selecionado
+        } else {
+            alert(res.erro);
+        }
+    });
+});
+
+// Inicialização
+document.addEventListener("DOMContentLoaded", () => {
+    gerarFiltrosAno();
+    carregarCiclos();
+});
+
+
+</script>
+
+<!-- JS: Modal de saída -->
+<script>
+    function abrirModalSaida(pessoaId) {
+        document.getElementById("internoId").value = pessoaId;
+
+        const inputData = document.getElementById("data_saida");
+        if (!inputData.value) {  // só preenche se estiver vazio
+            const hoje = new Date().toISOString().split('T')[0];
+            inputData.value = hoje;
+        }
+
+        $('#modalSairLeitura').modal('show');
+    }
+</script>
+<script>
+function enviarFormularioSaida() {
+  const form = document.getElementById("formSaida");
+
+  // Garante que o formulário será submetido normalmente
+  form.submit();
+
+  // Aguarda o redirect acontecer normalmente
+  return true;
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById('id_pessoa');
+    const lista = document.getElementById('listaSugestoesInterno');
+    const overlay = document.getElementById('overlaySugestoes');
+    let debounceTimeout = null;
+
+    function showOverlay() {
+        overlay.style.display = 'block';
+        setTimeout(() => { overlay.style.opacity = 1; }, 10);
+    }
+
+    function hideOverlay() {
+        overlay.style.opacity = 0;
+        setTimeout(() => { overlay.style.display = 'none'; }, 0);
+    }
+
+    input.addEventListener('focus', function() {
+        if(lista.children.length > 0) showOverlay();
+    });
+
+    input.addEventListener('input', function() {
+        const query = input.value.trim();
+        lista.innerHTML = '';
+
+        if (!query) {
+            hideOverlay();
+            return;
+        }
+
+        if(debounceTimeout) clearTimeout(debounceTimeout);
+
+        debounceTimeout = setTimeout(() => {
+            fetch("{% url 'pessoa_search' %}?q=" + encodeURIComponent(query))
+                .then(res => res.json())
+                .then(data => {
+                    lista.innerHTML = '';
+
+                    if(data.length === 0) {
+                        const li = document.createElement('li');
+                        li.textContent = 'Este interno não existe no banco';
+                        li.classList.add('list-group-item', 'text-muted');
+                        li.style.cursor = 'default';
+                        lista.appendChild(li);
+                        showOverlay();
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item.nome_completo + ' (' + item.matricula + ')';
+                        li.classList.add('list-group-item', 'list-group-item-action');
+                        li.style.cursor = 'pointer';
+
+                        li.addEventListener('click', function() {
+                            input.value = item.nome_completo;
+                            hideOverlay();
+
+                            if(!document.getElementById('pessoaIdHidden')) {
+                                const hidden = document.createElement('input');
+                                hidden.type = 'hidden';
+                                hidden.id = 'pessoaIdHidden';
+                                hidden.name = 'pessoa_id';
+                                hidden.value = item.id;
+                                input.closest('form').appendChild(hidden);
+                            } else {
+                                document.getElementById('pessoaIdHidden').value = item.id;
+                            }
+
+                            lista.innerHTML = '';
+                        });
+
+                        lista.appendChild(li);
+                    });
+
+                    if(lista.children.length > 0) showOverlay();
+                });
+        }, 300);
+    });
+
+    document.addEventListener('click', function(event) {
+        if(!input.contains(event.target) && !lista.contains(event.target)) {
+            lista.innerHTML = '';
+            hideOverlay();
+        }
+    });
+});
+</script>
+
+
+<!-- Selectize.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.pessoa-selectize').selectize({ ... });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  fetch("{% url 'dados_grafico_leitura' %}")
+    .then(response => response.json())
+    .then(data => {
+      // Gráfico 1: Pizza - Distribuição
+      Highcharts.chart('graficoDistribuicao', {
+        chart: {
+          type: 'pie'
+        },
+        title: {
+          text: 'Distribuição Atual dos Internos'
+        },
+        tooltip: {
+          pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        accessibility: {
+          point: {
+            valueSuffix: ''
+          }
+        },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              format: '<b>{point.name}</b>: {point.y}'
+            }
+          }
+        },
+        series: [{
+          name: 'Internos',
+          colorByPoint: true,
+          data: [
+            { name: 'Frente de Leitura', y: data.distribuicao.frente },
+            { name: 'Fila de Espera', y: data.distribuicao.espera },
+            { name: 'Já Saíram', y: data.distribuicao.saida }
+          ]
+        }]
+      });
+
+      // Gráfico 2: Colunas - Progresso
+      Highcharts.chart('graficoProgresso', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Progresso de Leitura por Interno'
+        },
+        xAxis: {
+          categories: ['Interno 1', 'Interno 2', 'Interno 3'],
+          crosshair: true
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: 'Páginas Lidas'
+          }
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+          pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                       '<td style="padding:0"><b>{point.y} páginas</b></td></tr>',
+          footerFormat: '</table>',
+          shared: true,
+          useHTML: true
+        },
+        plotOptions: {
+          column: {
+            borderWidth: 0
+          }
+        },
+        series: [{
+          name: 'Leitura',
+          data: data.progresso
+        }]
+      });
+    });
+});
+</script>
+
+<script>
+  function abrirModalExclusao(pessoaId, lista, historicoId = null) {
+  document.getElementById("modalPessoaId").value = pessoaId;
+  document.getElementById("modalExcluirLista").value = lista;
+
+  // Se estiver excluindo do histórico, envie o ID do registro
+  if (historicoId) {
+    document.getElementById("modalHistoricoId").value = historicoId;
+  } else {
+    document.getElementById("modalHistoricoId").value = "";
+  }
+
+  $('#modalExclusao').modal('show');
+}
+
+</script>
+
+<script>
+const inputBusca = document.querySelector('input[placeholder="Buscar interno..."]');
+const urlBuscar = "{% url 'buscar_interno' %}";
+
+
+inputBusca.addEventListener('keyup', function() {
+    const query = this.value.trim();
+
+    const mostrarContadores = query.length > 0;
+
+    if (!query) {
+        // Limpar tabelas e esconder contadores
+        atualizarTabela('ativos', []);
+        atualizarTabela('espera', []);
+        atualizarTabela('sairam', []);
+        document.getElementById('contador-ativos').style.display = 'none';
+        document.getElementById('contador-espera').style.display = 'none';
+        document.getElementById('contador-sairam').style.display = 'none';
+        return;
+    }
+
+    fetch(`${urlBuscar}?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+          atualizarTabela('ativos', data.frente);
+          atualizarTabela('espera', data.espera);
+          atualizarTabela('sairam', data.sairam);
+
+          // Atualizar e mostrar os contadores
+          const contAtivos = document.getElementById('contador-ativos');
+          const contEspera = document.getElementById('contador-espera');
+          const contSairam = document.getElementById('contador-sairam');
+
+          contAtivos.textContent = data.frente.length;
+          contEspera.textContent = data.espera.length;
+          contSairam.textContent = data.sairam.length;
+
+          contAtivos.style.display = mostrarContadores ? 'inline-block' : 'none';
+          contEspera.style.display = mostrarContadores ? 'inline-block' : 'none';
+          contSairam.style.display = mostrarContadores ? 'inline-block' : 'none';
+      })
+      .catch(error => console.error('Erro na busca:', error));
+});
+
+function atualizarTabela(idTabela, dados) {
+    const tbody = document.querySelector(`#${idTabela} tbody`);
+    tbody.innerHTML = ''; // Limpar tabela
+
+    if (dados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">Nenhum resultado encontrado.</td></tr>`;
+        return;
+    }
+
+    dados.forEach((item, index) => {
+        let linha = `<tr>
+            <td>${index + 1}</td>
+            <td style="width:5px;">${item.pessoa__bloco || ''}</td>
+            <td style="width:5px;">${item.pessoa__cela || ''}</td>
+            <td>${item.pessoa__nome_completo}</td>`;
+
+        if(idTabela === 'ativos') {
+            // Substituir os placeholders pelos dados corretos
+            const livroTitulo = item.exemplar__livro__titulo || 'Sem livro';
+            const codigoExemplar = item.exemplar__codigo || 'Sem código';
+            const ciclo = (item.ciclo__mes && item.ciclo__ano) ? `${item.ciclo__mes}/${item.ciclo__ano}` : 'Sem ciclo';
+
+            linha += `<td>${livroTitulo}</td>
+                      <td>${codigoExemplar}</td>
+                      <td>${ciclo}</td>
+                      <td class="td-acoes">
+                        <div class="d-flex align-items-center gap-2">
+                          <button class="btn btn-sm" style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px); padding: 0 0.75rem;" onclick="abrirModalSaida(${item.pessoa__id})">Retirar</button>
+                          <button type="button" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="font-weight: 600; height: calc(1.5em + 0.75rem + 2px); width: 2.5rem;" onclick="abrirModalExclusao('${item.pessoa__id}', 'frente')">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      </td>`;
+        } 
+        else if(idTabela === 'espera') {
+            const dataInclusao = new Date(item.data_inclusao).toLocaleDateString('pt-BR');
+            linha += `<td>${dataInclusao}</td>
+                      <td class="td-acoes">
+                        <div class="d-flex gap-1">
+                          <form method="POST" action="{% url 'pedagogia_view' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="pessoa_id" value="${item.pessoa__id}">
+                            <input type="hidden" name="lista" value="frente">
+                            <button type="submit" class="btn btn-sm btn-success">Mover</button>
+                          </form>
+                          <button type="button" class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('${item.pessoa__id}', 'espera')">🗑️</button>
+                        </div>
+                      </td>`;
+        } 
+        else if(idTabela === 'sairam') {
+            const dataSaida = new Date(item.data_saida).toLocaleDateString('pt-BR');
+            linha += `<td>${dataSaida}</td>
+                      <td>${item.motivo_saida}</td>
+                      <td class="td-acoes">
+                        <button class="btn btn-sm btn-outline-danger" onclick="abrirModalExclusao('${item.pessoa__id}', 'historico')">🗑️</button>
+                      </td>`;
+        }
+
+        linha += `</tr>`;
+        tbody.innerHTML += linha;
+    });
+}
+
+
+</script>
+
+<script>
+const inputLivro = document.getElementById("livroTitulo");
+const listaSugestoes = document.getElementById("listaSugestoes");
+
+let timeout = null;
+
+// Função de busca dinâmica
+inputLivro.addEventListener("input", function() {
+    clearTimeout(timeout);
+    const query = this.value.trim();
+
+    // Se vazio, limpa lista e idLivro
+    if (!query) {
+        listaSugestoes.innerHTML = "";
+        document.getElementById("idLivro").value = "";
+        return;
+    }
+
+    // Delay para não fazer requisição a cada letra
+    timeout = setTimeout(() => {
+        fetch("{% url 'buscar_livro' %}?q=" + encodeURIComponent(query))
+            .then(res => res.json())
+            .then(data => {
+                listaSugestoes.innerHTML = "";
+
+                if (data.livros.length === 0) {
+                    listaSugestoes.innerHTML = "<li class='list-group-item'>Nenhum livro encontrado.</li>";
+                    document.getElementById("idLivro").value = "";
+                } else {
+                    data.livros.forEach(l => {
+                        const li = document.createElement("li");
+                        li.classList.add("list-group-item", "list-group-item-action");
+                        li.textContent = `${l.titulo} (${l.autor || "Sem autor"})`;
+                        li.dataset.id = l.id;
+                        li.addEventListener("click", function() {
+                            inputLivro.value = l.titulo;
+                            document.getElementById("livroAutor").value = l.autor || "";
+                            document.getElementById("idLivro").value = l.id;
+                            listaSugestoes.innerHTML = "";
+                        });
+                        listaSugestoes.appendChild(li);
+                    });
+                }
+            });
+    }, 300); // 300ms de delay
+});
+
+// Fechar sugestões ao clicar fora
+document.addEventListener("click", function(e){
+    if(!inputLivro.contains(e.target) && !listaSugestoes.contains(e.target)){
+        listaSugestoes.innerHTML = "";
+    }
+});
+</script>
+
+<script>
+document.getElementById("formCadastrarLivro").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const idLivro = document.getElementById("idLivro")?.value || "";
+    const titulo = document.getElementById("livroTitulo").value.trim();
+    const autor = document.getElementById("livroAutor").value.trim();
+    const codigo = document.getElementById("exemplarCodigo").value.trim();
+    const mensagem = document.getElementById("mensagemLivro");
+    const totalExemplares = document.getElementById("totalExemplares");
+
+    if(!codigo){
+        mensagem.textContent = "O código do exemplar é obrigatório!";
+        mensagem.style.color = "red";
+        return;
+    }
+
+    // Se não houver id_livro, precisa de título para novo livro
+    if(!idLivro && !titulo){
+        mensagem.textContent = "O título do livro é obrigatório!";
+        mensagem.style.color = "red";
+        return;
+    }
+
+    let body = new URLSearchParams({codigo});
+    if(idLivro){
+        body.append("id_livro", idLivro);
+    } else {
+        body.append("titulo", titulo);
+        body.append("autor", autor);
+    }
+
+    fetch("{% url 'cadastrar_livro' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: body
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.erro){
+            mensagem.textContent = data.erro;
+            mensagem.style.color = "red";
+        } else {
+            mensagem.textContent = data.mensagem;
+            mensagem.style.color = "green";
+
+            if(data.total_exemplares !== undefined){
+                totalExemplares.textContent = `Total de exemplares: ${data.total_exemplares}`;
+            }
+
+            // Limpar campos
+            if(!idLivro){
+                document.getElementById("livroTitulo").value = "";
+                document.getElementById("livroAutor").value = "";
+            }
+            document.getElementById("exemplarCodigo").value = "";
+        }
+    })
+    .catch(err => {
+        mensagem.textContent = "Erro ao cadastrar o livro.";
+        mensagem.style.color = "red";
+        console.error(err);
+    });
+});
+
+</script>
+
+<script>
+function abrirModalExemplares(livroId, livroTitulo) {
+    const modalTitle = document.getElementById('modalExemplaresLabel');
+    const corpo = document.getElementById('corpoExemplares');
+    corpo.innerHTML = `<tr><td colspan="3">Carregando...</td></tr>`;
+    modalTitle.textContent = `Exemplares do Livro: ${livroTitulo}`;
+
+    fetch(`/leitura/livro-exemplares/${livroId}/`)
+        .then(res => res.json())
+        .then(data => {
+            corpo.innerHTML = "";
+
+            if(data.exemplares.length === 0){
+                corpo.innerHTML = "<tr><td colspan='3'>Nenhum exemplar cadastrado.</td></tr>";
+            } else {
+                data.exemplares.forEach((ex, idx) => {
+                    // Log detalhado para depuração
+                    console.log(`Exemplar ${idx + 1}:`, ex);
+
+                    const tr = document.createElement("tr");
+                      tr.innerHTML = `
+                          <td>${idx + 1}</td>
+                          <td>${ex.codigo}</td>
+                          <td>
+                              ${ex.disponivel 
+                                  ? `<span class="status disponivel">✅ Disponível</span>` 
+                                  : `<span class="status indisponivel">❌ Indisponível</span>
+                                    ${ex.leitor_atual ? `<span class="leitor-badge">Entregue para: ${ex.leitor_atual}</span>` : ''}`
+                              }
+                          </td>
+                      `;
+
+                    corpo.appendChild(tr);
+                });
+            }
+
+            new bootstrap.Modal(document.getElementById('modalExemplares')).show();
+        })
+        .catch(err => {
+            corpo.innerHTML = "<tr><td colspan='3'>Erro ao carregar exemplares.</td></tr>";
+            console.error(err);
+        });
+}
+</script>
+
+
+<script>
+let CURRENT_PESSOA_ID = null;
+const urlRemoverExemplar = "/leitura/leitura/remover-exemplar/";
+
+// ------------------------------
+// Função para carregar livros de um interno via AJAX
+// Recebe o ID da pessoa e popula a tabela dentro do modal de livros.
+// ------------------------------
+function carregarLivrosDoInterno(pessoaId) {
+    fetch(`/leitura/livros-interno/?pessoa_id=${pessoaId}`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("modalLivrosBody");
+            if (!tbody) return console.error("Tabela de livros não encontrada!");
+
+            tbody.innerHTML = ""; // Limpa tabela
+
+            console.log("=== Livros recebidos do backend ===");
+            console.table(data.livros);
+
+            if (!data.livros || data.livros.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5'>Nenhum livro cadastrado.</td></tr>";
+            } else {
+                data.livros.forEach(l => {
+                    const ciclo = l.ciclo || "Não definido";
+
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${l.livro}</td>
+                        <td>${l.codigo_exemplar}</td>
+                        <td>${ciclo}</td>
+                        <td>${l.status}</td>
+                        <td>
+                            <button 
+                              class="btn btn-submit d-flex align-items-center gap-2 btn-excluir" 
+                              data-exemplar-codigo="${l.codigo_exemplar}"
+                              style="padding: 0.25rem 0.75rem; font-size: 0.85rem; background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff; border: none; border-radius: 4px;">
+                              <span>Excluir</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao carregar livros do interno:", err);
+            const tbody = document.getElementById("modalLivrosBody");
+            if (tbody) tbody.innerHTML = "<tr><td colspan='5'>Erro ao carregar livros.</td></tr>";
+        });
+}
+
+// ------------------------------
+// Event delegation: botão "Excluir" dentro do modal de livros
+// Remove exemplar do interno (FrenteDeLeitura + histórico) via AJAX
+// ------------------------------
+document.getElementById("modalLivrosBody")?.addEventListener("click", function(e) {
+    const btnExcluir = e.target.closest(".btn-excluir");
+    if (!btnExcluir) return;
+
+    const codigoExemplar = btnExcluir.getAttribute("data-exemplar-codigo");
+    if (!codigoExemplar || !CURRENT_PESSOA_ID) { alert("Exemplar ou pessoa não definidos."); return; }
+
+    if (confirm("Deseja realmente excluir este exemplar?")) {
+        const formData = new FormData();
+        formData.append("pessoa_id", CURRENT_PESSOA_ID);
+        formData.append("exemplar_codigo", codigoExemplar);
+
+        fetch(urlRemoverExemplar, {
+            method: "POST",
+            headers: { "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(resp => {
+            if (resp.success) {
+                carregarLivrosDoInterno(CURRENT_PESSOA_ID); // Atualiza tabela do modal
+            } else {
+                alert(resp.erro || "Erro ao excluir exemplar.");
+            }
+        })
+        .catch(err => console.error("Erro ao excluir exemplar:", err));
+    }
+});
+
+// ------------------------------
+// Abrir modal de livros do interno
+// 1️⃣ Define CURRENT_PESSOA_ID
+// 2️⃣ Carrega livros via AJAX
+// 3️⃣ Exibe o modal #modalLivros
+// ------------------------------
+function abrirModalLivros(pessoaId) {
+    CURRENT_PESSOA_ID = pessoaId;
+    document.getElementById('exemplar_pessoa_id').value = pessoaId;
+    carregarLivrosDoInterno(pessoaId);
+    $('#modalLivros').modal('show');
+}
+
+// ------------------------------
+// Abrir modal para adicionar exemplar
+// Modal não bloqueia o modal de livros (backdrop: false)
+// ------------------------------
+function abrirModalAdicionar() {
+    // Esconde modal de livros
+    $('#modalLivros').modal('hide');
+
+    document.getElementById('exemplar_pessoa_id').value = CURRENT_PESSOA_ID;
+
+    // Carregar ciclos normalmente
+    const anoVigente = new Date().getFullYear();
+    fetch(`/leitura/listar-ciclos/?ano=${anoVigente}`)
+        .then(res => res.json())
+        .then(data => {
+            const cicloSelect = document.getElementById('id_ciclo');
+            cicloSelect.innerHTML = '<option value="">Ciclo Indefinido</option>';
+            if (data.ciclos && data.ciclos.length > 0) {
+                data.ciclos.forEach(c => {
+                    cicloSelect.innerHTML += `<option value="${c.id}">${c.numero}º Ciclo de ${c.ano}</option>`;
+                });
+            }
+        });
+
+    $('#modalAdicionarExemplar').modal({ backdrop: 'static', keyboard: true, show: true });
+
+    // Quando o modal de adicionar for fechado, reabre o modal de livros
+    $('#modalAdicionarExemplar').on('hidden.bs.modal', function () {
+        $('#modalLivros').modal('show');
+    });
+}
+
+
+// ------------------------------
+// Popular exemplares disponíveis ao selecionar um livro
+// ------------------------------
+document.getElementById('id_livro')?.addEventListener('change', function() {
+    const livroId = this.value;
+    const exemplarSelect = document.getElementById('id_exemplar');
+    if (!exemplarSelect) return;
+
+    exemplarSelect.innerHTML = '<option value="">Carregando...</option>';
+
+    if (livroId) {
+        fetch(`/leitura/livro-exemplares/${livroId}/`)
+        .then(res => res.json())
+        .then(data => {
+            exemplarSelect.innerHTML = '<option value="">Selecione um exemplar</option>';
+            if (!data.exemplares || data.exemplares.length === 0) {
+                exemplarSelect.innerHTML = '<option value="">Nenhum exemplar disponível</option>';
+            } else {
+                data.exemplares.forEach(ex => {
+                    exemplarSelect.innerHTML += `<option value="${ex.id}">${ex.codigo} (${ex.disponivel ? 'Disponível' : 'Indisponível'})</option>`;
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Erro ao carregar exemplares:", err);
+            exemplarSelect.innerHTML = '<option value="">Erro ao carregar exemplares</option>';
+        });
+    } else {
+        exemplarSelect.innerHTML = '<option value="">Selecione primeiro o livro</option>';
+    }
+});
+
+// ------------------------------
+// Submissão do formulário de adicionar exemplar via AJAX
+// Atualiza modal de livros após sucesso
+// ------------------------------
+document.getElementById('formAdicionarExemplar')?.addEventListener('submit', function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+    const cicloSelect = document.getElementById('id_ciclo');
+
+    // Define ciclo indefinido caso não selecionado
+    if (cicloSelect) {
+        if (cicloSelect.value === "") {
+            formData.set('ciclo_id', '');
+            formData.set('ciclo_indefinido', 'true');
+        } else {
+            formData.set('ciclo_id', cicloSelect.value);
+            formData.set('ciclo_indefinido', 'false');
+        }
+    }
+
+    fetch("{% url 'adicionar_exemplar_interno' %}", {
+        method: 'POST',
+        headers: {'X-CSRFToken': formData.get('csrfmiddlewaretoken')},
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.sucesso) {
+            $('#modalAdicionarExemplar').modal('hide');
+            carregarLivrosDoInterno(CURRENT_PESSOA_ID); // Atualiza modal de livros
+            document.getElementById('id_livro').value = '';
+            document.getElementById('id_exemplar').innerHTML = '<option value="">Selecione primeiro o livro</option>';
+            if(cicloSelect) cicloSelect.value = '';
+        } else {
+            alert(data.erro || "Erro ao adicionar exemplar.");
+        }
+    })
+    .catch(err => console.error("Erro ao adicionar exemplar:", err));
+});
+
+</script>
+
+
+
+
+<script>
+// ------------------------------
+// Sorter livros
+// Atualizar lista da tabela via ajax
+// ------------------------------
+document.getElementById('confirmarSortearLivros').addEventListener('click', function() {
+    fetch("{% url 'sortear_livros_frente' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.sucesso) {
+            alert(data.mensagem);
+            // Atualiza tabela dos internos ativos
+            atualizarTabela('ativos', data.resultados);
+        } else {
+            alert("Erro ao sortear livros: " + (data.mensagem || "Desconhecido"));
+        }
+
+        // Fecha o modal
+        $('#modalSortearLivros').modal('hide');
+    })
+    .catch(error => {
+        console.error("Erro ao sortear livros:", error);
+        alert("Erro na requisição.");
+        $('#modalSortearLivros').modal('hide');
+    });
+});
+</script>
+
+
+<style>
+/* ========================
+   CABEÇALHO DO PAINEL
+   ======================== */
+.header-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  height: 90px;
+  border-radius: 0.75rem;
+  background: #f8f9fa; /* fundo suave, quase branco */
+  color: #1a237e;       /* fonte azul escura */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* ========================
+   BLOCO DE TÍTULO
+   ======================== */
+.panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #ffffff; /* fundo leve */
+  border-left: 6px solid #1a237e; /* destaque azul */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.panel-title-text h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #1a237e; /* azul escuro */
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.05);
+}
+
+.panel-title-text small {
+  font-size: 0.9rem;
+  color: #283593; /* azul mais suave */
+}
+
+.panel-title-icon {
+  font-size: 2.5rem;
+  color: #1a237e;
+}
+
+/* ========================
+   BUSCA
+   ======================== */
+.search-box {
+  display: flex;
+  align-items: center;
+  max-width: 350px;
+  flex: 1;
+  margin-right: 1.5rem; /* adiciona espaçamento para os botões */
+}
+
+.search-box .search-icon {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+  color: #1a237e;
+}
+
+.search-box input.form-control {
+  flex: 1;
+  padding: 6px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 50px;
+  background: #ffffff;
+  color: #1a237e;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* ========================
+   BOTOES DE AÇÃO
+   ======================== */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #0d1b5b !important; /* azul mais forte e contrastante */
+  background: #e9ecef; /* fundo leve */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+/* Hover */
+.action-buttons .btn:hover {
+  background: #f1f3f5; /* leve destaque no hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* Botões de ação positiva (verde) */
+.btn-add-user, .btn-add-book {
+  color: #fff;
+  background: #43a047; /* verde */
+}
+
+/* Botões de destaque azul */
+.btn-home, .btn-graph {
+  color: #fff;
+  background: #1a237e;
+}
+
+
+
+/* ========================
+   TABELAS E BADGES
+   ======================== */
+td.td-acoes { white-space: nowrap; width: 1%; }
+
+/* Cabeçalhos de tabela */
+.thead-ativos, .thead-espera, .thead-sairam, .thead-livros {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Gradiente azul para ativos */
+.thead-ativos {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+}
+
+/* Verde para status positivos */
+.thead-espera {
+  background: #43a047;
+}
+
+/* Cinza escuro para saíram */
+.thead-sairam {
+  background: #212121;
+}
+
+/* Azul suave para livros */
+.thead-livros {
+  background: #283593;
+}
+
+/* Linha do total */
+.thead-total th {
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Badge total */
+.badge-total {
+  background: rgba(255,255,255,0.9);
+  color: #1a237e;
+  font-size: 1.5rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 2rem;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Badges de status */
+.badge-ativos { background-color: #43a047; }
+.badge-espera { background-color: #283593; }
+.badge-sairam { background-color: #212121; color: #fff; }
+
+.badge-contador {
+    display: inline-block;
+    min-width: 24px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    border-radius: 12px;
+    text-align: center;
+}
+
+/* ========================
+   ABAS
+   ======================== */
+#tabelasLeitura .nav-link {
+  font-weight: 600;
+  border-color: transparent !important;
+  color: #1a237e !important;
+  transition: all 0.3s ease;
+}
+
+#tabelasLeitura .nav-link:hover { opacity: 0.85; }
+
+#tabelasLeitura .nav-link.active#ativos-tab,
+#tabelasLeitura .nav-link.active#livros-tab {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%) !important;
+  color: #fff !important;
+}
+
+#tabelasLeitura .nav-link.active#espera-tab {
+  background: #43a047 !important;
+  color: #fff !important;
+}
+
+#tabelasLeitura .nav-link.active#sairam-tab {
+  background: #212121 !important;
+  color: #fff !important;
+}
+
+/* ========================
+   BOTOES
+   ======================== */
+.action-buttons .btn {
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+/* Gradientes dos botões */
+.btn-graph, .btn-add-book { 
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+}
+
+.btn-add-user { 
+  background: #43a047;
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+/* ========================
+   MODAIS
+   ======================== */
+.modal-custom {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-custom .modal-header {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  color: #fff;
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+}
+
+.modal-footer .btn {
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-cancel { background: #212121; color: #fff; }
+.btn-submit { background: #43a047; color: #fff; }
+
+.modal-footer .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+/* ========================
+   STATUS
+   ======================== */
+.status.disponivel { 
+  color: #43a047; font-weight: 500; 
+  font-size: 0.8em; 
+}
+.status.indisponivel { 
+  color: #212121; font-weight: 500; 
+  font-size: 0.8em; 
+}
+.leitor-badge { 
+  display: inline-block; 
+  margin-left: 8px; 
+  padding: 2px 6px; 
+  font-size: 0.9em; 
+  background-color: #f0f0f0; 
+  color: #333; 
+  border-radius: 12px; font-weight: 500; }
+
+.container{
+  background:#f0f0f0;
+}
+
+.ciclo-badge {
+  width:70px; height:70px; border-radius:50%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-weight:700; font-size:1rem; color:#fff;
+  background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%); /* novo gradiente */
+  line-height:1.2; flex-shrink:0;
+}
+</style>
+
+
+
+{% endblock %}

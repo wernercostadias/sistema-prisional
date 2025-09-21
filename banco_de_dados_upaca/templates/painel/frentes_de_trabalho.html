@@ -1,0 +1,739 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+
+{% block title %}Frentes de Trabalho - Sistema UPACA{% endblock %}
+{% block content %}
+<head>
+    
+    <!-- Font Awesome via CDN (escolha uma versão) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Ou use a outra versão, mas não ambas -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet"> -->
+    
+    <!-- Boxicons via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- jQuery via CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+
+<!-- Bootstrap JS (inclui Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 15px; font-size: 24px;">
+    <img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 50px; height: 50px; margin-right: 5px;">Frentes de Trabalho
+</h1>
+
+<form method="GET" class="mb-4 p-3 rounded" style="background-color: #e0f2f1; border: 1px solid #4db6ac;">
+  <div class="row g-3 align-items-center">
+
+    <div class="col-md-4 d-flex flex-column">
+    <label for="busca" class="form-label fw-semibold mb-1">Nome ou Matrícula:</label>
+    <input
+        type="text"
+        name="busca"
+        id="busca"
+        class="form-control form-control-sm"
+        placeholder="Digite nome ou matrícula"
+        value="{{ request.GET.busca|default:'' }}"
+    >
+    </div>
+
+    <div class="col-md-3 d-flex flex-column">
+      <label for="frente" class="form-label fw-semibold mb-1">Frente de Trabalho:</label>
+        <select name="frente" id="frente" class="form-select form-select-sm">
+        <option value="">Todas</option>
+        {% for codigo, nome in fronteiras_trabalho %}
+            <option value="{{ codigo }}" {% if request.GET.frente == codigo %}selected{% endif %}>{{ nome }}</option>
+        {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex flex-column">
+    <label class="form-label fw-semibold mb-1">Status:</label>
+
+    <div class="form-check">
+        <input
+        class="form-check-input"
+        type="checkbox"
+        name="status"
+        id="status-ativo"
+        value="ativo"
+        {% if 'ativo' in status_selecionados %}checked{% endif %}
+        >
+        <label class="form-check-label natureza-leve" for="status-ativo">
+        Ativo
+        </label>
+    </div>
+
+    <div class="form-check">
+        <input
+        class="form-check-input"
+        type="checkbox"
+        name="status"
+        id="status-revogado"
+        value="revogado"
+        {% if 'revogado' in status_selecionados %}checked{% endif %}
+        >
+        <label class="form-check-label natureza-grave" for="status-revogado">
+        Revogado
+        </label>
+    </div>
+
+    <div class="form-check">
+        <input
+        class="form-check-input"
+        type="checkbox"
+        name="status"
+        id="status-todos"
+        value=""
+        {% if not status_selecionados or '' in status_selecionados %}checked{% endif %}
+        onclick="document.querySelectorAll('input[name=status]').forEach(cb => { if(cb.id !== 'status-todos') cb.checked = false; });"
+        >
+        <label class="form-check-label natureza-media" for="status-todos">
+        Todos
+        </label>
+    </div>
+    </div>
+
+
+    <div class="col-md-2 d-flex flex-column" style="align-items: flex-end;">
+    <button type="submit" class="btn w-100 mb-2" style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px);">
+        Filtrar
+    </button>
+
+    <a href="{% url 'frentes_de_trabalho' %}" class="btn w-100 mb-2" style="border: 1px solid #00796b; color: #00796b; font-weight: 600; height: calc(1.5em + 0.75rem + 2px); text-align: center;">
+        Limpar
+    </a>
+
+    <!-- Botão para abrir modal de gráficos -->
+    <button type="button" class="btn w-100" style="background-color: #4db6ac; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px);" data-bs-toggle="modal" data-bs-target="#modalGraficos">
+        📈 Visualizar Gráficos
+    </button>
+    </div>
+
+
+
+  </div>
+</form>
+
+
+
+
+
+<div class="botao-container">
+  <button
+    class="btn w-10"
+    style="background-color: #00796b; color: white; font-weight: 600; height: calc(1.5em + 0.75rem + 2px);"
+    data-bs-toggle="modal"
+    data-bs-target="#cadastroModal"
+  >
+    Adicionar Interno ao Trabalho
+  </button>
+</div>
+
+
+<table class="table bg-teal-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Matrícula</th>
+            <th>Interno</th>
+            <th>Frente de Trabalho</th>
+            <th>Portaria</th>
+            <th>Status</th>
+            <th>Data de Início</th>
+            <th>Portaria Rev.</th>
+            <th>Data de Revogação</th>
+            <th>Ações</th> <!-- Coluna para ações -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for frente in page_obj %}
+        <tr id="frente-{{ frente.id }}">
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>{{ frente.pessoa.matricula }}</td>
+            <td>{{ frente.pessoa }}</td>
+            <td>{{ frente.get_frente_trabalho_display }}</td>
+            <td>{{ frente.numero_portaria_admissao }}</td>
+            <td>
+                {% if frente.status == 'ativo' %}
+                    <span class="natureza-leve">{{ frente.get_status_display }}</span>
+                {% elif frente.status == 'revogado' %}
+                    <span class="natureza-grave">{{ frente.get_status_display }}</span>
+                {% endif %}
+            </td>
+            <td>{{ frente.data_inicio }}</td>
+            <td>
+                {% if frente.numero_portaria_revogacao %}
+                    {{ frente.numero_portaria_revogacao }}
+                {% else %}
+                
+                {% endif %}
+            </td>
+            <td>
+                {% if frente.data_revogacao %}
+                    {{ frente.data_revogacao }}
+                {% else %}
+                    
+                {% endif %}
+            </td>
+            <td>
+                <div class="d-flex align-items-center" style="gap: 6px;">
+                    {% if frente.status == "ativo" %}
+                        <form id="form-revogar-{{ frente.id }}" method="post" action="{% url 'revogar_trabalho' frente.id %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-danger btn-sm btn-abrir-modal" data-id="{{ frente.id }}">Revogar</button>
+                        </form>
+                    {% else %}
+                        {% if frente.pdf_revogacao %}
+                            <a href="/media/{{ frente.pdf_revogacao }}" class="btn btn-primary btn-sm" download>
+                                Baixar PDF
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Revogado</button>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Botão de Apagar com ícone e espaçamento -->
+                    <button class="btn btn-outline-danger btn-sm btn-apagar" data-id="{{ frente.id }}" title="Apagar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<nav aria-label="Navegação de páginas" class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.status %}{% for s in request.GET.status %}status={{ s }}&{% endfor %}{% endif %}{% if request.GET.frente %}frente={{ request.GET.frente }}&{% endif %}{% if request.GET.busca %}busca={{ request.GET.busca }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if request.GET.status %}{% for s in request.GET.status %}status={{ s }}&{% endfor %}{% endif %}{% if request.GET.frente %}frente={{ request.GET.frente }}&{% endif %}{% if request.GET.busca %}busca={{ request.GET.busca }}&{% endif %}page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.status %}{% for s in request.GET.status %}status={{ s }}&{% endfor %}{% endif %}{% if request.GET.frente %}frente={{ request.GET.frente }}&{% endif %}{% if request.GET.busca %}busca={{ request.GET.busca }}&{% endif %}page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Próxima</span></li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+
+
+<!-- Modal de adicionar interno a frente de trabalho -->
+<div class="modal fade" id="cadastroModal" tabindex="-1" aria-labelledby="cadastroModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered"> <!-- Adicionada a classe modal-dialog-centered -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastroModalLabel">Adicionar Interno ao Trabalho</h5>
+                <button type="button" class="custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    ✖
+                </button>
+
+            </div>
+            <div class="modal-body">
+                <form id="cadastroForm">
+                    {% csrf_token %}
+                    <!-- Nome da Pessoa -->
+                    <div class="form-group">
+                        <label for="pessoa" class="font-weight-bold text-muted">Selecionar Pessoa:</label>
+                        <input type="text" id="id_pessoa" name="pessoa" class="pessoa-selectize" placeholder="Digite para buscar uma pessoa..." autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label for="frente_trabalho" class="form-label">Frente de Trabalho</label>
+                        <select class="form-control" id="frente_trabalho" name="frente_trabalho">
+                            {% for value, label in form.frente_trabalho.field.choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_inicio" class="form-label">Data de Início</label>
+                        <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="numero_portaria_admissao" class="form-label">Número da Portaria</label>
+                        <input type="text" class="form-control" id="numero_portaria_admissao" name="numero_portaria_admissao" required>
+                    </div>
+                    <button type="submit" class="btn-salvar">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal para confirmar exclusão do interno há frente de trabalho -->
+<!-- Modal para confirmar exclusão do interno há frente de trabalho -->
+<div class="modal fade" id="modalConfirmarApagar" tabindex="-1" role="dialog" aria-labelledby="modalConfirmarApagarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalConfirmarApagarLabel">Confirmar Exclusão</h5>
+        <button type="button" class="custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
+            ✖
+        </button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que deseja apagar esta frente de trabalho?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> <!-- aqui está a correção -->
+        <button type="button" id="btnConfirmarApagar" class="btn btn-danger">Apagar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmação -->
+<div class="modal fade" id="confirmRevogarModal" tabindex="-1" role="dialog" aria-labelledby="confirmRevogarLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="confirmRevogarLabel">Confirmar Revogação</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Tem certeza que deseja revogar esta frente de trabalho?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="btnConfirmarRevogar" class="btn btn-danger">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="modalGraficos" tabindex="-1" aria-labelledby="tituloModalGraficos" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Cabeçalho com título centralizado e botão de fechar -->
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title w-100 text-center fw-bold" id="tituloModalGraficos">
+          📊 Gráficos das Frentes de Trabalho
+        </h5>
+        <button type="button" class="custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
+            ✖
+        </button>
+      </div>
+
+      <!-- Corpo com gráficos -->
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div id="graficoPizza"></div>
+          </div>
+          <div class="col-md-6">
+            <div id="graficoColunas"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/variable-pie.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    Highcharts.setOptions({
+        lang: {
+            contextButtonTitle: "Menu do gráfico",
+            downloadPNG: "Baixar imagem PNG",
+            downloadJPEG: "Baixar imagem JPEG",
+            downloadPDF: "Baixar PDF",
+            downloadSVG: "Baixar SVG vetorial",
+            printChart: "Imprimir gráfico",
+            loading: "Carregando...",
+            noData: "Sem dados para exibir",
+            resetZoom: "Redefinir zoom",
+            resetZoomTitle: "Redefinir nível de zoom"
+        }
+    });
+
+    const modal = document.getElementById('modalGraficos');
+
+    modal.addEventListener('show.bs.modal', () => {
+        fetch('/frentes/graficos/')
+            .then(res => res.json())
+            .then(dados => {
+                const totalAtivos = dados.pizza.reduce((acc, item) => acc + item.y, 0);
+
+                // Gráfico de Pizza — SOMENTE ATIVOS
+                Highcharts.chart('graficoPizza', {
+                    chart: { type: 'pie' },
+                    title: { text: 'Distribuição das Frentes de Trabalho' },
+                    subtitle: {
+                        text: `<div style="margin-top: 10px;">Total Ativos: <b>${totalAtivos}</b></div>`,
+                        useHTML: true,
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        y: 20,
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            color: '#000'
+                        }
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: <b>{point.y}</b>'
+                    },
+                    series: [{
+                        minPointSize: 10,
+                        innerSize: '25%',
+                        zMin: 0,
+                        name: 'Frentes',
+                        data: dados.pizza,
+                        dataLabels: {
+                            enabled: true,
+                            distance: 20,
+                            format: '{point.name}',
+                            style: { fontSize: '12px' }
+                        }
+                    }]
+                });
+
+                // Gráfico de Colunas — ATIVOS vs REVOGADOS
+                Highcharts.chart('graficoColunas', {
+                    chart: { type: 'column' },
+                    title: { text: 'Frentes Ativas vs Revogadas' },
+                    xAxis: {
+                        categories: dados.barras.categorias,
+                        title: { text: 'Frentes de Trabalho' }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: { text: 'Quantidade de Internos' }
+                    },
+                    tooltip: {
+                        shared: true,
+                        valueSuffix: ' internos'
+                    },
+                    plotOptions: {
+                        column: {
+                            dataLabels: { enabled: true }
+                        }
+                    },
+                    series: [
+                        { name: 'Ativo', data: dados.barras.ativos, color: '#198754' },
+                        { name: 'Revogado', data: dados.barras.revogados, color: '#dc3545' }
+                    ]
+                });
+            });
+    });
+});
+</script>
+
+
+
+
+
+<!-- Notyf CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+<!-- Notyf JS -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+    const notyf = new Notyf({
+        duration: 4000,
+        position: { x: "right", y: "top" },
+        dismissible: true
+    });
+
+    $(document).ready(function() {
+        $('#cadastroForm').submit(function(event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'cadastrar_frente_de_trabalho' %}",
+                data: formData,
+                success: function(response) {
+                    notyf.success(response.message || 'Cadastro realizado com sucesso!');
+                    $('#cadastroModal').modal('hide'); // Fecha o modal
+                    setTimeout(() => location.reload(), 2000); // Espera 2s antes de recarregar
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Erro ao cadastrar. Verifique os dados.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    notyf.error(errorMsg);
+                }
+            });
+        });
+    });
+</script>
+<script>
+    window.notyf = window.notyf || new Notyf({
+        duration: 4000,
+        position: { x: "right", y: "top" },
+        dismissible: true
+    });
+
+    var frenteIdParaApagar = null;
+
+    // Abrir modal ao clicar no botão apagar
+    $(document).on('click', '.btn-apagar', function () {
+        frenteIdParaApagar = $(this).data('id');
+        $('#modalConfirmarApagar').modal('show');
+    });
+
+    // Confirmar exclusão no modal
+    $('#btnConfirmarApagar').on('click', function () {
+        if (!frenteIdParaApagar) return;
+
+        $.ajax({
+            url: `/apagar-frente/${frenteIdParaApagar}/`,
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (response) {
+                notyf.success(response.message);
+
+                // Remove a linha suavemente
+                $(`#frente-${frenteIdParaApagar}`).fadeOut(500, function () {
+                    $(this).remove();
+                });
+
+                // Fecha o modal do Bootstrap 4
+                $('#modalConfirmarApagar').modal('hide');
+
+                frenteIdParaApagar = null;
+            },
+            error: function (xhr) {
+                const msg = xhr.responseJSON?.message || 'Erro ao apagar frente.';
+                notyf.error(msg);
+            }
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  let idAtual = null;
+
+  document.querySelectorAll('.btn-abrir-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      idAtual = btn.getAttribute('data-id');
+      $('#confirmRevogarModal').modal('show');
+    });
+  });
+
+    document.getElementById('btnConfirmarRevogar').addEventListener('click', () => {
+    if (!idAtual) return;
+    const form = document.getElementById(`form-revogar-${idAtual}`);
+    if (form) {
+        form.submit();  // abre o download em nova aba
+        $('#confirmRevogarModal').modal('hide');
+
+        // Recarregar a página após um pequeno delay para garantir o disparo do download
+        setTimeout(() => {
+        location.reload();
+        }, 1000);  // 1 segundo é geralmente suficiente
+    }
+    });
+});
+
+</script>
+
+{% block extra_js %}
+<!-- Carregar os arquivos do Selectize.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Inicializar o Selectize para os campos de busca de pessoa
+        $('.pessoa-selectize').each(function() {
+            var selectize = $(this).selectize({
+                valueField: 'id',
+                labelField: 'nome_completo',
+                searchField: ['nome_completo'],
+                options: [],  // A lista de opções será carregada via AJAX
+                create: false,
+                load: function(query, callback) {
+                    if (!query.length) return callback();  // Não carrega se a query for vazia
+
+                    var page = 1;  // Começa a carregar a primeira página
+
+                    // Função para carregar os resultados
+                    var loadResults = function(page) {
+                        $.ajax({
+                            url: '{% url "pessoa_search" %}',  // Rota para buscar as pessoas
+                            data: {q: query, page: page},  // Parâmetros de busca e página
+                            dataType: 'json',
+                            success: function(res) {
+                                callback(res);  // Carregar os resultados
+                            }
+                        });
+                    };
+                    // Carregar os resultados da página inicial
+                    loadResults(page);
+                }
+            });
+
+            // Adicionar um evento de 'focus' para disparar a pesquisa automaticamente
+            $(this).on('focus', function() {
+                // Trigger de pesquisa imediata quando o input é focado
+                var query = '';  // Pode colocar algum valor de filtro inicial se necessário
+                $(this).trigger('input', [query]);  // Simula a digitação e carrega os resultados
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+
+<style>
+   
+    
+
+    .botao-container {
+        display: flex;
+        justify-content: flex-end; /* Alinha o botão à direita */
+        margin-bottom: 10px; /* Dá um espaço entre o botão e a tabela */
+    }
+    
+    .natureza-grave {
+        background-color: #f8d7da; /* Um vermelho suave */
+        color: #721c24; /* Texto vermelho escuro */
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    
+    .natureza-leve {
+        background-color: #d4edda; /* Um verde suave */
+        color: #155724; /* Texto verde escuro */
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .natureza-media {
+        background-color: #fff3cd; /* Um amarelo suave */
+        color: #856404; /* Texto amarelo escuro */
+        padding: 3px 8px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    
+    .container {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    .bg-teal-light {
+        background-color:   transparent; /* Teal bem clarinho */
+        padding: 10px; /* Adiciona um espaçamento interno */
+        border-radius: 5px; /* Bordas arredondadas para um visual mais suave */
+    }
+    body {
+        background-color: #f0f4f8; /* Azul acinzentado claro */
+    }
+    
+    .bg-teal-table {
+        background-color: #d9e4ec; /* Azul acinzentado suave */
+        padding: 10px;
+        border-radius: 8px; /* Bordas um pouco mais arredondadas para um efeito mais moderno */
+        border: 1px solid rgba(0, 0, 0, 0.1); /* Adiciona uma borda leve para contraste */
+    }
+    
+.custom-btn-close {
+    width: 22px;
+    height: 22px;
+    background-color: transparent;
+    background-image: inherit;
+    border: none;
+    opacity: 0.8;
+    outline: none; /* Remove borda de foco */
+    box-shadow: none; /* Remove sombra de foco */
+}
+
+.custom-btn-close:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+    
+    .custom-btn-close:hover {
+        opacity: 1; /* Torna o botão mais visível ao passar o mouse */
+        filter: invert(22%) sepia(76%) saturate(748%) hue-rotate(320deg) brightness(90%) contrast(85%);
+    }
+    
+    
+
+/* Cabeçalho da tabela */
+th {
+    background-color: #abe6e3ff;
+    color: #000000ff; /* Texto branco */
+    padding: 10px;
+    text-align: left;
+}
+
+/* Linhas alternadas para melhor leitura */
+tr:nth-child(even) {
+    background-color: #f2f6fc; /* Azul acinzentado bem claro */
+}
+
+tr:nth-child(odd) {
+    background-color: #ffffff; /* Branco */
+}
+
+/* Células da tabela */
+td {
+    color: #2c3e50; /* Preto acinzentado elegante */
+    padding: 10px;
+}
+
+/* Bordas da tabela */
+.table {
+    border: 1px solid #0000008c; /* Cinza suave */
+    border-collapse: collapse;
+}
+
+#graficoPizza {
+  width: 450px;   /* largura menor */
+  height: 450px;  /* altura menor */
+  margin: 0 auto; /* centraliza horizontalmente */
+}
+    
+</style>
+
+{% endblock %}

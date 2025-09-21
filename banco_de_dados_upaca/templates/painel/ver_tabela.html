@@ -5,59 +5,84 @@
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <script src="{% static 'js/script.js' %}"></script>
+<link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"> 
 <br>
 <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);  font-size: 24px;">
     <img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 70px; height: 70px; margin-right: 10px;">População Carcerária - UPACA
 </h1>
 
 
-<link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"> 
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 3500, // Tempo que a notificação fica visível
+            position: { x: "right", y: "top" }, // Posição da notificação
+            dismissible: true // Permitir fechar manualmente
+        });
 
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% else %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+<button id="toggle-filtro-btn" class="btn btn-dark d-md-none mb-2" type="button" onclick="toggleFiltro()">
+    <i class="fas fa-sliders-h"></i> <span id="filtro-btn-text">Mostrar Filtros</span>
+</button>
+
+<div id="filtro-container" class="d-none d-md-block">
 <!-- Formulário de Filtro -->
 <form method="get" action="{% url 'ver_tabela' %}" class="filter-form">
     <div class="form-row align-items-center">
-        <!-- Filtros de seleção -->
-        <div class="col-md-1 col-12 mb-2">
-            <label for="bloco">Bloco</label>
-            <select id="bloco" name="bloco" class="form-control form-control-sm">
-                <option value="">Todos</option>
-                <option value="A" {% if bloco_filter == 'A' %}selected{% endif %}>Bloco A</option>
-                <option value="B" {% if bloco_filter == 'B' %}selected{% endif %}>Bloco B</option>
-                <option value="C" {% if bloco_filter == 'C' %}selected{% endif %}>Bloco C</option>
-                <option value="D" {% if bloco_filter == 'D' %}selected{% endif %}>Bloco D</option>
-                <option value="E" {% if bloco_filter == 'E' %}selected{% endif %}>Bloco E</option>
-            </select>
-        </div>
+        <!-- Filtro de Bloco -->
+<div class="col-md-1" style="background-color:rgba(90, 98, 104, 0.23); color: #fff; border: none; border-radius: 5px; padding: 5px;">
+    <label for="bloco" >Bloco</label>
+    <select id="bloco" name="bloco" class="form-control form-control-sm" multiple>
+        <option value="A" {% if 'A' in bloco_filter %}selected{% endif %}>Bloco A</option>
+        <option value="B" {% if 'B' in bloco_filter %}selected{% endif %}>Bloco B</option>
+        <option value="C" {% if 'C' in bloco_filter %}selected{% endif %}>Bloco C</option>
+        <option value="D" {% if 'D' in bloco_filter %}selected{% endif %}>Bloco D</option>
+        <option value="E" {% if 'E' in bloco_filter %}selected{% endif %}>Bloco E</option>
+    </select>
+</div>
 
-        <div class="col-md-1 col-12 mb-2">
-            <label for="cela">Cela</label>
-            <select id="cela" name="cela" class="form-control form-control-sm">
-                <option value="">Todas</option>
-                <option value="1" {% if cela_filter == '1' %}selected{% endif %}>Cela 1</option>
-                <option value="2" {% if cela_filter == '2' %}selected{% endif %}>Cela 2</option>
-                <option value="3" {% if cela_filter == '3' %}selected{% endif %}>Cela 3</option>
-                <option value="4" {% if cela_filter == '4' %}selected{% endif %}>Cela 4</option>
-                <option value="5" {% if cela_filter == '5' %}selected{% endif %}>Cela 5</option>
-                <option value="6" {% if cela_filter == '6' %}selected{% endif %}>Cela 6</option>
-                <option value="7" {% if cela_filter == '7' %}selected{% endif %}>Cela 7</option>
-            </select>
-        </div>
+<!-- Filtro de Cela -->
+<div class="col-md-1" style="background-color:rgba(90, 98, 104, 0.23); color: #fff; border: none; border-radius: 5px; padding: 5px; margin:12px;">
+    <label for="cela">Cela</label>
+    <select id="cela" name="cela" class="form-control form-control-sm" multiple>
+        <option value="1" {% if '1' in cela_filter %}selected{% endif %}>Cela 1</option>
+        <option value="2" {% if '2' in cela_filter %}selected{% endif %}>Cela 2</option>
+        <option value="3" {% if '3' in cela_filter %}selected{% endif %}>Cela 3</option>
+        <option value="4" {% if '4' in cela_filter %}selected{% endif %}>Cela 4</option>
+        <option value="5" {% if '5' in cela_filter %}selected{% endif %}>Cela 5</option>
+        <option value="6" {% if '6' in cela_filter %}selected{% endif %}>Cela 6</option>
+        <option value="7" {% if '7' in cela_filter %}selected{% endif %}>Cela 7</option>
+    </select>
+</div>
 
-        <div class="col-md-2 col-12 mb-2">
-            <label for="escolaridade">Escolaridade</label>
-            <select id="escolaridade" name="escolaridade" class="form-control form-control-sm">
-                <option value="">Todas</option>
+
+<div class="row col-md-5">
+    <div class="col-md-5 offset-md-1">
+        <div class="mb-2" style="background-color: rgba(90, 98, 104, 0.3); color: #fff; border: none; border-radius: 5px; padding: 4px;">
+            <label for="escolaridade" style="font-weight: bold; color: rgba(26, 30, 32, 0.99);">Escolaridade</label>
+            <select id="escolaridade" name="escolaridade" class="form-control form-control-sm" 
+                style="background-color: #343a40; color: #fff; border: none;">
+                <option value="" style="background-color: #6c757d; color: #fff;">Todas</option>
                 <option value="1" {% if escolaridade_filter == '1' %}selected{% endif %}>Ensino Fundamental Incompleto</option>
                 <option value="2" {% if escolaridade_filter == '2' %}selected{% endif %}>Ensino Fundamental Completo</option>
                 <option value="3" {% if escolaridade_filter == '3' %}selected{% endif %}>Ensino Médio Incompleto</option>
@@ -67,10 +92,11 @@
             </select>
         </div>
 
-        <div class="col-md-2 col-12 mb-2">
-            <label for="estudando">Estudando</label>
-            <select id="estudando" name="estudando" class="form-control form-control-sm">
-                <option value="">Todos</option>
+        <div class="mb-2" style="background-color: rgba(90, 98, 104, 0.3); color: #fff; border: none; border-radius: 5px; padding: 4px;">
+            <label for="estudando" style="font-weight: bold; color: rgba(26, 30, 32, 0.99);">Estudando</label>
+            <select id="estudando" name="estudando" class="form-control form-control-sm" 
+                style="background-color: #343a40; color: #fff; border: none;">
+                <option value="" style="background-color: #6c757d; color: #fff;">Todos</option>
                 <option value="ibraema" {% if estudando_filter == 'ibraema' %}selected{% endif %}>IBRAEMA</option>
                 <option value="eja_i" {% if estudando_filter == 'eja_i' %}selected{% endif %}>EJA I</option>
                 <option value="eja_ii" {% if estudando_filter == 'eja_ii' %}selected{% endif %}>EJA II</option>
@@ -79,10 +105,13 @@
             </select>
         </div>
 
-        <div class="col-md-2 col-12 mb-2">
-            <label for="frente_trabalho">Frente de Trabalho</label>
-            <select id="frente_trabalho" name="frente_trabalho" class="form-control form-control-sm">
-                <option value="">Todas</option>
+    </div>
+    <div class="col-md-5">
+        <div class="mb-2" style="background-color:rgba(90, 98, 104, 0.41); color: #fff; border: none; border-radius: 5px; padding: 4px;">
+            <label for="frente_trabalho" style="font-weight: bold; color: rgba(26, 30, 32, 0.99);">Frente de Trabalho</label>
+            <select id="frente_trabalho" name="frente_trabalho" class="form-control form-control-sm" 
+                style="background-color: #343a40; color: #fff; border: none;">
+                <option value="" style="background-color: #6c757d; color: #fff;">Todas</option>
                 <option value="nao_trabalha" {% if frente_trabalho_filter == 'nao_trabalha' %}selected{% endif %}>Não trabalha</option>
                 <option value="horta" {% if frente_trabalho_filter == 'horta' %}selected{% endif %}>Horta</option>
                 <option value="piscicultura" {% if frente_trabalho_filter == 'piscicultura' %}selected{% endif %}>Piscicultura</option>
@@ -93,52 +122,89 @@
                 <option value="croche" {% if frente_trabalho_filter == 'croche' %}selected{% endif %}>Crochê</option>
                 <option value="digitalizador" {% if frente_trabalho_filter == 'digitalizador' %}selected{% endif %}>Digitalizador</option>
                 <option value="bibliotecario" {% if frente_trabalho_filter == 'bibliotecario' %}selected{% endif %}>Bibliotecário</option>
+                <option value="facilitador" {% if frente_trabalho_filter == 'facilitador' %}selected{% endif %}>Facilitador</option>
+                <option value="servicos_gerais" {% if frente_trabalho_filter == 'sevicoes_gerais' %}selected{% endif %}>Seviçoes Gerais</option>
+
             </select>
         </div>
-
-        <!-- Checkboxes e Botões em linha -->
-        <div class="col-md-2 col-12 mb-2">
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="ordenar_nome" name="ordenar_nome" {% if ordenar_nome %}checked{% endif %}>
-                <label class="form-check-label" for="ordenar_nome">Ordenar por A-Z</label>
-            </div>
+        <div class="mb-2" style="background-color: rgb(5, 168, 114); color: #fff; border: none; border-radius: 5px; padding: 4px;">
+            <label for="status" style="font-weight: bold; color: #fff;">Status</label>
+            <select name="status" id="status" class="form-control form-control-sm" 
+                style="background-color: #343a40; color: #fff; border: none;">
+                <option value="ativo" {% if status_filter == 'ativo' %}selected{% else %}selected{% endif %}>Ativo</option>
+                <option value="inativo" {% if status_filter == 'inativo' %}selected{% endif %}>Inativo</option>
+                <option value="foragido" {% if status_filter == 'foragido' %}selected{% endif %}>Foragido</option>
+            </select>
         </div>
+    </div>
+</div>
 
-        <div class="col-md-2 col-12 mb-2">
-            <div class="form-check">
+
+        <div class="row custom-checkbox-container">
+          
+          
+            <!-- Coluna Esquerda -->
+            <div class="col-md-6 custom-checkbox-column">
+                <label for="status" style="font-weight: bold; color: #000000; margin-bottom:-5px;" >Ordenações</label>
+              <div class="form-check custom-checkbox-item" style="display: inline-block;">
+                <input type="checkbox" class="form-check-input" id="ordenar_nome" name="ordenar_nome" {% if ordenar_nome %}checked{% endif %} style="vertical-align: middle; margin-top: 5px;">
+                <label class="form-check-label" for="ordenar_nome" style="padding-left: 20px;">Ord. por A-Z</label>
+              </div>
+          
+              <div class="form-check custom-checkbox-item">
                 <input type="checkbox" name="ordenar_bloco_cela" id="ordenar_bloco_cela" value="on" {% if ordenar_bloco_cela == 'on' %}checked{% endif %}>
-                <label class="form-check-label" for="ordenar_bloco_cela">Ordenar por Bloco e Cela</label>
+                <label class="form-check-label" for="ordenar_bloco_cela">Ord. Bloco e Cela</label>
+              </div>
             </div>
-        </div>
-
-        <!-- Filtro para Saiu Temporariamente -->
-        <div class="col-md-2 col-12 mb-2">
-            <div class="form-check">
+          
+            <!-- Coluna Direita -->
+            <div class="col-md-4 custom-checkbox-column">
+                <label for="status" style="font-weight: bold; color: #000000; margin-bottom:-5px;" >Alternativas</label>
+              <div class="form-check custom-checkbox-item">
                 <input type="checkbox" name="saiu_temporariamente" id="saiu_temporariamente" value="on" {% if saiu_temporariamente %}checked{% endif %}>
-                <label class="form-check-label" for="saiu_temporariamente">Saiu Temporariamente</label>
+                <label class="form-check-label" for="saiu_temporariamente">Saidas Temporárias</label>
+              </div>
+          
+              <div class="form-check custom-checkbox-item">
+                <input type="checkbox" name="albergado" id="albergado" value="on" {% if albergado_filter == 'on' %}checked{% endif %}>
+                <label class="form-check-label" for="albergado">Albergados</label>
+              </div>
+
+
+              <!-- Select para Faixas Etárias -->
+              <select name="faixa_etaria" class="form-control custom-width">
+
+                  <option value="">Escolha a faixa etária</option>
+                  <option value="18-20" {% if faixa_etaria_filtro == "18-20" %}selected{% endif %}>18 até 20 anos</option>
+                  <option value="21-30" {% if faixa_etaria_filtro == "21-30" %}selected{% endif %}>21 até 30 anos</option>
+                  <option value="31-59" {% if faixa_etaria_filtro == "31-59" %}selected{% endif %}>31 até 59 anos</option>
+                  <option value="60+" {% if faixa_etaria_filtro == "60+" %}selected{% endif %}>Idosos (60+ anos)</option>
+              </select>
             </div>
-        </div>
-        
+          </div>
+          
+
+
 
         <!-- Botões -->
         <div class="col-12 mb-2 text-center">
             <!-- Botão de Filtrar (Verde Claro) -->
-            <button type="submit" class="btn btn-success btn-sm shadow-lg   px-4 py-2" data-toggle="tooltip" data-placement="bottom" title="Clique para filtrar" style="font-weight: bold; transition: all 0.3s ease-in-out;">
+            <button type="submit" class="btn btn-success btn-sm shadow-lg px-4 py-2" data-toggle="tooltip" data-placement="bottom" title="Clique para filtrar" style="font-weight: bold; transition: all 0.3s ease-in-out;">
                 <i class="fas fa-filter"></i> Filtrar
             </button>
 
-            <a href="{% url 'exportar_tabela_pdf' %}?bloco={{ bloco_filter }}&cela={{ cela_filter }}&escolaridade={{ escolaridade_filter }}&estudando={{ estudando_filter }}&sancao={{ sancao_filter }}&frente_trabalho={{ frente_trabalho_filter }}&nome_completo={{ nome_filter }}&ordenar_bloco_cela={{ ordenar_bloco_cela|default:'' }}&ordenar_nome={{ ordenar_nome|default:'' }}&saiu_temporariamente={{ saiu_temporariamente|default:'' }}" 
-            class="btn btn-outline-success btn-sm shadow-lg  px-4 py-2" style="font-weight: bold; transition: all 0.3s ease-in-out;">
-                Baixar PDF
-            </a>
-
-        </div>
-
-
-        
+            <!-- Botão para Baixar PDF -->
+<!-- Botão para Baixar PDF com filtro de status -->
+<a href="{% url 'exportar_tabela_pdf' %}{{ request.get_full_path|cut:request.path }}" class="btn btn-outline-success">
+  Baixar PDF
+</a>
+                        <a href="{% url 'gerar_pdf' %}" class="btn btn-outline-primary btn-sm shadow-lg px-4 py-2" data-toggle="tooltip" data-placement="bottom" title="Clique para exportar para PDF" style="font-weight: bold; transition: all 0.3s ease-in-out;">
+                            <i class="fas fa-download"></i> Quantitativos PDF
+                        </a>
+                    </div>
     </div>
 </form>
-
+</div>
 
 
 
@@ -148,27 +214,31 @@
     <table class="table table-bordered table-striped">
         <thead class="thead-light">
             <tr> 
-                              
-                <th scope="col" class="col-id text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+
+                <th scope="col" class="col-id d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
                     #
                 </th>
+
                 <th scope="col" class="col-bloco text-center" style="max-width: 40px; background-color: #27A444; color: #ffffff; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #1d8c3b;">
                     B
                 </th>
                 <th scope="col" class="col-cela text-center" style="max-width: 40px; background-color: #27A444; color: #ffffff; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #1d8c3b;">
                     C
                 </th>
+                
+                <th scope="col" class="col-cela d-none d-md-table-cell text-center" style="max-width: 100px; background-color: #27A444; color: #ffffff; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #1d8c3b;">
+                    Matricula
+                </th>
 
-                <th scope="col" class="col-nome text-center" style="width: 20px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444; ">
+                <th scope="col" class="col-nome d-none d-md-table-cell text-center" style="width: 20px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444; ">
                     ST
                 </th>
-                
-                
-                
-                
-                
+
                 <th scope="col" class="col-nome text-center" style="width: 300px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
                     Nome do Interno
+                </th>
+                <th scope="col" class="col-id d-none d-md-table-cell text-center" style="background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
+                    Idade
                 </th>
                 <th scope="col" class="col-artigo d-none d-md-table-cell text-center" style="width: 120px; background-color: #343A40; color: #f1f1f1; font-weight: bold; text-align: center; padding: 10px; border: 1px solid #444;">
                     Art. Crim
@@ -206,26 +276,58 @@
         <tbody>
             {% for pessoa in page_obj %}
             <tr>
-                    <td>{{ pessoa.counter }}</td>
-                    <td class="text-center" style="font-weight: bold;">{{ pessoa.bloco }}</td>
-                    
-                    <td class="text-center" style="font-weight: bold;">{{ pessoa.cela }}</td>
-
+                    <td class="d-none d-md-table-cell">{{ pessoa.counter }}</td>
                     <td class="text-center" style="font-weight: bold;">
+                        {% if pessoa.bloco == "0" or pessoa.bloco is None %}
+                            &nbsp;  <!-- Exibe um espaço vazio caso o valor seja a string "0" ou None -->
+                        {% else %}
+                            {{ pessoa.bloco }}
+                        {% endif %}
+                    </td>
+                    
+                    <td class="text-center" style="font-weight: bold;">
+                        {% if pessoa.cela == "0" or pessoa.cela is None %}
+                            &nbsp;  <!-- Exibe um espaço vazio caso o valor seja a string "0" ou None -->
+                        {% else %}
+                            {{ pessoa.cela }}
+                        {% endif %}
+                    </td>
+                    
+                    <td class='d-none d-md-table-cell  text-center'>{{ pessoa.matricula }}</td>
+                    
+
+                    <td class="d-none d-md-table-cell text-center" style="font-weight: bold;">
                         {% if pessoa.saiu_temporariamente_ativo %}
-                            <!-- Ícone com Tooltip -->
+                            <!-- Ícone de Saída Temporária com Tooltip -->
                             <div class="tooltip-container">
                                 <img src="{% static 'imagens/saidao.png' %}" class="imagem-piscando" alt="Saída Temporária">
                                 <span class="tooltip-text">Interno à Saída Temporária</span>
                             </div>
+                        {% elif pessoa.albergado %}
+                            <!-- Ícone de Albergado com Tooltip -->
+                            <div class="tooltip-container">
+                                <img src="{% static 'imagens/albergado.png' %}" class="imagem-piscando" alt="Albergado" style="width: 28px; height: 28px;">
+
+                                <span class="tooltip-text">Interno Albergado</span>
+                            </div>
                         {% else %}
-                            &nbsp;
+                            <!-- Exibe o ícone baseado no status -->
+                            <div class="tooltip-container">
+                                {% if pessoa.status == "ativo" %}
+                                    <img src="{% static 'imagens/ativo.png' %}" class="imagem-status" alt="Ativo">
+                                    <span class="tooltip-text ativo-tooltip">Interno Ativo</span>
+                                {% elif pessoa.status == "inativo" %}
+                                    <img src="{% static 'imagens/inativo.png' %}" class="imagem-status" alt="Inativo">
+                                    <span class="tooltip-text inativo-tooltip">Interno Inativo</span>
+                                {% elif pessoa.status == "foragido" %}
+                                    <img src="{% static 'imagens/foragido.png' %}" class="imagem-status" alt="Foragido">
+                                    <span class="tooltip-text foragido-tooltip">Interno Foragido</span>
+                                
+                                {% endif %}
+                            </div>
                         {% endif %}
                     </td>
                     
-                    
-                    
-
                 
                     <td class="nome-completo">
                         {{ pessoa.nome_completo }}
@@ -234,11 +336,30 @@
                         {% elif pessoa.status_novo == 'Ontem' %}
                             <span class="status status-ontem">Ontem</span>
                         {% endif %}
+                    
+                        {% if pessoa.bloco == 'A' %}
+                            {% if pessoa.cela == '1' or pessoa.cela == '2' or pessoa.cela == '3' or pessoa.cela == '5' %}
+                                {% with pessoa.historico_alteracoes.all|dictsort:"data_alteracao"|last as ultima_alteracao %}
+                                    {% if ultima_alteracao %}
+                                        <!-- Exibe o valor antigo da última alteração -->
+                                        <span class="valor-antigo">{{ ultima_alteracao.valor_antigo }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        {% endif %}
                     </td>
                     
+                    <td class="d-none d-md-table-cell text-center">
+                        <span class="texto-limitado">
+                            {% if pessoa.get_idade is not None %}
+                                {{ pessoa.get_idade }} Anos
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
+                    </td>
 
-                    
-                
+                     
                     <td class="d-none d-md-table-cell text-center">
                     <span class="texto-limitado">{{ pessoa.artigo_criminal }}</span>
                     </td>
@@ -253,22 +374,18 @@
                         {{ pessoa.get_estudando_display }}
                     </td>
 
-                    <td class="d-none d-md-table-cell text-center" style="font-size:13px; 
-                        {% if pessoa.pdi_ativo == 'Sim' %}
+                    <td class="d-none d-md-table-cell text-center" style="font-size:13px;
+                        {% if pessoa.pdi_ativo == 'PDI Ativo' %}
                             color: #28a745; font-weight: bold; text-transform: uppercase; background-color: #e8f5e9;
+                        {% elif pessoa.pdi_ativo == 'Sobrestado' %}
+                            color: #ffc107; font-weight: bold; text-transform: uppercase; background-color: #fff3cd;
                         {% else %}
                             color: #6c757d; font-weight: normal; text-transform: none; background-color: #f8f9fa;
                         {% endif %}
                     ">
-                        {{ pessoa.pdi_ativo }}  <!-- Para depurar -->
+                        {{ pessoa.pdi_ativo }}  <!-- Para depuração -->
                     </td>
 
-                    
-
-
-
-                
-                
                     <td class="d-md-table-cell text-center">
                         {% if pessoa.sancoes_ativas %}
                             <!-- Itera sobre as sanções ativas -->
@@ -282,8 +399,6 @@
                         {% endif %}
                     </td>
                     
-                    
-                    
 
 
                                 <!-- Exibir os eletrônicos cadastrados -->
@@ -296,13 +411,13 @@
                                 {{ eletronico.get_tipo_display }}
 
                                 <!-- Ícones Condicionais -->
-                                {% if eletronico.tipo == 'tv' %}
+                                {% comment %} {% if eletronico.tipo == 'tv' %}
                                     <img src="{% static 'imagens/tv.png' %}" alt="TV" class="icone-option">
                                 {% elif eletronico.tipo == 'radio' %}
                                     <img src="{% static 'imagens/radio.png' %}" alt="Rádio" class="icone-option">
                                 {% elif eletronico.tipo == 'ventilador' %}
                                     <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" class="icone-option">
-                                {% endif %}
+                                {% endif %} {% endcomment %}
                             </div>
                         {% endfor %}
                     {% else %}
@@ -313,15 +428,18 @@
 
                 <td class="d-none d-md-table-cell text-center cidade-limitada" style="font-size:13px;">{{ pessoa.cidade }}</td>
 
-                <td class="d-none d-md-table-cell text-center" style="font-size:13px; 
-                    {% if pessoa.get_frente_trabalho_display == 'Horta' or pessoa.get_frente_trabalho_display == 'Piscicultura' or pessoa.get_frente_trabalho_display == 'Minhocário' or pessoa.get_frente_trabalho_display == 'Limpeza' or pessoa.get_frente_trabalho_display == 'Manutenção' or pessoa.get_frente_trabalho_display == 'Fáb. de Blocos' or pessoa.get_frente_trabalho_display == 'Crochê' or pessoa.get_frente_trabalho_display == 'Digitalizador' or pessoa.get_frente_trabalho_display == 'Bibliotecário' %}
+                <td class="d-none d-md-table-cell text-center" style="font-size:13px;
+                    {% if pessoa.frente_trabalho_ativa and pessoa.frente_trabalho_ativa.0.get_frente_trabalho_display in 'Horta Piscicultura Minhocário Limpeza Manutenção Fáb. de Blocos Crochê Digitalizador Bibliotecário' %}
                         font-weight: bold;
                     {% endif %}">
-                    {{ pessoa.get_frente_trabalho_display }}
+                    {% if pessoa.frente_trabalho_ativa %}
+                        {{ pessoa.frente_trabalho_ativa.0.get_frente_trabalho_display }}
+                    {% else %}
+                        Não há
+                    {% endif %}
                 </td>
 
 
-                
                 <td class="d-md-table-cell d-none text-center" style="font-size:13px;"> {{ pessoa.data_entrada|date:"d/m/Y" }}</td>
                 
                 <td>
@@ -362,38 +480,40 @@
                     </div>
                     
                     <div class="row">
+
+                        <div class="form-group col-md-6">
+                            <label for="matricula">Matrícula</label>
+                            <input type="text" name="matricula" id="matricula" class="form-control" value="{{ pessoa.matricula }}">
+                        </div>
+                        
+                        <!-- Artigo Criminal e Escolaridade lado a lado -->
+                        <div class="form-group col-md-6">
+                            <label for="artigo_criminal">Artigo Criminal</label>
+                            <input type="text" name="artigo_criminal" id="artigo_criminal" value="{{ pessoa.artigo_criminal }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <!-- Data de Entrada e Idade lado a lado -->
                         <div class="form-group col-md-6">
                             <label for="data_entrada">Data de Entrada</label>
                             <input type="date" name="data_entrada" id="data_entrada" value="{{ pessoa.data_entrada|date:'Y-m-d' }}" class="form-control">
                         </div>
                     
-                        {% comment %} <div class="form-group col-md-6">
-                            <label for="idade">Idade</label>
-                            <input type="number" name="idade" id="idade" class="form-control" value="{{ pessoa.idade }}">
-                        </div> {% endcomment %}
+                        <div class="form-group col-md-3">
+                            <label for="data_nascimento">Data de Nascimento</label>
+                            <input type="date" name="data_nascimento" class="form-control data-nascimento" value="{{ pessoa.data_nascimento|date:'Y-m-d' }}">
+                        </div>
+                        
+                        <div class="form-group col-md-3">
+                            <label>Idade</label>
+                            <input type="text" class="form-control idade" readonly>
+                        </div> 
+                        
+                        
                     </div>
                     
-                    <div class="row">
-                        <!-- Artigo Criminal e Escolaridade lado a lado -->
-                        <div class="form-group col-md-6">
-                            <label for="artigo_criminal">Artigo Criminal</label>
-                            <input type="text" name="artigo_criminal" id="artigo_criminal" value="{{ pessoa.artigo_criminal }}" class="form-control">
-                        </div>
                     
-                        <div class="form-group col-md-6">
-                            <label for="escolaridade">Escolaridade</label>
-                            <select name="escolaridade" id="escolaridade" class="form-control">
-                                <option value="" {% if not pessoa.escolaridade %}selected{% endif %}>Selecione a Escolaridade</option>
-                                <option value="1" {% if pessoa.escolaridade == '1' %}selected{% endif %}>Fundamental Incompleto</option>
-                                <option value="2" {% if pessoa.escolaridade == '2' %}selected{% endif %}>Fundamental Completo</option>
-                                <option value="3" {% if pessoa.escolaridade == '3' %}selected{% endif %}>Médio Incompleto</option>
-                                <option value="4" {% if pessoa.escolaridade == '4' %}selected{% endif %}>Médio Completo</option>
-                                <option value="5" {% if pessoa.escolaridade == '5' %}selected{% endif %}>Superior Incompleto</option>
-                                <option value="6" {% if pessoa.escolaridade == '6' %}selected{% endif %}>Superior Completo</option>
-                            </select>
-                        </div>
-                    </div>
                     
                     <div class="row">
                         
@@ -410,8 +530,21 @@
 
                             </select>
                         </div>
-                    
+
                         <div class="form-group col-md-6">
+                            <label for="escolaridade">Escolaridade</label>
+                            <select name="escolaridade" id="escolaridade" class="form-control">
+                                <option value="" {% if not pessoa.escolaridade %}selected{% endif %}>Selecione a Escolaridade</option>
+                                <option value="1" {% if pessoa.escolaridade == '1' %}selected{% endif %}>Fundamental Incompleto</option>
+                                <option value="2" {% if pessoa.escolaridade == '2' %}selected{% endif %}>Fundamental Completo</option>
+                                <option value="3" {% if pessoa.escolaridade == '3' %}selected{% endif %}>Médio Incompleto</option>
+                                <option value="4" {% if pessoa.escolaridade == '4' %}selected{% endif %}>Médio Completo</option>
+                                <option value="5" {% if pessoa.escolaridade == '5' %}selected{% endif %}>Superior Incompleto</option>
+                                <option value="6" {% if pessoa.escolaridade == '6' %}selected{% endif %}>Superior Completo</option>
+                            </select>
+                        </div>
+                    
+                        {% comment %} <div class="form-group col-md-6">
                             <label for="frente_trabalho">Frente de Trabalho</label>
                             <select name="frente_trabalho" id="frente_trabalho" class="form-control">
                                 <option value="nao_trabalha" {% if pessoa.frente_trabalho == 'nao_trabalha' %}selected{% endif %}>Não trabalha</option>
@@ -425,7 +558,7 @@
                                 <option value="digitalizador" {% if pessoa.frente_trabalho == 'digitalizador' %}selected{% endif %}>Digitalizador</option>
                                 <option value="bibliotecario" {% if pessoa.frente_trabalho == 'bibliotecario' %}selected{% endif %}>Bibliotecário</option>
                             </select>
-                        </div>
+                        </div> {% endcomment %}
                         
                     </div>
                     
@@ -462,10 +595,57 @@
                         </div>
                     </div>
 
+                    <h4 class="text-center mb-4" 
+                        style="font-size: 1.4rem; font-weight: 600; color: #333; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); border-bottom: 3px solid rgba(0, 0, 0, 0.9); padding-bottom: 12px; display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+                        <i class="fas fa-history" style="color: rgba(0, 0, 0, 0.5); margin-right: 12px; font-size: 1.8rem;"></i> 
+                        Histórico do Interno
+                    </h4>
+
+                    <div class="table-responsive" >
+                        <div style="max-height: 200px; overflow-y: auto; margin-bottom:10px;">
+                            <table class="table table-bordered table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th class="text-center">#</th> <!-- Numerador Bonito -->
+                                        <th class="text-center">Alteração</th>
+                                        <th class="text-center">Antes</th>
+                                        <th class="text-center">Agora</th>
+                                        <th class="text-center">Servidor</th>
+                                        <th class="text-center">Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for alteracao in pessoa.historico_alteracoes.all %}
+                                        <tr>
+                                            <td class="text-center numerador">{{ forloop.counter }}</td> <!-- Numerador -->
+                                            <td class="text-center">{{ alteracao.campo_alterado }}</td>
+                                            <td class="text-center">{{ alteracao.valor_antigo }}</td>
+                                            <td class="text-center">{{ alteracao.valor_novo }}</td> <!-- Números Verdinho -->
+                                            <td class="text-center">{{ alteracao.usuario.username|default:"-" }}</td>
+                                            <td class="text-center">{{ alteracao.data_alteracao|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="text-center">Não houve mudanças desde o seu ingresso na penitenciária.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+
+
                     <div class="form-group">
                         <label for="id_saiu_temporariamente">Saiu Temporariamente</label>
                         <input type="checkbox" name="saiu_temporariamente" id="id_saiu_temporariamente" class="custom-checkbox-stylish" {% if pessoa.saiu_temporariamente %}checked{% endif %}>
                     </div>
+
+                    <div class="form-group">
+                        <label for="id_albergado">Albergado</label>
+                        <input type="checkbox" name="albergado" id="id_albergado" class="custom-checkbox-stylish" {% if pessoa.albergado %}checked{% endif %}>
+                    </div>
+                    
                     
                     
 
@@ -678,13 +858,76 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                                                <!-- Isolamento Preventivo -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card sancao-card p-3">
+                                        <h5 class="card-title mb-3">
+                                            <img src="{% static 'imagens/isolamento.png' %}" alt="Isolamento Preventivo" class="card-img-icon">
+                                            Isolamento Preventivo
+                                        </h5>
+                                        <div class="form-check d-flex align-items-center">
+                                            <div class="custom-checkbox-wrapper">
+                                                <input type="checkbox" class="form-check-input sancao-checkbox" id="sancao_isolamento_preventivo_{{ pessoa.id }}" name="sancao_isolamento_preventivo_{{ pessoa.id }}" {% if sancoes.isolamento_preventivo %}checked{% endif %}>
+                                                <label for="sancao_isolamento_preventivo_{{ pessoa.id }}" class="custom-checkbox-label">
+                                                    <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                        <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                                    </svg>
+                                                    <span>Aplicar Sanção</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="sancao-opcoes mt-3">
+                                            <label for="data_inicio_isolamento_preventivo_{{ pessoa.id }}" class="label-sancao">Início da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_inicio_isolamento_preventivo_{{ pessoa.id }}" value="{{ sancoes.isolamento_preventivo.data_inicio|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="data_fim_isolamento_preventivo_{{ pessoa.id }}" class="label-sancao mt-3">Fim da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_fim_isolamento_preventivo_{{ pessoa.id }}" value="{{ sancoes.isolamento_preventivo.data_fim|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="descricao_sancao_isolamento_preventivo_{{ pessoa.id }}" class="mt-3">Descreva algo:</label>
+                                            <textarea class="form-control" name="descricao_sancao_isolamento_preventivo_{{ pessoa.id }}" style="min-height: 100px;">{{ sancoes.isolamento_preventivo.descricao }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Isolamento Reflexivo -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card sancao-card p-3">
+                                        <h5 class="card-title mb-3">
+                                            <img src="{% static 'imagens/isolamento.png' %}" alt="Isolamento Reflexão" class="card-img-icon">
+                                            Isolamento Reflexivo
+                                        </h5>
+                                        <div class="form-check d-flex align-items-center">
+                                            <div class="custom-checkbox-wrapper">
+                                                <input type="checkbox" class="form-check-input sancao-checkbox" id="sancao_isolamento_reflexao_{{ pessoa.id }}" name="sancao_isolamento_reflexao_{{ pessoa.id }}" {% if sancoes.isolamento_reflexao %}checked{% endif %}>
+                                                <label for="sancao_isolamento_reflexao_{{ pessoa.id }}" class="custom-checkbox-label">
+                                                    <svg class="checkbox-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <rect x="2" y="2" width="20" height="20" rx="5" class="checkbox-rect"></rect>
+                                                        <path d="M6 12L10 16L18 8" class="checkbox-tick"></path>
+                                                    </svg>
+                                                    <span>Aplicar Sanção</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="sancao-opcoes mt-3">
+                                            <label for="data_inicio_isolamento_reflexao_{{ pessoa.id }}" class="label-sancao">Início da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_inicio_isolamento_reflexao_{{ pessoa.id }}" value="{{ sancoes.isolamento_reflexao.data_inicio|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="data_fim_isolamento_reflexao_{{ pessoa.id }}" class="label-sancao mt-3">Fim da Sanção:</label>
+                                            <input type="datetime-local" class="form-control" name="data_fim_isolamento_reflexao_{{ pessoa.id }}" value="{{ sancoes.isolamento_reflexao.data_fim|date:'Y-m-d\\TH:i' }}">
+
+                                            <label for="descricao_sancao_isolamento_reflexao_{{ pessoa.id }}" class="mt-3">Descreva algo:</label>
+                                            <textarea class="form-control" name="descricao_sancao_isolamento_reflexao_{{ pessoa.id }}" style="min-height: 100px;">{{ sancoes.isolamento_reflexao.descricao }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
 
-                            <div class="form-group" style="text-align: right; margin-top: 10px;">
-                                <button type="submit" class="btn btn-success btn-sm">Aplicar Alterações</button>
-                            </div>
+                    <div class="form-group" style="text-align: right; margin-top: 10px;">
+                        <button type="submit" class="btn btn-success btn-lg">Aplicar Alterações</button>
+                    </div>
                          
 
                 </form>
@@ -692,15 +935,27 @@
                 
                 
             </div>
+            <div class="modal-body">
+                
+            </div>
             <div class="modal-footer">
-                <!-- Fechar Modal -->
-                <form id="alvara-form" method="post" action="{% url 'remover_pessoa' pessoa.id %}" style="display:inline;">
+                <!-- Botões de ação com condições de visibilidade baseadas no usuário -->
+                
+                <form id="alvara-form-{{ pessoa.id }}" method="post" action="{% url 'conceder_alvara' pessoa.id %}" style="display:inline;">
                     {% csrf_token %}
-                    <button type="button" class="btn btn-danger btn-sm" onclick="handleClick(event)">Alvará</button>
+                    <button type="submit" class="btn btn-warning" style="margin-right: 10px;">Conceder Alvará</button>
                 </form>
                 
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                
+                <form id="excluir-form-{{ pessoa.id }}" method="post" action="{% url 'remover_pessoa' pessoa.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger" style="margin-right: 10px;">Excluir</button>
+                </form>
+                
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Fechar</button>
             </div>
+            
+
         </div>
     </div>
 </div>
@@ -720,23 +975,23 @@
     </table>
 </div>
 
-<!-- Paginação -->
+<!-- Paginação com filtro de status -->
 <nav aria-label="Navegação de página exemplo">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link pagination-btn" href="?page={{ page_obj.previous_page_number }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}" tabindex="-1">Anterior</a>
+                <a class="page-link pagination-btn" href="?page={{ page_obj.previous_page_number }}{% for bloco in bloco_filter %}&bloco={{ bloco }}{% endfor %}{% for cela in cela_filter %}&cela={{ cela }}{% endfor %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% else %}&status=ativo{% endif %}">Anterior</a>
             </li>
         {% else %}
             <li class="page-item disabled">
-                <a class="page-link pagination-btn disabled-btn" href="#" tabindex="-1">Anterior</a>
+                <a class="page-link pagination-btn disabled-btn" href="#">Anterior</a>
             </li>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
             {% if num >= page_obj.number|add:-3 and num <= page_obj.number|add:3 %}
                 <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                    <a class="page-link pagination-btn" href="?page={{ num }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}">
+                    <a class="page-link pagination-btn" href="?page={{ num }}{% for bloco in bloco_filter %}&bloco={{ bloco }}{% endfor %}{% for cela in cela_filter %}&cela={{ cela }}{% endfor %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% else %}&status=ativo{% endif %}">
                         {{ num }}
                     </a>
                 </li>
@@ -745,7 +1000,7 @@
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link pagination-btn" href="?page={{ page_obj.next_page_number }}{% if bloco_filter %}&bloco={{ bloco_filter }}{% endif %}{% if cela_filter %}&cela={{ cela_filter }}{% endif %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}">Próximo</a>
+                <a class="page-link pagination-btn" href="?page={{ page_obj.next_page_number }}{% for bloco in bloco_filter %}&bloco={{ bloco }}{% endfor %}{% for cela in cela_filter %}&cela={{ cela }}{% endfor %}{% if escolaridade_filter %}&escolaridade={{ escolaridade_filter }}{% endif %}{% if estudando_filter %}&estudando={{ estudando_filter }}{% endif %}{% if sancao_filter %}&sancao={{ sancao_filter }}{% endif %}{% if frente_trabalho_filter %}&frente_trabalho={{ frente_trabalho_filter }}{% endif %}{% if ordenar_nome %}&ordenar_nome={{ ordenar_nome }}{% endif %}{% if ordenar_bloco_cela %}&ordenar_bloco_cela={{ ordenar_bloco_cela }}{% endif %}{% if nome_filter %}&nome={{ nome_filter }}{% endif %}{% if saiu_temporariamente %}&saiu_temporariamente={{ saiu_temporariamente }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% else %}&status=ativo{% endif %}">Próximo</a>
             </li>
         {% else %}
             <li class="page-item disabled">
@@ -756,35 +1011,6 @@
 </nav>
 
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-<script>
-    function handleClick(event) {
-        event.preventDefault(); // Evita o envio imediato do formulário
-
-        // Dispara os confetes
-        confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-            zIndex: 9999
-        });
-
-        // Aguarda 2 segundos antes de enviar o formulário
-        setTimeout(function () {
-            const form = document.getElementById('alvara-form');
-            if (form) {
-                form.submit(); // Envia o formulário após o tempo
-            } else {
-                console.error('Formulário não encontrado!');
-            }
-        }, 2000); // 2 segundos de atraso
-
-        // Aguarda 4 segundos no total antes de recarregar a página suavemente
-        setTimeout(function () {
-            location.reload(); // Recarrega a página atual
-        }, 4000); // Tempo total de 4 segundos
-    }
-</script>
 
 
 
@@ -836,6 +1062,65 @@ PARA ABRIR O CHECKBEX DE SANÇÕES DE TRANSFERENCIAS
     
 </script>
 <style>
+    
+    .custom-width {
+        min-width: 230px;
+        max-width: 60%;
+    }
+    {% comment %} modificações feitas em 10/02/2025 {% endcomment %}
+    .custom-checkbox-container {
+      padding: 7px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      
+    }
+  
+    .custom-checkbox-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .custom-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Controla a distância entre o checkbox e o label */
+        padding: 10px;
+        width:230px !important;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .custom-checkbox-item input[type="checkbox"] {
+        margin: 0; /* Remove espaçamento padrão */
+        transform: scale(1.2); /* Aumenta tamanho do checkbox, opcional */
+      }
+      
+  
+    .custom-checkbox-item:hover {
+      background-color: #f1f1f1;
+    }
+  
+    label {
+      font-weight: 500;
+    }
+
+     /* Estilo para o numerador */
+     .numerador {
+        font-weight: bold;
+        color: #007bff; /* Cor para o numerador */
+        background-color: #f1f1f1; /* Cor de fundo suave */
+        
+    }
+
+  
+
+  </style>
+<style>
+
+    
     /* Estilo personalizado para o checkbox com outra classe */
     .custom-checkbox-stylish {
         position: relative;
@@ -1040,14 +1325,15 @@ td {
 
 /* Estilo para as sanções ativas */
 .eletronico-ativo {
-    color: DarkBlue;  /* Define a cor do texto como verde */
-    font-weight: bold;  /* Deixa o texto em negrito para maior destaque */
+    color: DarkBlue; 
+    font-weight: bold; 
+    font-size: 12px;  
 }
 
 /* Estilo para telas menores, como celulares */
 @media (max-width: 767px) {
     .eletronico-ativo {
-        font-size: 12px;  /* Ajusta o tamanho da fonte no celular */
+        font-size: 9px;  /* Ajusta o tamanho da fonte no celular */
 
     }
 
@@ -1369,28 +1655,33 @@ td {
 
 
 
+
 {% comment %} ----------------------------------------------------------
     PARA ABRIR O CHECKBOX DE SANÇÕES DISCIPLINARES
 ---------------------------------------------------------- {% endcomment %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const sancaoCheckboxes = document.querySelectorAll(".sancao-checkbox");
-
+    
         // Verifica se existem checkboxes antes de tentar iterar sobre eles
         if (sancaoCheckboxes.length > 0) {
             sancaoCheckboxes.forEach(function (checkbox) {
+                // Encontra o card mais próximo do checkbox
                 const card = checkbox.closest(".card");
+                // Encontra as opções de sanção dentro do card
                 const opcoes = card ? card.querySelector(".sancao-opcoes") : null; // Garante que card e opcoes não sejam nulos
-
+    
                 if (opcoes) {
-                    // Configura a exibição inicial
+                    // Configura a exibição inicial com base no estado do checkbox
                     if (checkbox.checked) {
                         opcoes.classList.add("active");
+                        opcoes.style.display = "block"; // Torna visível imediatamente
                     } else {
                         opcoes.classList.remove("active");
+                        opcoes.style.display = "none"; // Torna invisível
                     }
-
-                    // Adiciona o evento de mudança
+    
+                    // Adiciona o evento de mudança para exibir ou ocultar as opções
                     checkbox.addEventListener("change", function () {
                         if (checkbox.checked) {
                             opcoes.style.display = "block"; // Garante que está visível antes de animar
@@ -1406,9 +1697,50 @@ td {
             console.log('Nenhum checkbox encontrado com a classe ".sancao-checkbox".');
         }
     });
+    
 </script>
 
+<script>
+    function calcularIdade(event) {
+        let inputDataNascimento = event.target;
+        let modal = inputDataNascimento.closest(".modal");
+        let inputIdade = modal.querySelector(".idade");
 
+        let dataNascimento = inputDataNascimento.value;
+        if (dataNascimento) {
+            let hoje = new Date();
+            let nascimento = new Date(dataNascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            let mes = hoje.getMonth() - nascimento.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            inputIdade.value = idade + " anos";
+        } else {
+            inputIdade.value = "";
+        }
+    }
 
+    document.querySelectorAll(".data-nascimento").forEach(input => {
+        input.addEventListener("input", calcularIdade);
+    });
+
+    window.onload = function () {
+        document.querySelectorAll(".data-nascimento").forEach(input => {
+            calcularIdade({ target: input });
+        });
+    };
+</script>
+<script>
+function toggleFiltro() {
+    const container = document.getElementById("filtro-container");
+    const textoBotao = document.getElementById("filtro-btn-text");
+
+    const filtroVisivel = !container.classList.contains("d-none");
+    container.classList.toggle("d-none");
+
+    textoBotao.textContent = filtroVisivel ? "Mostrar Filtros" : "Ocultar Filtros";
+}
+</script>
   
 {% endblock %}

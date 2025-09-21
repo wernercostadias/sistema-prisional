@@ -1,0 +1,688 @@
+<!-- Cabeçalho -->
+{% load static %}
+<div style="display: flex; align-items: center; margin-bottom: -30px;"> 
+    <img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" style="width: 100px; height: 100px; margin-right: -10px; margin-left: 10px;">
+    <header class="header-container">
+        <h1 class="header-title">
+            SISTEMA DE INTELIGÊNCIA UPACA
+        </h1>
+        <h3 class="header-small-title">
+            Unidade Prisional de Ressocialização de Açailândia
+        </h3>
+        <h2 class="header-subtitle">
+            Relatório do Quantitativo Prisional
+        </h2>
+    </header>
+</div>
+
+
+  <h2 class="titulo-lista-table">Tabela de Blocos e Celas Personalizada</h2>
+<!-- Coluna 1: Conteúdo das tabelas -->
+ 
+<div class="centralizar">
+    <div class="table-container">
+        <!-- Bloco A -->
+        <table>
+        <tr>
+            <th colspan="6" class="cell-highlight">BLOCO A</th>
+        </tr>
+        <tr>
+            <td class="cell-alert">
+                <div style="margin-bottom: -1px;">A1</div>
+                <div class="small-text" style="margin-top: -1px;">Triagem 1</div>
+            </td>
+            <td class="cell-alert">
+                <div style="margin-bottom: -1px;">A2</div>
+                <div class="small-text" style="margin-top: -1px;">Triagem 2</div>
+            </td>
+            <td class="cell-alert">
+                <div style="margin-bottom: -1px;">A3</div>
+                <div class="small-text" style="margin-top: -1px;">Reflexão</div>
+            </td>
+            <td class="cell-alert">
+                <div style="margin-bottom: -1px;">A4</div>
+                <div class="small-text" style="margin-top: -1px;">Central</div>
+            </td>
+            <td class="cell-alert">
+                <div style="margin-bottom: -1px;">A5</div>
+                <div class="small-text" style="margin-top: -1px;">Intima</div>
+            </td>
+            <td class="cell-hub" style="width: 80px;">TOTAL</td>
+        </tr>
+        <tr>
+            <td class="cell">{{ cela_1_a }}</td>
+            <td class="cell">{{ cela_2_a }}</td>
+            <td class="cell">{{ cela_3_a }}</td>
+            <td class="cell">{{ cela_4_a }}</td>
+            <td class="cell">{{ cela_5_a }}</td>
+            <td class="cell-hub-1">{{ cela_1_a|add:cela_2_a|add:cela_3_a|add:cela_4_a }}</td>
+        </tr>
+        </table>
+
+        <!-- Bloco B -->
+        <table>
+            <tr>
+                <th colspan="6" class="cell-highlight">
+                    BLOCO B
+                    <div class="small-text" style="color: #333333;">Pavilhão Faccionado PCC</div>
+                </th>
+                
+                
+            </tr>
+            <tr>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">B1</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 1</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">B2</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 2</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">B3</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 3</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">B4</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 4</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">B5</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 5</div> 
+                </td>
+                <td class="cell-hub" style="width: 80px;">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_b1 }}</td>
+                <td class="cell">{{ cela_b2 }}</td>
+                <td class="cell">{{ cela_b3 }}</td>
+                <td class="cell">{{ cela_b4 }}</td>
+                <td class="cell">{{ cela_b5 }}</td>
+                <td class="cell-hub-1">{{ cela_b1|add:cela_b2|add:cela_b3|add:cela_b4|add:cela_b5 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco C -->
+        <table>
+            <tr>
+                <th colspan="8" class="cell-highlight">
+                    <div>BLOCO C</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Neutro</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C1</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 1</div></td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C2</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 2</div></td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C3</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 3</div></td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C4</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 4</div></td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C5</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 5</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C6</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 6</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">C7</div>
+                    <div class="small-text" style="margin-top: -1px;">PCD</div>
+                </td>
+                <td class="cell-hub" style="width: 80px;">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_c1 }}</td>
+                <td class="cell">{{ cela_c2 }}</td>
+                <td class="cell">{{ cela_c3 }}</td>
+                <td class="cell">{{ cela_c4 }}</td>
+                <td class="cell">{{ cela_c5 }}</td>
+                <td class="cell">{{ cela_c6 }}</td>
+                <td class="cell">{{ cela_c7 }}</td>
+                <td class="cell-hub-1">{{ cela_c1|add:cela_c2|add:cela_c3|add:cela_c4|add:cela_c5|add:cela_c6|add:cela_c7 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco D -->
+        <table>
+            <tr>
+                <th colspan="6" class="cell-highlight">
+                    <div>BLOCO D</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Faccionado CV</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">D1</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 1</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">D2</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 2</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">D3</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 3</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">D4</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 4</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">D5</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 5</div>
+                </td>
+                <td class="cell-hub" style="width: 80px;">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_d1 }}</td>
+                <td class="cell">{{ cela_d2 }}</td>
+                <td class="cell">{{ cela_d3 }}</td>
+                <td class="cell">{{ cela_d4 }}</td>
+                <td class="cell">{{ cela_d5 }}</td>
+                <td class="cell-hub-1">{{ cela_d1|add:cela_d2|add:cela_d3|add:cela_d4|add:cela_d5 }}</td>
+            </tr>
+        </table>
+
+        <!-- Bloco E -->
+        <table>
+            <tr>
+                <th colspan="8" class="cell-highlight">
+                    <div>BLOCO E</div>
+                    <div class="small-text"style="color: #333333;">Pavilhão Seguro</div>
+                </th>
+            </tr>
+            <tr>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E1</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 1</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E2</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 2</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E3</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 3</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E4</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 4</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E5</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 5</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E6</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 6</div>
+                </td>
+                <td class="cell-alert1">
+                    <div style="margin-bottom: -1px;">E7</div>
+                    <div class="small-text" style="margin-top: -1px;">Cela 7</div>
+                </td>
+                <td class="cell-hub" style="width: 80px;">TOTAL</td>
+            </tr>
+            <tr>
+                <td class="cell">{{ cela_e1 }}</td>
+                <td class="cell">{{ cela_e2 }}</td>
+                <td class="cell">{{ cela_e3 }}</td>
+                <td class="cell">{{ cela_e4 }}</td>
+                <td class="cell">{{ cela_e5 }}</td>
+                <td class="cell">{{ cela_e6 }}</td>
+                <td class="cell">{{ cela_e7 }}</td>
+                <td class="cell-hub-1">{{ cela_e1|add:cela_e2|add:cela_e3|add:cela_e4|add:cela_e5|add:cela_e6|add:cela_e7 }}</td>
+            </tr>
+        </table>
+        
+
+    </div>
+
+</div>
+<!-- Inserindo imagens espalhadas -->
+
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark3">
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark4">
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark5">
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark6">
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark7">
+
+<img src="data:image/png;base64,{{ img_base64 }}" alt="Ícone" class="watermark10">
+
+
+<table class="list-table">
+    <tr>
+      <th class="list-title title-1">Geral</th>
+      <th class="list-title title-2">Trabalho</th>
+      <th class="list-title title-3">Estudo</th>
+      <th class="list-title title-4">PDI's</th>
+      <th class="list-title title-5">Sanções</th>
+    </tr>
+    <tr>
+        <td class="list-cell cell-1">
+            <div class="split-container">
+              <div class="split-left">
+                <ul class="custom-list list-1">
+                  <li>Ativos:</li>
+                  <li>Albergados:</li>
+                  <li>Saida Temp.</li>
+                  <li>--------</li>
+                  <li>TV</li>
+                  <li>Rádio</li>
+                  <li>Ventilador</li>
+                </ul>
+              </div>
+              <div class="split-right">
+                <ul class="custom-list list-1">
+                  <li>{{ total_pessoas}}</li>
+                  <li>{{ total_albergado}}</li>
+                  <li>{{ total_saiu_temporariamente}}</li>
+                  <li>---</li>
+                  <li>{{ total_tv}}</li>
+                  <li>{{ total_radio}}</li>
+                  <li>{{ total_ventilador}}</li>
+                </ul>
+              </div>
+            </div>
+          </td>
+          
+      <td class="list-cell cell-2">
+        <div class="split-container">
+          <div class="split-left">
+            <ul class="custom-list list-2">
+              <li>Fáb. Blocos:</li>
+              <li>Limpeza:</li>
+              <li>Manutenção:</li>
+              <li>Crochê:</li>
+              <li>Bibliotecário:</li>
+              <li>Facilitador:</li>
+              <li>Horta:</li>
+              <li>Piscicultura:</li>
+              <li>Minhocário:</li>
+              <li>Digitalizador:</li>
+                <li>Svç. Gerais:</li>
+              <li>Total:</li>
+            </ul>
+          </div>
+          <div class="split-right">
+            <ul class="custom-list list-2">
+              <li>{{ total_fabrica_blocos }}</li>
+              <li>{{ total_limpeza }}</li>
+              <li>{{ total_manutencao }}</li>
+              <li>{{ total_croche}}</li>
+              <li>{{ total_bibliotecario}}</li>
+              <li>{{ total_facilitador}}</li>
+              <li>{{ total_horta}}</li>
+              <li>{{ total_piscicultura}}</li>
+              <li>{{ total_minhocario}}</li>
+              <li>{{ total_digitalizador}}</li>
+                <li>{{ total_servicos_gerais}}</li>
+              <li>{{ total_trabalhando}}</li>
+            </ul>
+          </div>
+        </div>
+      </td>
+      
+      <td class="list-cell cell-3">
+        <div class="split-container">
+          <div class="split-left">
+            <ul class="custom-list list-3">
+              <li>EJA I:</li>
+              <li>EJA II:</li>
+              <li>EJA III:</li>
+              <li>IBRAEMA:</li>
+              <li>Ens. Superior:</li>
+            </ul>
+          </div>
+          <div class="split-right">
+            <ul class="custom-list list-3">
+              <li>{{total_eja_i}}</li>
+              <li>{{total_eja_ii}}</li>
+              <li>{{total_eja_iii}}</li>
+              <li>{{total_ibraema}}</li>
+              <li>{{total_ensino_superior}}</li>
+            </ul>
+          </div>
+        </div>
+      </td>
+      
+      <td class="list-cell cell-4">
+        <div class="split-container">
+          <div class="split-left">
+            <ul class="custom-list list-4">
+              <li>Leve:</li>
+              <li>Média:</li>
+              <li>Grave:</li>
+              <li>-----</li>
+              <li>Andamentos:</li>
+              <li>Condenados:</li>
+              <li>Sobrestados:</li>
+              <li>------</li>
+              <li>PDI's Ativos:</li>
+            </ul>
+          </div>
+          <div class="split-right">
+            <ul class="custom-list list-4">
+              <li>{{total_pdi_leve}}</li>
+              <li>{{total_pdi_media}}</li>
+              <li>{{total_pdi_grave}}</li>
+              <li>--</li>
+              <li>{{total_pdi_andamento}}</li>
+              <li>{{total_pdi_condenado}}</li>
+              <li>{{total_pdi_sobrestado}}</li>
+              <li>--</li>
+              <li>{{total_pdi_ativos}}</li>
+            </ul>
+          </div>
+        </div>
+      </td>
+      
+      <td class="list-cell cell-5">
+        <div class="split-container">
+          <div class="split-left">
+            <ul class="custom-list list-5">
+              <li>S/Castelo:</li>
+              <li>S/V/ Intima:</li>
+              <li>S/V/ Social:</li>
+              <li>-----</li>
+              <li>Sancionados:</li>
+
+            </ul>
+          </div>
+          <div class="split-right">
+            <ul class="custom-list list-5">
+              <li>{{total_sancao_sem_castelo}}</li>
+              <li>{{total_sancao_sem_visita_intima}}</li>
+              <li>{{total_sancao_sem_visita_social}}</li>
+              <li>--</li>
+              <li>{{total_pessoas_com_sancao_ativa}}</li>
+            </ul>
+          </div>
+        </div>
+      </td>
+      
+    </tr>
+  </table>
+
+  <div class="pdf-info">
+    <p>Relatório criado em: {{ tempo_geracao }}</p>
+    <p>Por: {{ usuario }}</p>
+</div>
+    
+</div>
+
+
+<head>
+<style>
+/* Estilo global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+
+/* Container para as tabelas */
+.table-container {
+    width: 70%;
+    margin: 0 auto; /* Centraliza o conteúdo horizontalmente */
+}
+
+/* Tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    background-color: #fff;
+    
+}
+
+/* Cabeçalhos das tabelas */
+th {
+    padding: 5px;
+    text-align: center;
+    background-color: rgb(175, 175, 175);
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid rgb(102, 102, 102);
+    
+}
+
+.small-text {
+    font-size: 8px;
+    color:black;
+   
+}
+
+
+/* Linhas das células */
+td {
+    padding: 4px;
+    text-align: center;
+    font-size: 12px;
+    border: 1px solid rgb(102, 102, 102);
+}
+
+td div {
+    margin-bottom: 10px;
+}
+
+/* Estilos para células de destaque */
+.cell-alert, .cell-alert1 {
+    background-color:rgba(216, 216, 216, 0.25);
+    font-weight: bold;
+    margin-bottom: 0; /* Remove o espaçamento entre as divs */
+    padding-bottom: 0; /* Remove qualquer padding extra */
+}
+
+.cell {
+    height: 30px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid rgb(102, 102, 102);
+}
+
+.cell-alert1 {
+    background-color: rgba(216, 216, 216, 0.2);
+}
+
+.cell-hub {
+    background-color:rgba(175, 175, 175, 0.27);
+    color: black;
+}
+
+.cell-hub-1 {
+    font-weight: bold;
+    color: black;
+}
+
+/* Tabelas em um bloco específico */
+table tr:nth-child(odd) {
+    background-color:rgba(241, 241, 241, 0.26);
+}
+
+table tr:nth-child(even) {
+    background-color: #fff;
+}
+
+/* Garantir que os totais ficam bem alinhados e o espaço das células é otimizado */
+table td, table th {
+    vertical-align: middle;
+    text-align: center;
+}
+
+
+table td.cell-hub-1 {
+    font-weight: bold;
+    color: #1e1e1e; /* Cor mais profunda */
+    font-size: 15px; /* Tamanho maior para um impacto visual */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra suave para destacar */
+    letter-spacing: 1px; /* Um espaçamento leve entre as letras para um visual mais moderno */
+    font-family: 'Roboto', sans-serif; /* Fonte clean e moderna */
+}
+
+
+/* Responsividade para telas pequenas */
+@media screen and (max-width: 768px) {
+    table {
+        font-size: 10px;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+}
+
+@page {
+    size: 210mm 297mm; /* Largura e altura da página */
+    margin: 8mm 20mm 20mm 20mm; /* Margem de 35mm apenas no eixo X (esquerda e direita) e 20mm no eixo Y (topo e base) */
+}
+
+</style>
+
+<style>
+    .header-container {
+        width: 100%;
+        color: black;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 20px; /* Para deixar um espacinho abaixo */
+    }
+    
+    .header-title {
+        display: flex; /* Usando flexbox */
+        align-items: flex-start; /* Alinha a imagem e o texto à esquerda */
+        font-size: 19px;
+        font-weight: bold;
+        font-family: Arial, sans-serif;
+        letter-spacing: 1px;
+        text-align: left; /* Mover o título para a esquerda */
+        padding-left: 60px; /* Ajusta o título e a imagem para a esquerda */
+        margin-bottom: 0; /* Remover qualquer margem adicional */
+        position: relative; /* Necessário para usar top */
+        top: 20; /* Move o texto para cima */
+    }
+    
+
+.header-small-title{
+    font-size: 13px;
+        font-weight: normal;
+        font-family: Arial, sans-serif;
+        color: #666; /* Cor mais suave para o subtítulo */
+        margin-top: 5px; /* Remover o espaçamento superior */
+        margin-left: -65px; /* Mover para a esquerda */
+}
+
+
+    .header-subtitle {
+        font-size: 13px;
+        font-weight: normal;
+        font-family: Arial, sans-serif;
+        color: #666; /* Cor mais suave para o subtítulo */
+        margin-top: 5px; /* Remover o espaçamento superior */
+        margin-left: -65px; /* Mover para a esquerda */
+    }
+</style>
+
+
+<style>
+    .titulo-lista-table {
+    font-family: Arial, sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      margin-top:10px;
+    }
+    .list-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+      }
+    .list-title {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color:rgba(240, 240, 240, 0.25);
+    }
+    .list-cell {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .custom-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .custom-list li {
+      margin: 5px 0;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .split-container {
+        display: flex;
+        justify-content: space-between;
+      }
+      
+      .split-left {
+        width: 80px;
+        text-align: left;
+        
+        
+      }
+      
+      .split-right {
+        width: 23px; /* Ajuste conforme necessário */
+        text-align: left;
+        padding:1px;
+      }
+      
+      
+      .custom-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+  </style>
+  <style>
+    .watermark1, .watermark2, .watermark3, .watermark4, .watermark5, .watermark6, .watermark7, .watermark8, .watermark9, .watermark10 {
+      position: fixed;
+      opacity: 0.06; /* Ajuste a opacidade conforme necessário */
+      pointer-events: none; /* Para não interferir com o conteúdo */
+      z-index: -1; /* Para ficar no fundo */
+    }
+  
+  .watermark3 { top: 50%; left: 35%; width: 200px; transform: rotate(-20deg); } /* Um pouco mais à esquerda */
+  .watermark4 { top: 70%; left: 0%; width: 400px; transform: rotate(-20deg); } /* Mais à esquerda */
+  .watermark5 { top: 60%; left: 85%; width: 200px; transform: rotate(-20deg); } /* Mais à direita */
+  .watermark6 { top: -5%; left: -5%; width: 450px; transform: rotate(-20deg); } /* Um pouco mais à direita */
+  .watermark7 { top: 40%; left: -20%; width: 250px; transform: rotate(-20deg); } /* Mais à esquerda */
+
+  .watermark10 { top: 20%; left: 90%; width: 200px; transform: rotate(-20deg); } /* Mais à direita */
+</style>
+<style>
+    .pdf-info {
+        position: absolute;
+        bottom: -50px;
+        right: -12px;
+        text-align: right;
+        font-size: 14px;
+        color: #555;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+</style>
+  
+</head>

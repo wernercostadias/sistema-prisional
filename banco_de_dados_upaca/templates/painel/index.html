@@ -1,7 +1,6 @@
 {% extends 'bases/base.html' %}
 {% load static %}
 {% block title %}Sistema Upaca - Tela Inicial{% endblock %}
-
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
  <!-- Scripts Bootstrap -->
@@ -11,314 +10,324 @@
 <!-- Boxicons CDN -->
 <!-- Font Awesome CDN -->
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-<div class="work-section">
-    <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); font-size: 24px;"><img src="{% static 'imagens/logoupaca2.png' %}" alt="Ícone" style="width: 70px; height: 70px; margin-right: 10px;">FRENTES DE TRABALHO</h1>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 3500, // Tempo que a notificação fica visível
+            position: { x: "right", y: "top" }, // Posição da notificação
+            dismissible: true, // Permitir fechar manualmente
+            types: [
+                {
+                    type: 'info',
+                    background: '#17a2b8', // Azul claro (padrão de info)
+                    icon: false
+                }
+            ]
+        });
 
-    <div class="work-block-container">
-        <div class="work-block">
-            <h4 class="work-title naotrabaha" style="text-align: center;">
-                <img src="{% static 'imagens/triste.png' %}" alt="Sem Trabalho" class="icon-horta" style="display: block; margin: 0 auto;">
-                Sem Trabalho
-            </h4>
-            <p class="work-total">{{ total_nao_trabalha }}</p>
-        </div>
-        
-        <div class="work-block">
-            <h4 class="work-title total-trabalhando" style="text-align: center;">
-                <img src="{% static 'imagens/feliz.png' %}" alt="Trabalhando" class="icon-horta">
-                <br>
-                Total Trabalhando
-            </h4>
-            <p class="work-total">{{ total_trabalhando }}</p>
-        </div>
-        
-        <div class="work-block">
-            <h4 class="work-title horta">
-                <img src="{% static 'imagens/horta.png' %}" alt="Horta" class="icon-horta">
-                <span>Horta</span>
-            </h4>
-            <p class="work-total">{{ total_horta }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title piscicultura">
-                <img src="{% static 'imagens/peixe.png' %}" alt="Peixe" class="icon-horta">
-                Piscicultura
-            </h4>
-            <p class="work-total">{{ total_piscicultura }}</p>
-        </div>
-        
-        <div class="work-block">
-            <h4 class="work-title minhocario">
-                <img src="{% static 'imagens/minhoca.png' %}" alt="Minhocario" class="icon-horta">
-                Minhocário
-            </h4>
-            <p class="work-total">{{ total_minhocario }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title limpeza">
-                <img src="{% static 'imagens/limpeza2.png' %}" alt="Limpeza" class="icon-limpeza">
-                Limpeza
-            </h4>
-            <p class="work-total">{{ total_limpeza }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title manutencao">
-                <img src="{% static 'imagens/manutencao4.png' %}" alt="Manutencao" class="icon-limpeza">
-                Manutenção
-            </h4>
-            <p class="work-total">{{ total_manutencao }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title croche">
-                <img src="{% static 'imagens/croche4.png' %}" alt="Croche" class="icon-limpeza">
-                Crochê
-            </h4>
-            <p class="work-total">{{ total_croche }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title digitalizador">
-                <img src="{% static 'imagens/impressora.png' %}" alt="Digitalizador" class="icon-horta">
-                Digitalizador
-            </h4>
-            <p class="work-total">{{ total_digitalizador }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title bibliotecario">
-                <img src="{% static 'imagens/livro.png' %}" alt="Bibliotecario" class="icon-horta">
-                Bibliotecário
-            </h4>
-            <p class="work-total">{{ total_bibliotecario }}</p>
-        </div>
-        <div class="work-block">
-            <h4 class="work-title fabrica-blocos">
-                <span class="icon-container">
-                    <img src="{% static 'imagens/tijolo.png' %}" alt="Fabrica" class="icon-horta">
-                </span>
-                <span class="text-container">
-                    Fábrica de Blocos
-                </span>
-            </h4>
-            <p class="work-total">{{ total_fabrica_blocos }}</p>
-        </div>
-        
-    </div>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% elif message.tags == 'info' %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% else %}
+                    notyf.open({ message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+
+
+<div id="sniper-loader">
+    <div class="spinner"></div>
 </div>
 
- 
 
-<div class="main-container">
+    <div class="main-container">
 
 
     
-    <!-- Coluna 1: Conteúdo das tabelas -->
-    <div class="table-container">
-        <!-- Bloco A -->
-        <table>
-        <tr>
-            <th colspan="6" class="cell-highlight">BLOCO A</th>
-        </tr>
-        <tr>
-            <td class="cell-alert">
-                <div>A1</div>
-                <div class="small-text">Triagem 1</div>
-            </td>
-            <td class="cell-alert">
-                <div>A2</div>
-                <div class="small-text">Triagem 2</div>
-            </td>
-            <td class="cell-alert">
-                <div>A3</div>
-                <div class="small-text">Reflexão</div>
-            </td>
-            <td class="cell-alert">
-                <div>A4</div>
-                <div class="small-text">Central</div>
-            </td>
-            <td class="cell-alert">
-                <div>A5</div>
-                <div class="small-text">Intima</div>
-            </td>
-            <td class="cell-hub" style="width: 100px; ">TOTAL</td>
-        </tr>
-        <tr>
-            <td class="cell">{{ cela_1_a }}</td>
-            <td class="cell">{{ cela_2_a }}</td>
-            <td class="cell">{{ cela_3_a }}</td>
-            <td class="cell">{{ cela_4_a }}</td>
-            <td class="cell">{{ cela_5_a }}</td>
-            <td class="cell-hub-1">{{ cela_1_a|add:cela_2_a|add:cela_3_a|add:cela_4_a }}</td>
-        </tr>
-        </table>
+        <!-- Coluna 1: Conteúdo das tabelas -->
+        <div class="table-container" >
+        
+            <!-- Bloco A -->
+            <table>
+                <tr>
+                    <th colspan="6" class="cell-highlight">BLOCO A</th>
+                </tr>
+                <tr>
+                    <td class="cell-alert" >
+                        <div>A1</div>
+                        <div class="small-text">Triagem 1</div>
+                    </td>
+                    <td class="cell-alert" >
+                        <div>A2</div>
+                        <div class="small-text">Triagem 2</div>
+                    </td>
+                    <td class="cell-alert" >
+                        <div>A3</div>
+                        <div class="small-text">Reflexão</div>
+                    </td>
+                    <td class="cell-alert" >
+                        <div>A4</div>
+                        <div class="small-text">Central</div>
+                    </td>
+                    <td class="cell-alert" >
+                        <div>A5</div>
+                        <div class="small-text">Intima</div>
+                    </td>
+                    <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+                </tr>
+                <tr>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('A1')">{{ cela_1_a }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('A2')">{{ cela_2_a }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('A3')">{{ cela_3_a }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('A4')">{{ cela_4_a }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('A5')">{{ cela_5_a }}</td>
+                    <td class="cell-hub-1">{{ cela_1_a|add:cela_2_a|add:cela_3_a|add:cela_4_a }}</td>
+                </tr>
+            </table>
 
-        <!-- Bloco B -->
-        <table>
-            <tr>
-                <th colspan="6" class="cell-highlight">
-                    BLOCO B
-                    <div class="small-text" style="color: #333333;">Pavilhão Faccionado PCC</div>
+            
 
-                </th>
-            </tr>
-            <tr>
-                <td class="cell-alert1">B1
-                    <div class="small-text">Cela 1</div>
-                </td>
-                <td class="cell-alert1">B2
-                    <div class="small-text">Cela 2</div>
-                </td>
-                <td class="cell-alert1">B3
-                    <div class="small-text">Cela 3</div>
-                </td>
-                <td class="cell-alert1">B4
-                    <div class="small-text">Cela 4</div>
-                </td>
-                <td class="cell-alert1">B5
-                    <div class="small-text">Cela 5</div> 
-                </td>
-                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
-            </tr>
-            <tr>
-                <td class="cell">{{ cela_b1 }}</td>
-                <td class="cell">{{ cela_b2 }}</td>
-                <td class="cell">{{ cela_b3 }}</td>
-                <td class="cell">{{ cela_b4 }}</td>
-                <td class="cell">{{ cela_b5 }}</td>
-                <td class="cell-hub-1">{{ cela_b1|add:cela_b2|add:cela_b3|add:cela_b4|add:cela_b5 }}</td>
-            </tr>
-        </table>
+            <!-- Bloco B -->
+            <table>
+                <tr>
+                    <th colspan="6" class="cell-highlight">
+                        BLOCO B
+                        <div class="small-text" style="color: #333333;">Pavilhão Faccionado PCC</div>
 
-        <!-- Bloco C -->
-        <table>
-            <tr>
-                <th colspan="8" class="cell-highlight">
-                    <div>BLOCO C</div>
-                    <div class="small-text"style="color: #333333;">Pavilhão Neutro</div>
-                </th>
-            </tr>
-            <tr>
-                <td class="cell-alert1">C1
-                    <div class="small-text">Cela 1</div></td>
-                <td class="cell-alert1">C2
-                    <div class="small-text">Cela 2</div></td>
-                <td class="cell-alert1">C3
-                    <div class="small-text">Cela 3</div></td>
-                <td class="cell-alert1">C4
-                    <div class="small-text">Cela 4</div></td>
-                <td class="cell-alert1">C5
-                    <div class="small-text">Cela 5</div>
-                </td>
-                <td class="cell-alert1">C6
-                    <div class="small-text">Cela 6</div>
-                </td>
-                <td class="cell-alert">
-                    <div>C7</div>
-                    <div class="small-text">PCD</div>
-                </td>
-                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+                    </th>
+                </tr>
+                <tr>
+                    <td class="cell-alert1" >B1
+                        <div class="small-text">Cela 1</div>
+                    </td>
+                    <td class="cell-alert1" >B2
+                        <div class="small-text">Cela 2</div>
+                    </td>
+                    <td class="cell-alert1" >B3
+                        <div class="small-text">Cela 3</div>
+                    </td>
+                    <td class="cell-alert1" >B4
+                        <div class="small-text">Cela 4</div>
+                    </td>
+                    <td class="cell-alert1" >B5
+                        <div class="small-text">Cela 5</div> 
+                    </td>
+                    <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+                </tr>
+                <tr>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('B1')">{{ cela_b1 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('B2')">{{ cela_b2 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('B3')">{{ cela_b3 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('B4')">{{ cela_b4 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('B5')">{{ cela_b5 }}</td>
+                    <td class="cell-hub-1">{{ cela_b1|add:cela_b2|add:cela_b3|add:cela_b4|add:cela_b5 }}</td>
+                </tr>
+            </table>
 
-            </tr>
-            <tr>
-                <td class="cell">{{ cela_c1 }}</td>
-                <td class="cell">{{ cela_c2 }}</td>
-                <td class="cell">{{ cela_c3 }}</td>
-                <td class="cell">{{ cela_c4 }}</td>
-                <td class="cell">{{ cela_c5 }}</td>
-                <td class="cell">{{ cela_c6 }}</td>
-                <td class="cell">{{ cela_c7 }}</td>
-                <td class="cell-hub-1">{{ cela_c1|add:cela_c2|add:cela_c3|add:cela_c4|add:cela_c5|add:cela_c6|add:cela_c7 }}</td>
-            </tr>
-        </table>
+            <!-- Bloco C -->
+            <table>
+                <tr>
+                    <th colspan="8" class="cell-highlight">
+                        <div>BLOCO C</div>
+                        <div class="small-text"style="color: #333333;">Pavilhão Neutro</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td class="cell-alert1">C1
+                        <div class="small-text">Cela 1</div></td>
+                    <td class="cell-alert1">C2
+                        <div class="small-text">Cela 2</div></td>
+                    <td class="cell-alert1">C3
+                        <div class="small-text">Cela 3</div></td>
+                    <td class="cell-alert1">C4
+                        <div class="small-text">Cela 4</div></td>
+                    <td class="cell-alert1">C5
+                        <div class="small-text">Cela 5</div>
+                    </td>
+                    <td class="cell-alert1">C6
+                        <div class="small-text">Cela 6</div>
+                    </td>
+                    <td class="cell-alert" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C7')">
+                        <div>C7</div>
+                        <div class="small-text">PCD</div>
+                    </td>
+                    <td class="cell-hub" style="width: 100px; ">TOTAL</td>
 
-        <!-- Bloco D -->
-        <table>
-            <tr>
-                <th colspan="6" class="cell-highlight">
-                    <div>BLOCO D</div>
-                    <div class="small-text"style="color: #333333;">Pavilhão Faccionado CV</div>
-                </th>
-            </tr>
-            <tr>
-                <td class="cell-alert1">D1
-                    <div class="small-text">Cela 1</div>
-                </td>
-                <td class="cell-alert1">D2
-                    <div class="small-text">Cela 2</div>
-                </td>
-                <td class="cell-alert1">D3
-                    <div class="small-text">Cela 3</div>
-                </td>
-                <td class="cell-alert1">D4
-                    <div class="small-text">Cela 4</div>
-                </td>
-                <td class="cell-alert1">D5
-                    <div class="small-text">Cela 5</div>
-                </td>
-                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
-            </tr>
-            <tr>
-                <td class="cell">{{ cela_d1 }}</td>
-                <td class="cell">{{ cela_d2 }}</td>
-                <td class="cell">{{ cela_d3 }}</td>
-                <td class="cell">{{ cela_d4 }}</td>
-                <td class="cell">{{ cela_d5 }}</td>
-                <td class="cell-hub-1">{{ cela_d1|add:cela_d2|add:cela_d3|add:cela_d4|add:cela_d5 }}</td>
-            </tr>
-        </table>
+                </tr>
+                <tr>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C1')">{{ cela_c1 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C2')">{{ cela_c2 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C3')">{{ cela_c3 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C4')">{{ cela_c4 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C5')">{{ cela_c5 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C6')">{{ cela_c6 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('C7')">{{ cela_c7 }}</td>
+                    <td class="cell-hub-1">{{ cela_c1|add:cela_c2|add:cela_c3|add:cela_c4|add:cela_c5|add:cela_c6|add:cela_c7 }}</td>
+                </tr>
+            </table>
 
-        <!-- Bloco E -->
-        <table>
-            <tr>
-                <th colspan="8" class="cell-highlight">
-                    <div>BLOCO E</div>
-                    <div class="small-text"style="color: #333333;">Pavilhão Seguro</div>
-                </th>
-            </tr>
-            <tr>
-                <td class="cell-alert1">E1
-                    <div class="small-text">Cela 1</div>
-                </td>
-                <td class="cell-alert1">E2
-                    <div class="small-text">Cela 2</div>
-                </td>
-                <td class="cell-alert1">E3
-                    <div class="small-text">Cela 3</div>
-                </td>
-                <td class="cell-alert1">E4
-                    <div class="small-text">Cela 4</div>
-                </td>
-                <td class="cell-alert1">E5
-                    <div class="small-text">Cela 5</div>
-                </td>
-                <td class="cell-alert1">E6
-                    <div class="small-text">Cela 6</div>
-                </td>
-                <td class="cell-alert1">E7
-                    <div class="small-text">Cela 7</div>
-                </td>
-                <td class="cell-hub" style="width: 100px; ">TOTAL</td>
-            </tr>
-            <tr>
-                <td class="cell">{{ cela_e1 }}</td>
-                <td class="cell">{{ cela_e2 }}</td>
-                <td class="cell">{{ cela_e3 }}</td>
-                <td class="cell">{{ cela_e4 }}</td>
-                <td class="cell">{{ cela_e5 }}</td>
-                <td class="cell">{{ cela_e6 }}</td>
-                <td class="cell">{{ cela_e7 }}</td>
-                <td class="cell-hub-1">{{ cela_e1|add:cela_e2|add:cela_e3|add:cela_e4|add:cela_e5|add:cela_e6|add:cela_e7 }}</td>
-            </tr>
-        </table>
+            <!-- Bloco D -->
+            <table>
+                <tr>
+                    <th colspan="6" class="cell-highlight">
+                        <div>BLOCO D</div>
+                        <div class="small-text"style="color: #333333;">Pavilhão Faccionado CV</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td class="cell-alert1">D1
+                        <div class="small-text">Cela 1</div>
+                    </td>
+                    <td class="cell-alert1">D2
+                        <div class="small-text">Cela 2</div>
+                    </td>
+                    <td class="cell-alert1">D3
+                        <div class="small-text">Cela 3</div>
+                    </td>
+                    <td class="cell-alert1">D4
+                        <div class="small-text">Cela 4</div>
+                    </td>
+                    <td class="cell-alert1">D5
+                        <div class="small-text">Cela 5</div>
+                    </td>
+                    <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+                </tr>
+                <tr>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('D1')">{{ cela_d1 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('D2')">{{ cela_d2 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('D3')">{{ cela_d3 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('D4')">{{ cela_d4 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('D5')">{{ cela_d5 }}</td>
+                    <td class="cell-hub-1">{{ cela_d1|add:cela_d2|add:cela_d3|add:cela_d4|add:cela_d5 }}</td>
+                </tr>
+            </table>
 
+            <!-- Bloco E -->
+            <table>
+                <tr>
+                    <th colspan="8" class="cell-highlight">
+                        <div>BLOCO E</div>
+                        <div class="small-text"style="color: #333333;">Pavilhão Seguro</div>
+                    </th>
+                </tr>
+                <tr>
+                    <td class="cell-alert1">E1
+                        <div class="small-text">Cela 1</div>
+                    </td>
+                    <td class="cell-alert1">E2
+                        <div class="small-text">Cela 2</div>
+                    </td>
+                    <td class="cell-alert1">E3
+                        <div class="small-text">Cela 3</div>
+                    </td>
+                    <td class="cell-alert1">E4
+                        <div class="small-text">Cela 4</div>
+                    </td>
+                    <td class="cell-alert1">E5
+                        <div class="small-text">Cela 5</div>
+                    </td>
+                    <td class="cell-alert1">E6
+                        <div class="small-text">Cela 6</div>
+                    </td>
+                    <td class="cell-alert1">E7
+                        <div class="small-text">Cela 7</div>
+                    </td>
+                    <td class="cell-hub" style="width: 100px; ">TOTAL</td>
+                </tr>
+                <tr>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E1')">{{ cela_e1 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E2')">{{ cela_e2 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E3')">{{ cela_e3 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E4')">{{ cela_e4 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E5')">{{ cela_e5 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E6')">{{ cela_e6 }}</td>
+                    <td class="cell" data-toggle="modal" data-target="#modalInternos" onclick="abrirModal('E7')">{{ cela_e7 }}</td>
+                    <td class="cell-hub-1">{{ cela_e1|add:cela_e2|add:cela_e3|add:cela_e4|add:cela_e5|add:cela_e6|add:cela_e7 }}</td>
+                </tr>
+            </table>
         </div>
-            <div class="test-column" style="width: 310px; text-align: center;  flex-direction: column; ">
+
+            <!-- Modal de Nomes de Internos -->
+            <!-- Modal de Nomes de Internos -->
+<!-- Modal de Nomes de Internos -->
+<div class="modal fade" id="modalInternos" tabindex="-1" role="dialog" aria-labelledby="modalInternosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document"> <!-- Removido modal-sm -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalInternosLabel">Internos da Cela</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Adicionada responsividade na tabela -->
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Nome dos internos</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nomesInternosLista">
+                            <!-- Os nomes dos internos serão preenchidos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- Modal para Mover Interno -->
+            <div class="modal fade" id="modalMoverInterno" tabindex="-1" role="dialog" aria-labelledby="modalMoverInternoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalMoverInternoLabel">Mover Interno</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formMoverInterno" method="POST" action="{% url 'editar_pessoa_index' %}">
+                                {% csrf_token %}
+                                <input type="hidden" id="pessoa_id" name="pessoa_id">
+                                
+                                <div class="form-group">
+                                    <label for="id_bloco">Bloco:</label>
+                                    {{ form.bloco }}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="id_cela">Cela:</label>
+                                    {{ form.cela }}
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Salvar</button>
+                                
+                                
+                                <button type="button" class="btn btn-secondary" id="btnVoltar">Voltar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-column1" style="width: 310px; text-align: center;  flex-direction: column; margin-right:15px;">
                 <!-- Primeiro item -->
                 <div class="test-column" style="width: 310px; text-align: center; flex-direction: column;">
                     <!-- Primeiro item -->
@@ -326,13 +335,21 @@
                         <h3 class="item-title">População Carcerária</h3>
                         <div class="circular-chart">
                             <svg viewBox="0 0 36 36" class="circular-svg">
+                                <!-- Definição do Gradiente Dinâmico -->
+                                <defs>
+                                    <linearGradient id="gradient-progress">
+                                        <stop offset="0%" stop-color="#00ff00"/> <!-- Começo (Verde) -->
+                                        <stop id="dynamic-stop" offset="100%" stop-color="#e60000"/> <!-- Final dinâmico -->
+                                    </linearGradient>
+                                </defs>
                                 <!-- Fundo do círculo -->
                                 <path class="circle-bg"
-                                      d="M18 2.0845 a 15.9155 15.9155 0 1 1 -0.0001 0" 
+                                      d="M18 2.0845 a 15.9155 15.9155 0 1 1 -0.0001 0"
                                       style="stroke: #dcdcdc;" />
-                                <!-- Progresso -->
+                                <!-- Progresso com Gradiente -->
                                 <path id="progress-circle" class="circle"
-                                      stroke-dasharray="{{ porcentagem_cadastrados }}, 100"
+                                      stroke="url(#gradient-progress)"
+                                      stroke-dasharray="0, 100"
                                       d="M18 2.0845 a 15.9155 15.9155 0 1 1 -0.0001 0" />
                             </svg>
                             <!-- Texto no centro do gráfico -->
@@ -344,185 +361,412 @@
                             </div>
                         </div>
                         <!-- Informações adicionais -->
+                        <br>
                         <div class="additional-info">
-                            <p>Presos atuais vs. capacidade máxima.</p>
-
-
-                            <p><strong class="current-status">Atual:</strong> {{ total_pessoas }} Internos Ativos</p>
-                            <p><strong class="current-saiu">Saida Temporária:</strong> {{ total_saiu_temporariamente }} Internos </p>  <!-- Exibindo a contagem de pessoas que saíram temporariamente -->
-                            <p><strong class="critical-capacity">Capacidade Máxima:</strong> {{ limite_maximo }} Internos</p>
-                        </div>
-                    </div>
-                </div>
-                
-
-            
-
-            
-            <!-- Segundo item -->
-            <div style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
-                <!-- segundo item -->
-                <h3 class="section-title">Quantitativos Estudantes</h3>
-
-                <div class="d-flex justify-content-around w-100">
-                    <div class="custom-block bg-info text-white p-3">
-                        <h4 class="text-light" style="margin-left: -5px;">IBRAEMA</h4>
-                        <p class="text-light">{{ total_ibraema }}</p>
-                    </div>
-                    <div class="custom-block bg-warning text-dark p-3">
-                        <h4 class="text-dark">EJA I</h4>
-                        <p class="text-dark">{{ total_eja_i }}</p>
-                    </div>
-                    <div class="custom-block bg-success text-white p-3">
-                        <h4 class="text-light">EJA II</h4>
-                        <p class="text-light">{{ total_eja_ii }}</p>
-                    </div>
-                    <div class="custom-block bg-danger text-white p-3">
-                        <h4 class="text-light">EJA III</h4>
-                        <p class="text-light">{{ total_eja_iii }}</p>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-around w-100">
-                    <div class="custom-block bg-dark text-white p-3">
-                        <h4 class="text-light">Ensino Superior</h4>
-                        <p class="text-light">{{ total_ensino_superior }}</p>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
-                <!-- segundo item -->
-                <h3 class="section-title">Outros Quantitativos</h3>
-
-                <div class="d-flex justify-content-around w-100">
-                    <div class="custom-block tv-block p-3">
-                        <img src="{% static 'imagens/tv.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
-                        <p class="text-content">{{ total_tv }}</p>
-                    </div>
-                    
-                    <div class="custom-block radio-block p-3">
-                        <img src="{% static 'imagens/radio.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
-                        <p class="text-content">{{ total_radio }}</p>
-                    </div>
-
-                    <div class="custom-block radio-block p-3">
-                        <img src="{% static 'imagens/ventilador.png' %}" alt="Ventilador" style="width: 24px; height: 24px;">
-                        <p class="text-content">{{ total_ventilador }}</p>
-                    </div>
-
-                    <div class="custom-block fotos-block p-3">
-                        <h4 class="text-title">FOTOS - Construção</h4>
-                        <p class="text-content">{{ total_eja_ii }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-
-        
-
-        <!-- Coluna 3: Texto "Teste" -->
-
-    
-        
-        <div class="test-column" style="width: 765px;">
-
-            <table class="table  ">
-                
-                <h1 class="text-center tabela-titulo" style="color: #607D8B; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 0px; font-size: 18px;">Registro de Histórico de Bloco, Cela<br> e Transferência</h1>
-                <thead class="thead-light">
-                    <tr>
-                      <th class="text-primary text-center">Servidor<div class="small-text"style='font-size:8px;'>Responsável</div></th>
-                      <th class="text-primary text-center" style="width: 200px;">Interno<div class="small-text"style='font-size:8px;'>Modificado</div></th>
-                      <th class="text-primary text-center" style="width: 65px;">Ação<div class="small-text" style='font-size:8px;'>Modificada</div></th>
-                      <th class="text-primary text-center">Antes<div class="small-text"style='font-size:8px;'>Onde estava?</div></th>
-                      <th class="text-primary text-center">Agora<div class="small-text"style='font-size:8px;'>Onde está?</div></th>
-                      <th class="text-primary text-center" style="width: 10px;">Data<div class="small-text" style="font-size: 8px;">modificação</div></th>
-
-                    </tr>
-                </thead>
-                  
-                <tbody>
-                {% for alteracao in page_obj %}
-                <tr>
-                    
-                    <td class="text-center">{{ alteracao.usuario.username }}</td>
-                    <td class="text-center">{{ alteracao.pessoa.nome_completo }}</td>
-                    <td class="text-center">{{ alteracao.campo_alterado }}</td>
-                    <td class="valor-antigo text-center">
-                        <span style="display: inline-block;">{{ alteracao.valor_antigo }}</span>
-                        {% if alteracao.valor_antigo == "A - 1" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
-                        {% elif alteracao.valor_antigo == "A - 2" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
-                        {% elif alteracao.valor_antigo == "A - 3" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
-                        {% elif alteracao.valor_antigo == "A - 4" %}
-                            <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
-                        {% elif alteracao.valor_antigo == "A - 5" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Íntima</span>
-                        {% elif alteracao.valor_antigo == "C - 7" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
-                        {% endif %}
-                    </td>
-
+                            <p>A baixo observe o quantitativo específico de forma rápida.</p>
+                            <br>
                         
-                    </td>
-                    <td class="valor-novo" style="text-align: center;">
-                        <span style="display: inline-block;">{{ alteracao.valor_novo }}</span>
-                        {% if alteracao.valor_novo == "A - 1" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
-                        {% endif %}
-                        {% if alteracao.valor_novo == "A - 2" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
-                        {% endif %}
-                        {% if alteracao.valor_novo == "A - 3" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
-                        {% endif %}
-                        {% if alteracao.valor_novo == "A - 4" %}
-                        <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
-                        {% endif %}
-                        {% if alteracao.valor_novo == "A - 5" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Intima</span>
-                        {% endif %}
-                        {% if alteracao.valor_novo == "C - 7" %}
-                            <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
-                        {% endif %}
+                            <!-- Linha para "Atual" -->
+                            <div class="row">
+                                <div class="col text-start"><strong class="current-status">Atual:</strong></div>
+                                <div class="col text-end">{{ total_pessoas }} Internos</div>
+                            </div>
 
-                    </td>
-
-                    <td data-data="{{ alteracao.data_alteracao|date:"Y-m-d" }}">
-                        {{ alteracao.data_alteracao|date:"d/m/Y" }}
-                        <div class="small-text" style="font-size: 10px;"></div>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-          
-            <!-- Navegação de paginação -->
-            <div class="pagination-wrapper">
-                {% if page_obj.has_previous %}
-                  <a href="?page=1" class="pagination-link">&laquo; Primeira</a>
-                  <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">Anterior</a>
-                {% endif %}
-                
-                <span class="pagination-info">
-                  Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                </span>
-                
-                {% if page_obj.has_next %}
-                  <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Próxima</a>
-                  <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">Última &raquo;</a>
-                {% endif %}
-              </div>
-              
-              
-              
+                            <!-- Linha para "Capacidade Máxima" -->
+                            <div class="row">
+                                <div class="col text-start"><strong class="critical-capacity">Cap. Máxima:</strong></div>
+                                <div class="col text-end">{{ limite_maximo }} Internos</div>
+                            </div>
+                        
+                            <!-- Linha para "Albergados" -->
+                            <div class="row">
+                                <div class="col text-start"><strong class="albergado-title">Albergados:</strong></div>
+                                <div class="col text-end"><span id="totalAlbergadoText">{{ total_albergado }} Internos</span> <span id="internosText"></span></div>
+                            </div>
+                        
+                            <!-- Modal para mostrar a lista de albergados -->
+                            <div id="albergadoModal" class="albergado-modal">
+                                <div class="albergado-modal-content">
+                                    <span class="albergado-modal-close">&times;</span>
+                                    <h2 class="albergado-modal-title">Lista de Albergados:</h2>
+                                    <div class="albergado-modal-body">
+                                        {% for nome in nomes_albergados %}
+                                            {{ forloop.counter }} - {{ nome }}<br> <!-- Exibe o contador antes do nome -->
+                                        {% endfor %}
+                                    </div>
+                                    <button id="closeModalButton" class="albergado-modal-btn-close">OK</button>
+                                </div>
+                            </div>
+                        
+                            <!-- Linha para "Saída Temporária" -->
+                            <div class="row">
+                                <div class="col text-start"><strong class="current-saiu">Saída Temp.:</strong></div>
+                                <div class="col text-end">{{ total_saiu_temporariamente }} Internos</div>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
         </div>
-    </div>
+        
 
+            <!-- Coluna 3: -->        
+            <div class="test-column1" style="width: 700px; max-width: 100%; padding: 2px;">
+                <br>
+                <h1 class="text-center tabela-titulo" style="color: #007acc; font-weight: bold; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); margin-top: 35px; font-size: 18px;">Histórico de Alterações Internas</h1>
+                    <thead class="thead-light">
+
+                <table class="table">
+                        <tr>
+                        <th class="text-primary text-center">Servidor<div class="small-text"style='font-size:8px;'>Responsável</div></th>
+                        <th class="text-primary text-center" style="width: 200px;">Interno<div class="small-text"style='font-size:8px;'>Modificado</div></th>
+                        <th class="text-primary text-center" style="width: 65px;">Ação<div class="small-text" style='font-size:8px;'>Modificada</div></th>
+                        <th class="text-primary text-center">Antes<div class="small-text"style='font-size:8px;'>Onde estava?</div></th>
+                        <th class="text-primary text-center">Agora<div class="small-text"style='font-size:8px;'>Onde está?</div></th>
+                        <th class="text-primary text-center" style="width: 10px;">Data<div class="small-text" style="font-size: 8px;">modificação</div></th>
+
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        {% for alteracao in historico_alteracoes %}
+                            <tr>
+                                <td class="text-center">{{ alteracao.usuario.username }}</td>
+                                <td class="text-center" style="word-break: break-word; white-space: normal;">
+                                    {{ alteracao.pessoa.nome_completo }}
+                                </td>
+                                <td class="text-center">{{ alteracao.campo_alterado }}</td>
+                                <td class="valor-antigo text-center">
+                                    <span style="display: inline-block;">{{ alteracao.valor_antigo }}</span>
+                                    {% if alteracao.valor_antigo == "A - 1" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                                    {% elif alteracao.valor_antigo == "A - 2" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                                    {% elif alteracao.valor_antigo == "A - 3" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
+                                    {% elif alteracao.valor_antigo == "A - 4" %}
+                                        <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
+                                    {% elif alteracao.valor_antigo == "A - 5" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Íntima</span>
+                                    {% elif alteracao.valor_antigo == "C - 7" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
+                                    {% endif %}
+                                </td>
+                                <td class="valor-novo" style="text-align: center;">
+                                    <span style="display: inline-block;">{{ alteracao.valor_novo }}</span>
+                                    {% if alteracao.valor_novo == "A - 1" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                                    {% endif %}
+                                    {% if alteracao.valor_novo == "A - 2" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Triagem</span>
+                                    {% endif %}
+                                    {% if alteracao.valor_novo == "A - 3" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Reflexão</span>
+                                    {% endif %}
+                                    {% if alteracao.valor_novo == "A - 4" %}
+                                        <span style="display: block; font-size: 0.7em; color: Teal; margin-top: -6px; -webkit-text-stroke: 0.2px black; letter-spacing: 0.5px;">Central</span>
+                                    {% endif %}
+                                    {% if alteracao.valor_novo == "A - 5" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">Intima</span>
+                                    {% endif %}
+                                    {% if alteracao.valor_novo == "C - 7" %}
+                                        <span style="display: block; font-size: 0.7em; color: gray; margin-top: -6px;">PCD</span>
+                                    {% endif %}
+                                    
+                                </td>
+                                <td data-data="{{ alteracao.data_alteracao|date:"Y-m-d" }}">
+                                    {{ alteracao.data_alteracao|date:"d/m/Y" }}
+                                    <div class="small-text" style="font-size: 10px;"></div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">Nenhuma alteração registrada.</td>
+                                
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        
+                </table>
+            
+                <div class="pagination-wrapper">
+                    {% if historico_alteracoes.has_previous %}
+                        <a href="?page=1" class="pagination-link">&laquo; Primeira</a>
+                        <a href="?page={{ historico_alteracoes.previous_page_number }}" class="pagination-link">Anterior</a>
+                    {% endif %}
+                    
+                    <span class="pagination-info">
+                        Página {{ historico_alteracoes.number }} de {{ historico_alteracoes.paginator.num_pages }}
+                    </span>
+                    
+                    {% if historico_alteracoes.has_next %}
+                        <a href="?page={{ historico_alteracoes.next_page_number }}" class="pagination-link">Próxima</a>
+                        <a href="?page={{ historico_alteracoes.paginator.num_pages }}" class="pagination-link">Última &raquo;</a>
+                    {% endif %}
+                </div>       
+            </div>
+        </div>
+<style>
+    #sniper-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #56AB2F;
+        border-top: 5px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+
+</style>  
+<!-- Estilo para limitar a altura e permitir scroll -->
+<style>
+
+
+     @media (max-width: 576px) {
+    .modal-dialog {
+      max-width: 95% !important;
+    }
+
+    .modal-content {
+      font-size: 0.9rem;
+    }
+
+    .table th, .table td {
+      font-size: 0.85rem;
+      padding: 0.4rem;
+      white-space: nowrap; /* Evita quebra de texto feia */
+    }
+  }
+</style>
+<!-- Adicione o script para preencher o modal -->
+<script>
+   // Função para abrir o modal com a lista de internos
+function abrirModal(cela) {
+    const bloco = cela.charAt(0);
+    const numeroCela = cela.slice(1);
+
+    const celasNomes = {{ celas_nomes|safe }};
+    const nomesInternos = celasNomes[cela] || [];
+
+    const listaNomes = document.getElementById('nomesInternosLista');
+    const modalTitle = document.getElementById('modalInternosLabel');
+
+    // Obter os eletrônicos para a cela atual
+    const eletronicos = {{ eletronicos_por_cela|safe }};
+    const eletronicosCela = eletronicos[cela] || { "tv": 0, "radio": 0, "ventilador": 0 };
+
+    // Limpar a lista de internos
+    listaNomes.innerHTML = '';
+
+    // Definir o título do modal
+    modalTitle.textContent = `Internos do Bloco ${bloco} - Cela ${numeroCela}`;
+
+    // Criar os badges para eletrônicos
+    const badgesContainer = document.createElement('div');
+    badgesContainer.classList.add('mb-3', 'd-flexx', 'gap-3'); // 'd-flex' e 'gap-3' para alinhar horizontalmente e adicionar espaço
+
+    for (const [eletronico, quantidade] of Object.entries(eletronicosCela)) {
+        const badge = document.createElement('span');
+        badge.classList.add('badge', 'badge-custom'); // Classe personalizada para os badges
+
+        // Definindo cores com base no tipo de eletrônico
+        if (eletronico === 'tv') badge.classList.add('bg-tv');
+        if (eletronico === 'radio') badge.classList.add('bg-radio');
+        if (eletronico === 'ventilador') badge.classList.add('bg-ventilador');
+
+        badge.textContent = `${eletronico.charAt(0).toUpperCase() + eletronico.slice(1)}: ${quantidade}`;
+        badgesContainer.appendChild(badge);
+    }
+
+    // Adicionar os badges ao título
+    modalTitle.appendChild(badgesContainer);
+
+
+    // Preencher a lista de internos
+    if (nomesInternos.length > 0) {
+        nomesInternos.forEach((interno, index) => {
+            const tr = document.createElement('tr');
+
+            const tdNumero = document.createElement('td');
+            tdNumero.textContent = index + 1;
+
+            const tdNome = document.createElement('td');
+            tdNome.textContent = interno.nome;
+
+            const tdOpcoes = document.createElement('td');
+            const btnAcao = document.createElement('button');
+            btnAcao.textContent = "Ações";
+            btnAcao.className = "btn btn-outline-success btn-sm";
+            btnAcao.onclick = function() {
+                // Passando bloco e cela atuais junto com o id e nome
+                abrirModalMover(interno.id, interno.nome, bloco, numeroCela);
+            };
+
+            tdOpcoes.appendChild(btnAcao);
+            tr.appendChild(tdNumero);
+            tr.appendChild(tdNome);
+            tr.appendChild(tdOpcoes);
+            listaNomes.appendChild(tr);
+        });
+    } else {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 3;
+        td.textContent = "Não há internos nesta cela.";
+        td.style.textAlign = "center";
+        td.style.fontStyle = "italic";
+        tr.appendChild(td);
+        listaNomes.appendChild(tr);
+    }
+
+    $('#modalInternos').modal('show');
+}
+
+let abrirSegundoModal = false;
+let voltarParaPrimeiro = false;
+
+// Função para abrir o segundo modal
+function abrirModalMover(id, nome, blocoAtual, celaAtual) {
+    document.getElementById('pessoa_id').value = id;
+    document.getElementById('modalMoverInternoLabel').textContent = `Mover ${nome}`;
+    document.getElementById('id_bloco').value = blocoAtual;
+    document.getElementById('id_cela').value = celaAtual;
+
+    abrirSegundoModal = true;
+
+    // Quando o primeiro modal terminar de esconder, abre o segundo modal
+    $('#modalInternos').one('hidden.bs.modal', function () {
+        if (abrirSegundoModal) {
+            $('#modalMoverInterno').modal('show');
+            abrirSegundoModal = false;
+        }
+    });
+
+    $('#modalInternos').modal('hide');
+}
+
+// Fechamento normal do primeiro modal
+$('#modalInternos').on('hidden.bs.modal', function () {
+    if (!abrirSegundoModal) { // só remove o backdrop se não vamos abrir outro modal
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+    }
+});
+
+// Botão Voltar do segundo modal
+document.getElementById('btnVoltar').addEventListener('click', function() {
+    voltarParaPrimeiro = true;
+    $('#modalMoverInterno').modal('hide');
+});
+
+// X do segundo modal (btn-close)
+const btnCloseMover = document.querySelector('#modalMoverInterno .btn-close, #modalMoverInterno .close');
+if (btnCloseMover) {
+    btnCloseMover.addEventListener('click', function() {
+        voltarParaPrimeiro = true;
+        $('#modalMoverInterno').modal('hide');
+    });
+}
+
+// Ao fechar o segundo modal
+$('#modalMoverInterno').on('hidden.bs.modal', function () {
+    // Remove qualquer backdrop residual
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open');
+
+    // Se fechou para voltar, reabre o primeiro modal
+    if (voltarParaPrimeiro) {
+        $('#modalInternos').modal('show');
+        voltarParaPrimeiro = false;
+    }
+});
+
+
+
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Verifica se o cookie já existe
+        if (document.cookie.includes("visited=true")) {
+            document.getElementById("sniper-loader").style.display = "none";
+        } else {
+            // Aguarda o carregamento completo da página
+            window.onload = function () {
+                setTimeout(() => {
+                    document.getElementById("sniper-loader").style.opacity = "0";
+                    setTimeout(() => {
+                        document.getElementById("sniper-loader").style.display = "none";
+                    }, 500);
+                }, 1000); // Pequeno delay opcional
+    
+                // Define um cookie para indicar que o usuário já visitou
+                document.cookie = "visited=true; path=/; max-age=86400"; // Expira em 1 dia
+            };
+        }
+    });
+    
+</script>
     <script>
+            // Obter os elementos do modal e os gatilhos para abrir o modal
+            var modal = document.getElementById("albergadoModal");
+            var openModalElements = document.querySelectorAll("#totalAlbergadoText, #internosText"); // Seleciona ambos os textos
+            var closeModalButton = document.getElementById("closeModalButton");
+            var closeSpan = document.getElementsByClassName("albergado-modal-close")[0];
+
+            // Quando o usuário clicar no texto "{{ total_albergado }}" ou "Internos", abre o modal
+            openModalElements.forEach(function(element) {
+                element.onclick = function() {
+                    modal.style.display = "block";
+                };
+            });
+
+            // Quando o usuário clicar no botão "OK", fecha o modal
+            closeModalButton.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            // Quando o usuário clicar no "X", fecha o modal
+            closeSpan.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            // Quando o usuário clicar fora do modal, ele também fecha
+            window.onclick = function(event) {
+                if (event.target == modal) { // Verifica se o clique foi no fundo do modal
+                    modal.style.display = "none"; // Fecha o modal
+                }
+            }
+
+            // Fechar o modal ao pressionar a tecla "Esc"
+            window.onkeydown = function(event) {
+                if (event.key === "Escape") { // Verifica se a tecla pressionada é "Esc"
+                    modal.style.display = "none";
+                }
+            }
+
+
+            {% comment %} ABAIXO JÁ É DE OUTRO ELEMENTO, PARA MOSTRAR algo mais informativo na data de modificação, uma menssagem de hoje, ontem e etc .. {% endcomment %}
+
         document.addEventListener('DOMContentLoaded', function() {
             // Captura todas as células de data
             const dataCells = document.querySelectorAll('td[data-data]');
@@ -563,47 +807,117 @@
       
     <style>
 
-        body {
-            background:#CFCECD;
-        }
+body {
+    background: #bbb;
+    color: #1a1a1a; /* levemente mais escuro para contraste */
+}
+
+.custom-container {
+    background: transparent;
+}
+
+.main-container {
+    background: #bbb;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}
 
 
-        .custom-container {
-            background: #CFCECD;
-            
+
+        /* Estilo para os badges */
+        .badge-custom {
+            padding: 5px 10px; /* Padding de 5px */
+            border-radius: 15px; /* Bordas mais arredondadas */
+            font-size: 14px; /* Tamanho da fonte */
+            font-weight: bold; /* Deixa o texto mais forte */
+            border: 2px solid #ccc; /* Borda mais forte */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave para destacar */
         }
-        
-        
-        
-        .main-container {
-            background: #CFCECD;
+
+        /* Cores metalizadas para os badges */
+        .bg-tv {
+            background-color:rgba(127, 140, 141, 0.27); /* Cinza metálico para TV */
+            border-color: #95a5a6;
         }
-        
+
+        .bg-radio {
+            background-color:rgba(22, 160, 132, 0.18); /* Verde metálico para rádio */
+            border-color: #1abc9c;
+        }
+
+        .bg-ventilador {
+            background-color:rgba(243, 157, 18, 0.16); /* Amarelo metálico para ventilador */
+            border-color: #e67e22;
+        }
+
+        /* Aumentando o espaço entre os badges */
+        .d-flexx {
+            display: flex;
+            gap: 10px; /* Aumenta o espaçamento entre os badges */
+        }
+
+                @media (max-width: 576px) {
+    table.table th,
+    table.table td {
+        font-size: 10px;
+        padding: 2px 4px;
+    }
+
+    .small-text {
+        font-size: 6px !important;
+    }
+
+    table.table th .small-text,
+    table.table td .small-text {
+        display: block;
+        margin-top: 2px;
+    }
+
+    .valor-antigo span,
+    .valor-novo span {
+        font-size: 9px !important;
+    }
+
+    .valor-antigo span + span,
+    .valor-novo span + span {
+        font-size: 6px !important;
+        margin-top: -4px !important;
+    }
+
+    td[data-data] {
+        font-size: 9px !important;
+    }
+}
+
         
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Pega o valor da porcentagem diretamente do texto exibido
             const percentageText = document.getElementById('percentage-text');
             const progressCircle = document.getElementById('progress-circle');
-            const percentage = parseFloat(percentageText.textContent); // Pega o valor numérico da porcentagem
-    
-            // Define a cor do círculo e do texto com base na porcentagem (cores invertidas)
-            if (percentage <= 25) {
-                progressCircle.style.stroke = '#00ff00'; // Verde
-                percentageText.style.color = '#00ff00'; // Texto verde
-            } else if (percentage <= 50) {
-                progressCircle.style.stroke = '#ffff00'; // Amarelo
-                percentageText.style.color = '#ffff00'; // Texto amarelo
-            } else if (percentage <= 75) {
-                progressCircle.style.stroke = '#ffaa00'; // Laranja suave
-                percentageText.style.color = '#ffaa00'; // Texto laranja suave
-            } else {
-                progressCircle.style.stroke = '#ff4d4d'; // Vermelho mais suave
-                percentageText.style.color = '#ff4d4d'; // Texto vermelho suave
+            const dynamicStop = document.getElementById('dynamic-stop'); // Ponto final do gradiente
+        
+            const percentage = parseFloat(percentageText.textContent); 
+        
+            // Atualiza o progresso do círculo
+            progressCircle.style.strokeDasharray = `${percentage}, 100`;
+        
+            // Define a cor do final do gradiente conforme a porcentagem
+            function getColor(percentage) {
+                if (percentage <= 10) return ' #00ff00'; // Verde
+                if (percentage <= 30) return ' #66ff66'; // Verde claro
+                if (percentage <= 50) return ' #ffff00'; // Amarelo
+                if (percentage <= 70) return ' #ffaa00'; // Laranja
+                if (percentage <= 90) return ' #ff5500'; // Laranja escuro
+                return '#e60000'; // Vermelho
             }
-            
+        
+            // Atualiza a cor do gradiente na ponta do progresso
+            dynamicStop.setAttribute("stop-color", getColor(percentage));
+            dynamicStop.setAttribute("offset", `${percentage}%`);
         });
+        
+        
     </script>
     
     

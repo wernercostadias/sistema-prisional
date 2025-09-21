@@ -8,17 +8,45 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <!-- Exibir mensagens de sucesso ou erro -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const notyf = new Notyf({
+            duration: 4000, // Tempo da notificação na tela
+            position: { x: "right", y: "top" }, // Posição do alerta
+            dismissible: true // Permite fechar manualmente
+        });
+
+        // Exibir mensagens do Django
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    notyf.success("{{ message|escapejs }}");
+                {% elif message.tags == 'error' %}
+                    notyf.error("{{ message|escapejs }}");
+                {% else %}
+                    notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        // Exibir erros do formulário Django
+        {% if form.errors %}
+            notyf.error("Por favor, corrija os erros abaixo.");
+
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    notyf.error("{{ field }}: {{ error|escapejs }}");
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    });
+</script>
 
 <div class="container mt-5">
-    {% if messages %}
-    <div class="alert alert-success" role="alert">
-        {% for message in messages %}
-            {{ message }}
-        {% endfor %}
-    </div>
-    {% endif %}
 
     <form method="POST" class="mb-4 p-4 border rounded shadow-sm bg-light">
         {% csrf_token %}
@@ -28,51 +56,53 @@
         <div class="border p-4 rounded mb-4 shadow-sm bg-white">
             <div class="row">
                 <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.nome_completo.id_for_label }}" class="text-dark">Nome Completo</label>
-                    {{ form.nome_completo }}
-                </div>
+                    <label for="id_nome_completo" class="text-dark">Nome Completo</label>
 
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.cidade.id_for_label }}" class="text-dark">Cidade</label>
-                    {{ form.cidade }}
-                </div>
+                    <div id="nome-wrapper" class="position-relative">
+                        <input type="text" 
+                            name="nome_completo" 
+                            class="form-control"
+                            id="id_nome_completo" 
+                            placeholder="Digite o nome completo"
+                            autocomplete="new-password">
 
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.idade.id_for_label }}" class="text-dark">Idade</label>
-                    {{ form.idade }}
+                        <div id="nome-sugestoes" class="dropdown-menu p-0">
+                        <!-- itens via JS -->
+                        </div>
+                        <!-- espaço para mensagem de erro -->
+                        <small id="nome-error" class="text-danger d-none"></small>
+                    </div>
                 </div>
-
+                
+            
                 <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.data_entrada.id_for_label }}" class="text-dark">Data de Entrada</label>
+                    <label for="id_cidade" class="text-dark">Cidade</label>
+                    <input type="text" name="cidade"placeholder="Cidade onde o interno reside" class="form-control" id="id_cidade">
+                </div>
+            
+                <div class="col-md-6 form-group mb-3">
+                    <label for="data_nascimento" class="text-dark">Data de Nascimento</label>
+                    <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" value="{{ pessoa.data_nascimento|date:'Y-m-d' }}">
+                </div>
+            
+                <div class="form-group col-md-6">
+                    <label for="{{ form.matricula.id_for_label }}">Matrícula</label>
+                    {{ form.matricula }}
+                </div>
+                
+            
+                <div class="col-md-6 form-group mb-3">
+                    <label for="{{ form.data_entrada.id_for_label }}" class="text-dark">Data da Prisão</label>
                     {{ form.data_entrada }}
                 </div>
+
+                <div class="col-md-6 form-group mb-3">
+                    <label for="id_artigo_criminal" class="text-danger">Artigo Criminal</label>
+                    <input type="text" name="artigo_criminal" class="form-control" id="id_artigo_criminal" placeholder="Ex: Art.129º CPB ">
+                </div>
             </div>
         </div>
 
-        <!-- Escolaridade e Trabalho -->
-        <div class="border p-4 rounded mb-4 shadow-sm bg-white">
-            <div class="row">
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.escolaridade.id_for_label }}" class="text-dark">Escolaridade</label>
-                    {{ form.escolaridade }}
-                </div>
-
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.estudando.id_for_label }}" class="text-dark">Estudando na Unidade?</label>
-                    {{ form.estudando }}
-                </div>
-
-                <div class="col-md-6 form-group mb-3">
-                    <label for="{{ form.frente_trabalho.id_for_label }}" class="text-dark">Frente de Trabalho</label>
-                    {{ form.frente_trabalho }}
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="{{ form.artigo_criminal.id_for_label }}" class="text-danger">Artigo Criminal</label>
-                {{ form.artigo_criminal }}
-            </div>
-        </div>
 
         <!-- Localização -->
         <h4 class="mt-4 mb-4 text-center text-success">Qual cela e bloco o interno ficará?</h4>
@@ -110,14 +140,34 @@ h4 {
 }
 
 
-
-
-
 form .form-group label {
     font-size: 1.1rem;
     font-weight: 600;
     
 }
+
+
+
+
+
+#id_artigo_criminal::placeholder {
+        color:rgb(187, 183, 183) !important; 
+}
+
+#id_matricula::placeholder{
+    color:rgb(187, 183, 183) !important; 
+}
+
+
+
+
+
+
+
+
+
+
+
 
 /* Bordas e sombreamento */
 .border {
@@ -203,9 +253,182 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
+#nome-wrapper { position: relative; }
 
+#nome-sugestoes.dropdown-menu {
+  display: none;                /* controlado pelo JS */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;                     /* faz ocupar toda a largura do wrapper */
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
 
+  /* overrides do Bootstrap */
+  min-width: 0 !important;      /* cancela min-width: 10rem */
+  width: auto !important;       /* respeita left:0 + right:0 */
+  box-sizing: border-box;       /* borda conta na largura */
+}
 </style>
+<style>
+/* Estilo de erro no input */
+.input-error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 8px rgba(220, 53, 69, .7) !important;
+}
+
+/* Animação vibrar */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+.shake {
+  animation: shake 0.4s ease;
+}
+</style>
+<style>
+  #id_nome_completo {
+    text-transform: uppercase; /* transforma o texto digitado */
+  }
+
+  #id_nome_completo::placeholder {
+    text-transform: none; /* mantém o placeholder como está */
+  }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function () {
+  const $input = $('#id_nome_completo');
+  const $box   = $('#nome-sugestoes');
+  const $error = $('#nome-error');
+
+  function alinharDropdown() {
+    $box.css('width', $input.outerWidth());
+  }
+
+  // Transformar texto digitado em maiúsculas, placeholder permanece minúsculo
+  $input.on('input', function() {
+      this.value = this.value.toUpperCase();
+  });
+
+  // Autocomplete
+  $input.on('input', function () {
+      let query = $(this).val();
+
+      if (query.length === 0) {
+          $input.removeClass('input-error shake');
+          $error.addClass('d-none').text('');
+          $box.hide();
+          return;
+      }
+
+      if (query.length >= 2) {
+          $.ajax({
+              url: "{% url 'autocomplete_nome' %}",
+              data: { term: query },
+              dataType: 'json',
+              success: function (data) {
+                  $box.empty();
+
+                  if (data.length > 0) {
+
+                      data.forEach(function (item) {
+                          let color = 'text-secondary';
+                          if (item.status === 'ativo') color = 'text-success';
+                          else if (item.status === 'foragido') color = 'text-danger';
+                          else if (item.status === 'inativo') color = 'text-muted';
+
+                          $box.append(
+                              `<div class="dropdown-item ${color}" 
+                                  style="cursor:pointer" 
+                                  data-value="${item.value}" 
+                                  data-status="${item.status}">
+                                  ${item.label}
+                              </div>`
+                          );
+                      });
+
+                      alinharDropdown();
+                      $box.show();
+
+                      // Verifica se existe algum cadastro ativo com o mesmo nome
+                      const existeAtivo = data.some(d => d.value.toLowerCase() === query.toLowerCase() && d.status === 'ativo');
+
+                      if (existeAtivo) {
+                          const userUrl = `http://10.110.37.244:8000/tabela/?nome=${encodeURIComponent(query)}`;
+                          const mensagem = `Usuário já cadastrado e ativo! <a href="${userUrl}" target="_blank" style="text-decoration: underline; color: #0d6efd;">Ver cadastro</a>`;
+                          $input.addClass('input-error shake');
+                          $error.removeClass('d-none').html(mensagem);
+                      } else {
+                          $input.removeClass('input-error shake');
+                          $error.addClass('d-none').text('');
+                      }
+
+                  } else {
+                      $box.hide();
+                      $input.removeClass('input-error shake');
+                      $error.addClass('d-none').text('');
+                  }
+              }
+          });
+      } else {
+          $box.hide();
+      }
+  });
+
+  // Clique na sugestão
+  $(document).on('click', '#nome-sugestoes .dropdown-item', function () {
+      const valor = $(this).data('value');
+      $input.val(valor);
+      $box.hide();
+
+      // Verifica se qualquer cadastro ativo existe com o mesmo valor
+      const todosItens = $box.children().map(function() {
+          return { value: $(this).data('value'), status: $(this).data('status') };
+      }).get();
+
+      const existeAtivo = todosItens.some(d => d.value.toLowerCase() === valor.toLowerCase() && d.status === 'ativo');
+
+      if (existeAtivo) {
+          const userUrl = `http://10.110.37.244:8000/tabela/?nome=${encodeURIComponent(valor)}`;
+          const mensagem = `Usuário já cadastrado e ativo! <a href="${userUrl}" target="_blank" style="text-decoration: underline; color: #0d6efd;">Ver cadastro</a>`;
+          $input.addClass('input-error shake');
+          $error.removeClass('d-none').html(mensagem);
+      } else {
+          $input.removeClass('input-error shake');
+          $error.addClass('d-none').text('');
+      }
+  });
+
+  // Fecha ao clicar fora
+  $(document).on('click', function (e) {
+      if (!$(e.target).closest('#nome-wrapper').length) $box.hide();
+  });
+
+  // Reabre se focar de novo
+  $input.on('focus', function () {
+      if ($input.val().length >= 2 && $box.children().length > 0) {
+          alinharDropdown();
+          $box.show();
+      }
+  });
+
+  // Fecha com ESC
+  $input.on('keydown', function (e) {
+      if (e.key === "Escape") {
+          $box.hide();
+          $input.blur();
+      }
+  });
+
+  $(window).on('resize', alinharDropdown);
+});
+</script>
 
 
 

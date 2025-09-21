@@ -8,17 +8,46 @@
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<!-- Adiciona Notyf via CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const notyf = new Notyf({
+          duration: 6000, // Tempo que a notificação fica visível
+          position: { x: "right", y: "top" }, // Posição da notificação
+          dismissible: true, // Permitir fechar manualmente
+          types: [
+              {
+                  type: 'info',
+                  background: '#17a2b8', // Azul claro (padrão de info)
+                  icon: false
+              }
+          ]
+      });
+
+      {% if messages %}
+          {% for message in messages %}
+              {% if message.tags == 'success' %}
+                  notyf.success("{{ message|escapejs }}");
+              {% elif message.tags == 'error' %}
+                  notyf.error("{{ message|escapejs }}");
+              {% elif message.tags == 'info' %}
+                  notyf.open({ type: 'info', message: "{{ message|escapejs }}" });
+              {% else %}
+                  notyf.open({ message: "{{ message|escapejs }}" });
+              {% endif %}
+          {% endfor %}
+      {% endif %}
+  });
+</script>
+
 
 <div class="container custom-container my-5" style="max-width: 600px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert" style="padding: 10px; font-size: 14px; margin-bottom: 15px; border-radius: 5px;">
-          {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-  
-  <h2 class="text-center mb-4 custom-title" style="font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; color: #333; margin-bottom: 30px;">Cadastrar Servidor no Sistema UPACA</h2>
+    <h2 class="text-center mb-4 custom-title" style="font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; color: #333; margin-bottom: 30px;">Cadastrar Servidor no Sistema UPACA</h2>
 
   <form method="post" class="mb-4">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">

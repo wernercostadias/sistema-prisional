@@ -1,0 +1,555 @@
+{% extends 'bases/base.html' %}
+{% load static %}
+{% block title %}Lista Personalizada - Sistema UPACA{% endblock %}
+{% block content %}
+<head>  
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/script.js' %}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+
+<div class="container">
+    <h2>Crie Sua Lista</h2>
+    
+<div class="form-group">
+    <label for="pessoa" class="font-weight-bold text-muted">Selecionar Interno:</label>
+    <small class="form-text text-muted" style="margin-top: -4px; margin-bottom: 6px;">
+        Selecione apenas um interno por vez.
+    </small>
+    <div class="d-flex w-100">
+        <input type="text" id="id_pessoa" name="pessoa"
+               class="search-control flex-grow-1" 
+               placeholder="Digite para buscar uma pessoa..." autocomplete="off">
+        <button id="addPessoa" class="btn btn-outline-dark ml-2">
+            <i class="fas fa-plus"></i> Adicionar Interno
+        </button>
+    </div>
+</div>
+
+
+<div class="form-group mt-4">
+    <label class="font-weight-bold text-muted mb-2">Selecionar Setores (máximo 4):</label>
+    <div class="row">
+        <!-- Coluna esquerda: Checkboxes -->
+        <div class="col-md-6">
+            <div class="row">
+                <!-- Subcoluna 1 -->
+                <div class="col-md-6">
+                    <div id="destinosCheckboxes" class="d-flex flex-column">
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Enfermaria"> Enfermaria</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Dentista"> Dentista</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Medico"> Médico</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Assistência Social"> Assistência Social</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Psicóloga"> Psicóloga</label>
+                    </div>
+                </div>
+
+                <!-- Subcoluna 2 -->
+                <div class="col-md-6">
+                    <div id ="destinosCheckboxes" class="d-flex flex-column">
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Defensoria"> Defensoria</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Advogado"> Advogado</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Direção"> Direção</label>
+                        <label><input type="checkbox" class="destino-checkbox mr-2" value="Saída Temporária"> Saída Temporária</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna direita: Botões -->
+        <div class="col-md-6 d-flex flex-column align-items-start">
+            <button id="sortPessoas" class="btn btn-dark mb-2 w-100">Ordenar por Bloco e Cela</button>
+            <button id="sortNome" class="btn btn-secondary mb-2 w-100">Ordenar por Nome</button>
+
+            <form id="formGerarPDF" method="post" action="{% url 'gerar_pdf_lista' %}" class="w-100">
+                {% csrf_token %}
+                <input type="hidden" name="dados_json" id="dados_json">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="fas fa-file-pdf"></i> Gerar PDF da Lista
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+    <h3>Pessoas Adicionadas</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:10px;">Bloco</th>
+                <th style="width:10px;">Cela</th>
+                <th>Nome Completo</th>
+                <th>Destino</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="listaPessoas">
+            <!-- Aqui serão adicionadas as pessoas selecionadas -->
+        </tbody>
+    </table>
+</div>
+{% block extra_js %}
+<!-- Carregar Selectize.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script>
+    const notyf = new Notyf({
+        duration: 4000,
+        position: { x: "right", y: "top" },
+        dismissible: true
+    });
+</script>
+<script>
+$('#formGerarPDF').submit(function(e) {
+    e.preventDefault();
+
+    var dados = [];
+
+    $('#listaPessoas tr').each(function() {
+        var bloco = $(this).find('td').eq(0).text().trim();
+        var cela = $(this).find('td').eq(1).text().trim();
+        var nome = $(this).find('td').eq(2).text().trim();
+        var destino = $(this).find('td').eq(3).text().trim();
+
+        dados.push({
+            'bloco': bloco,
+            'cela': cela,
+            'nome': nome,
+            'destino': destino
+        });
+    });
+
+    $('#dados_json').val(JSON.stringify(dados));
+    this.submit();  // Submete o formulário com os dados
+});
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var selectizePessoa = $('#id_pessoa').selectize({
+            valueField: 'id',
+            labelField: 'nome_completo',
+            searchField: ['nome_completo'],
+            options: [],
+            create: false,
+            load: function(query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '{% url "pessoa_search" %}',
+                    data: { q: query },
+                    dataType: 'json',
+                    success: function(res) {
+                        console.log(res);  // Verificando a resposta
+                        callback(res);
+                    }
+                });
+            },
+            onChange: function(value) {
+                var selectedOptions = this.items;
+                this.clearOptions();
+                var newOptions = this.options;
+                for (var id in newOptions) {
+                    if (!selectedOptions.includes(id)) {
+                        this.addOption(newOptions[id]);
+                    }
+                }
+                this.refreshOptions();
+            },
+            render: {
+                option: function(item, escape) {
+                    return `<div class="option">
+                                <span>${escape(item.nome_completo)}</span>
+                                <small class="text-muted">Bloco: ${escape(item.bloco)} | Cela: ${escape(item.cela)}</small>
+                            </div>`;
+                },
+                item: function(item, escape) {
+                    return `<div class="item">${escape(item.nome_completo)} ${escape(item.bloco)} - ${escape(item.cela)}</div>`;
+                }
+            }
+        });
+
+        var selectizeInstance = selectizePessoa[0].selectize;
+
+$('#addPessoa').click(function() {
+    var selectedPessoa = selectizeInstance.getValue();
+    if (!selectedPessoa) {
+        notyf.error("Selecione uma pessoa primeiro!");
+        return;
+    }
+
+    if ($("#pessoa_" + selectedPessoa).length) {
+        notyf.error("Essa pessoa já foi adicionada!");
+        return;
+    }
+
+    var pessoaTexto = selectizeInstance.options[selectedPessoa].nome_completo;
+    var bloco = selectizeInstance.options[selectedPessoa].bloco || '-';
+    var cela = selectizeInstance.options[selectedPessoa].cela || '-';
+
+    var destinosSelecionados = [];
+    $('.destino-checkbox:checked').each(function() {
+        destinosSelecionados.push($(this).val());
+    });
+
+    if (destinosSelecionados.length === 0) {
+        notyf.error("Selecione pelo menos um destino.");
+        return;
+    }
+
+    if (destinosSelecionados.length > 4) {
+        notyf.error("Você só pode selecionar no máximo 4 destinos.");
+        return;
+    }
+
+    var destinoTexto = destinosSelecionados.join(', ');
+
+    var newRow = ` 
+        <tr id="pessoa_${selectedPessoa}" data-bloco="${bloco}" data-cela="${cela}" data-destino="${destinoTexto}">
+            <td>${bloco}</td>
+            <td>${cela}</td>
+            <td>${pessoaTexto}</td>
+            <td>${destinoTexto}</td>
+            <td><button class="btn btn-danger btn-sm removePessoa" data-id="${selectedPessoa}"><i class="fas fa-trash"></i></button></td>
+        </tr>
+    `;
+
+    $('#listaPessoas').append(newRow);
+    selectizeInstance.clear();
+
+
+    notyf.success("Pessoa adicionada à lista com sucesso!");
+});
+
+        // Ordenar as pessoas por Bloco e Cela
+        $('#sortPessoas').click(function() {
+            var rows = $('#listaPessoas tr').get();
+            rows.sort(function(a, b) {
+                var blocoA = $(a).data('bloco');
+                var blocoB = $(b).data('bloco');
+                var celaA = parseInt($(a).data('cela'), 10);
+                var celaB = parseInt($(b).data('cela'), 10);
+
+                if (blocoA < blocoB) {
+                    return -1;
+                }
+                if (blocoA > blocoB) {
+                    return 1;
+                }
+                if (celaA < celaB) {
+                    return -1;
+                }
+                return celaA > celaB ? 1 : 0;
+            });
+
+            $.each(rows, function(index, row) {
+                $('#listaPessoas').append(row);
+            });
+        });
+
+        // Ordenar as pessoas por Nome (A - Z)
+        $('#sortNome').click(function() {
+            var rows = $('#listaPessoas tr').get();
+            rows.sort(function(a, b) {
+                var nomeA = $(a).find('td').eq(2).text().toUpperCase();  // Nome está na 3ª coluna (índice 2)
+                var nomeB = $(b).find('td').eq(2).text().toUpperCase();
+
+                if (nomeA < nomeB) {
+                    return -1;
+                }
+                if (nomeA > nomeB) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            $.each(rows, function(index, row) {
+                $('#listaPessoas').append(row);
+            });
+        });
+
+
+        $(document).on('click', '.removePessoa', function() {
+            var pessoaId = $(this).data('id');
+            $("#pessoa_" + pessoaId).remove();
+        });
+        selectizeInstance.on('item_add', function() {
+            setTimeout(function() {
+                $('#addPessoa').click();
+            }, 10); // pequeno delay para garantir que o valor seja reconhecido
+        });
+    });
+</script>
+{% endblock %}
+
+
+
+
+<style>
+    #addPessoa {
+        padding: 5px 15px; /* Ajuste o padding para diminuir a altura */
+        font-size: 14px; /* Tamanho da fonte do texto */
+        line-height: 0.01; /* Ajuste a altura da linha */
+        height: auto; /* Garante que o botão se ajuste ao conteúdo */
+        display: flex;
+        align-items: center; /* Alinha o ícone e o texto verticalmente */
+        height:50px;
+      }
+      
+      #addPessoa i {
+        margin-right: 8px; /* Dá um espaço adequado entre o ícone e o texto */
+      }
+      
+     
+      .search-control {
+        width: 60%;
+        padding: 8px 15px;
+        font-size: 16px;
+        border-radius: 25px; /* Borda arredondada */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição suave */
+      }
+
+      .selectize-input.items {
+        border-radius: 6px !important; /* Bordas arredondadas */
+        transition: border-color 0.3s ease-in-out !important; /* Transição suave */
+    
+        background: #fff!important;
+       
+      }
+      
+      .selectize-input.items:focus,
+      .selectize-input.items:hover {
+        border-color:rgba(27, 29, 26, 0.46) !important; /* Azul mais escuro ao focar ou passar o mouse */
+        
+      }
+      
+      
+      .search-control:focus {
+        border-color:rgba(86, 171, 47, 0.47); /* Cor de foco (pode ser a cor principal do seu tema) */
+        box-shadow: 0 0 5px rgba(86, 171, 47, 0.42); /* Efeito de sombra ao focar */
+      }
+      
+      .search-control::placeholder {
+        color: #999; /* Cor do texto do placeholder */
+        font-style: italic; /* Deixa o texto do placeholder em itálico */
+      }
+      
+      .search-control:hover {
+        border-color: rgba(27, 29, 26, 0.46);
+
+      }
+
+      body > div.container.custom-container > div > div > div > div > div.selectize-input.items.not-full.has-options.has-items > div{
+        background:rgba(27, 29, 26, 0.14);
+        border:1px solid rgba(27, 29, 26, 0.46);
+        color:black;
+      }
+
+      /* Estilizando o dropdown */
+.selectize-dropdown {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Borda arredondada */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: auto;
+    max-width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .selectize-dropdown-content {
+    max-height: 200px; /* Limite de altura para a lista */
+    overflow-y: auto; /* Adiciona rolagem quando necessário */
+  }
+  
+  /* Estilizando as opções */
+  .option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .option:hover {
+    background-color: #f0f0f0 !important; /* Cor de fundo quando passa o mouse */
+  }
+  
+  .option span {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .option small {
+    color: #777;
+    font-style: italic;
+  }
+  
+  /* Adicionando um efeito de foco */
+  .option:focus {
+    outline: none;
+    background-color:rgb(63, 212, 155) !important; /* Cor de fundo ao focar */
+  }
+  
+  /* Estilizando o item selecionado */
+  .option[data-selectable="true"]:nth-child(even) {
+    background-color: #f9f9f9; /* Alternando fundo para um visual mais leve */
+  }
+  
+  /* Estilo para o dropdown invisível quando não está em uso */
+  .selectize-dropdown[style*="display: none;"] {
+    visibility: hidden;
+  }
+  
+      
+</style>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 12px;
+       
+    }
+
+    h2, h3 {
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    input.search-control {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.2s ease;
+        font-size: 15px;
+    }
+
+    input.search-control:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    #addPessoa {
+        padding: 10px 16px;
+        font-size: 15px;
+        border-radius: 8px;
+    }
+
+#destinosCheckboxes label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    padding: 1px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+#destinosCheckboxes label:hover {
+    background-color: #f1f1f1;
+}
+
+#destinosCheckboxes input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #007bff; /* Azul tradicional */
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+
+    .btn {
+        border-radius: 8px;
+        font-size: 14px;
+        padding: 8px 14px;
+        margin-right: 8px;
+    }
+
+    .btn i {
+        margin-right: 4px;
+    }
+
+    table.table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    table.table th,
+    table.table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    table.table th {
+        background-color: #f0f2f5;
+        font-weight: 600;
+    }
+
+    table.table td button {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-dark {
+        background-color: #343a40;
+        border: none;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+
+        .form-group.d-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #addPessoa {
+            margin-top: 10px;
+        }
+    }
+</style>
+
+{% endblock %}
