@@ -1,42 +1,38 @@
+# Sistema Prisional - UPACA
 
+Este é um sistema desenvolvido para **gerenciamento prisional**, com funcionalidades como:
 
-	1 - Baixar o Python ultima versão .
-	https://www.python.org/downloads/
+- Controle de internos
+- Controle de pavilões e blocos
+- Controle de sanções disciplinares
+- Controle de procedimentos administrativos
+- Comunicação de transferências
+- Eletrônicos de internos
+- Listas personalizadas
+- Frentes de trabalho
+- Leitura pedagógica
+- Comunicação interna
+- Relatórios em PDF
+- entre outros...
 
-	baixar Node js
-	https://nodejs.org/pt
+---
 
-	baixar todas as extensões Obs: dentro do Vs Code.
-	HTML: Extensão como HTML CSS Support.
-	CSS: Extensão CSS IntelliSense.
-	Django: Extensão como Django para facilitar o desenvolvimento em templates Django.
-	JavaScript: Extensão JavaScript (ES6).
-	
-	2 - dentro do terminal verificar a versão do python - 
-	python --version
-	
-	3 - já dentro do vscode com o repositorio aberto, ir ao terminal e abrir o 
-	ambiente virtual.   digite o comando. 
-	\venv\Scripts\activate
-	
-	4- Após isso instale o requirements.txt 
-	Obs: se não instalar pode ser que o o ambiente virual não esteja configurado ou possa ter bugado.
-	então sugiro que desinstale atual e reinstale novamente, e assim poderá tentar novamente instalar o requirements.txt
-	
-	
+## Pré-requisitos
 
-	5 - Acessar a parta da windows e configurar o ip local
-C:\Windows\System32\drivers\etc\hosts
+Antes de iniciar, é necessário instalar algumas ferramentas:
 
-	6 - depois colocar dentro do setings.py do sistema 
-ALLOWED_HOSTS = ['IP LOCAL', 'localhost', '127.0.0.1']
-Modificar o nome ip local pelo ip da rede da maquina que desejar fazer a configuração paa deixar online o servidor.
+1. **Python (última versão)**  
+   [Download Python](https://www.python.org/downloads/)
 
+2. **Extensões do VS Code recomendadas**:  
+   - HTML: `HTML CSS Support`  
+   - CSS: `CSS IntelliSense`  
+   - Django: `Django` (suporte a templates)
 
+---
 
+## Configuração do ambiente
 
-
-	Comando para deixar o banco de dados ativo.. 
-usndo o power shell
-
-uvicorn banco_de_dados_upaca.asgi:application --host 10.110.37.178 --port 8000
+### 1. Verificar a versão do Python
+```bash
+python --version
