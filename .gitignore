@@ -11,6 +11,13 @@ venv/
 # Arquivos estáticos e de mídia gerados
 staticfiles/
 media/
+# Ignorar imagens dentro de static
+banco_de_dados_upaca/static/imagens/
+banco_de_dados_upaca/static/js/      # se tiver arquivos js gerados que não quer versionar
+banco_de_dados_upaca/static/css/     # se quiser ignorar css compilado
+banco_de_dados_upaca/static/fonts/   # se houver fontes
+banco_de_dados_upaca/static/media/   # se houver uploads
+
 
 # Logs e arquivos temporários
 *.log

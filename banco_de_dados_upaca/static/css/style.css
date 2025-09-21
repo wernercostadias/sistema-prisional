@@ -10,24 +10,25 @@
 
 
 .item-container {
-    background-color: #ffffff;
+    background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%);
     border-radius: 8px;
     padding: 20px;
     color: #333;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    height: 358px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+    height: 500px;
+    margin-top: 65px;
 }
 
 .item-title {
     margin-bottom: 10px;
     font-size: 18px;
     font-weight: bold;
-    color: #007acc;
+    color: #2c3e50; /* azul escuro acinzentado */
     text-align: center;
 }
 
 .additional-info p {
-    margin-bottom: 7px; /* Reduz o espaço entre os parágrafos */
+    margin-bottom: 7px;
 }
 
 .circular-chart {
@@ -35,44 +36,43 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    background-color: #282828; /* Fundo escuro e elegante */
-    border-radius: 50%; /* Tornar o contêiner circular */
-    box-shadow: 0 0 20px rgba(255, 64, 129, 0.8), 0 0 30px rgba(0, 229, 255, 0.8), 0 0 20px rgba(103, 233, 7, 0.8); /* Sombra fixa com várias cores vibrantes */
-    padding: 5px; /* Espaçamento interno para deixar o gráfico centralizado */
-    width: 150px;
-    height: 150px;
-    margin: 5px auto;
+    background-color: #dcdcdc;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    padding: 5px;
+    width: 190px;
+    height: 190px;
+    margin: 20px auto;
 }
 
 .circular-svg {
-    transform: rotate(-90deg); /* Faz o gráfico começar do topo */
+    transform: rotate(-90deg);
     width: 100%;
     height: 100%;
 }
 
 .circle-bg {
     fill: none;
-    stroke: #444444; /* Cor do fundo em cinza escuro */
-    stroke-width: 4; /* Aumenta a espessura da borda do fundo */
-    opacity: 0.3; /* Torna o fundo um pouco transparente */
+    stroke: #bbbbbb;
+    stroke-width: 4;
+    opacity: 0.4;
 }
 
 .circle {
     fill: none;
+    stroke: #3b5998; /* azul neutro */
     stroke-width: 3.5;
     stroke-linecap: round;
     transition: stroke-dasharray 0.5s ease, stroke 0.3s ease-in-out;
-    animation: colorChange 2s infinite alternate; 
-    
 }
 
 .percentage-text {
     font-size: 24px;
     font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra no texto para mais destaque */
-    transition: color 0.3s ease; /* Transição suave para a mudança de cor */
+    color: #2c3e50;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    transition: color 0.3s ease;
 }
-
 
 .center-text {
     position: absolute;
@@ -80,15 +80,14 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    font-family: 'Roboto', sans-serif;  
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra no texto para mais destaque */
+    font-family: 'Roboto', sans-serif;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
-
 
 .quantity-text {
     font-size: 16px;
-    color: #76ff03; /* Texto da quantidade em verde limão */
-    margin-top: 5px; /* Espaçamento entre a percentagem e a quantidade */
+    color: #4caf50; /* verde suave */
+    margin-top: 5px;
 }
 
 .additional-info {
@@ -99,27 +98,26 @@
     color: #555;
 }
 
-
 .additional-info p {
-    margin-bottom: 2px; /* Reduz o espaçamento entre os parágrafos */
-    padding: 0; /* Remove o padding extra */
+    margin-bottom: 2px;
+    padding: 0;
 }
 
 .critical-capacity {
-    color: #d32f2f; /* Capacidade crítica em vermelho */
-    margin-bottom: 1px; /* Diminui a distância para o próximo item */
+    color: #b71c1c; /* vermelho escuro */
+    margin-bottom: 1px;
 }
 
 .current-status {
-    color: #388e3c; /* Status atual em verde */
-    margin-bottom: 2px; /* Diminui a distância para o próximo item */
+    color: #2e7d32; /* verde escuro */
+    margin-bottom: 2px;
 }
 
-
-.current-saiu{
-    color: #38398e; /* Status atual em verde */
-    margin-bottom: 2px; /* Diminui a distância para o próximo item */
+.current-saiu {
+    color: #3f51b5; /* azul mais fechado */
+    margin-bottom: 2px;
 }
+
 /* ================================================
 QUANTIDADE DE INTERNOS ESTUDANDO NA PAGINA PRINCIPAL INDEX
 ================================================= */
@@ -216,7 +214,6 @@ QUANTIDADE DE INTERNOS ESTUDANDO NA PAGINA PRINCIPAL INDEX
     display: flex;
     flex-direction: column;
     gap: 15px;
-    
 }
 
 
@@ -234,8 +231,14 @@ table {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     transition: background 0.3s, box-shadow 0.3s;
     position: relative; /* Necessário para o pseudo-elemento */
-    border-radius: 10px; /* Borda arredondada */
+    border-radius: 9px; /* Borda arredondada */
     border: 3px solid transparent; /* Borda transparente para dar espaço ao gradiente */
+   
+    
+}
+
+.cell{
+    cursor: pointer;
 }
 
 .cell::after, .header::after, .cell-highlight::after, .cell-highlight1::after, .cell-alert::after, .cell-alert1::after{
@@ -248,6 +251,7 @@ table {
     background: linear-gradient(45deg, #8e8e8e, #5c5c5c, #4b4b4b, #333333); /* Gradiente mais escuro */
     border-radius: 10px; /* Borda arredondada para combinar com o conteúdo */
     z-index: -1; /* Coloca o pseudo-elemento atrás do conteúdo */
+   
 }
 
 
@@ -267,7 +271,7 @@ table {
 
 
 .cell-alert {
-    background-color: #a7686336;
+    background-color: #e2cac8dc;
 }
 
 .cell-alert1 {
@@ -299,6 +303,8 @@ table {
     text-align: center;        
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);  /* Sombra mais leve */
     transition: background-color 0.3s ease; 
+    border-radius: 0px 0px 9px 0px;;
+
 }
 
 
@@ -355,69 +361,60 @@ table {
 ====================================================== */
 
 
-.test-column {
-    display: flex;
-    
+.test-column1 {
     align-items: center;
-    background-color: #cfcecd; /* Cor de fundo para diferenciar as colunas */
-    font-size: 20px;
+    background-color: transparent;
+    font-size: 1px;
     font-weight: bold;
     color: #333;
-    
-   
 }
 
-
-
-
-/* Estilo para o título (h2) dentro da .test-column */
-.test-column h2 {
+/* Título */
+.test-column1 h2 {
     font-size: 1.8rem;
-    color: #2c3e50;  /* Tom de cinza-escuro para contraste suave */
+    color: #2e2e2e; /* Cinza escuro elegante */
     text-align: center;
     margin-bottom: 1rem;
 }
 
-/* Estilo da tabela dentro da .test-column */
-.test-column table {
-    width: 100%;
-    max-width: 100%;
+/* Tabela */
+.test-column1 table {
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 1rem;
-    border: 1px solid #b2bec3; /* Cor de borda mais suave */
-    border-radius: 8px; /* Cantos arredondados */
+    border: 1px solid #ccc; /* Cinza claro e neutro */
+    border-radius: 5px;
     overflow: hidden;
-
 }
 
-/* Estilo das células (th, td) dentro da .test-column */
-.test-column th, .test-column td {
-    padding: 0.6rem 0.8rem;  /* Maior espaçamento para melhor legibilidade */
+/* Células */
+.test-column1 th,
+.test-column1 td {
+    padding: 0.6rem 0.8rem;
     text-align: left;
-    font-size: 0.8rem;
-    color: #34495e;  /* Cor mais suave e escura para texto */
-    border: 1px solid #dfe6e9;  /* Borda mais clara e suave */
-    background-color: #f4f6f7;  /* Fundo muito suave e claro */
+    font-size: 0.85rem;
+    color: #444; /* Tom neutro escuro */
+    border: 1px solid #e0e0e0;
+    background-color: #f9f9f9; /* Fundo claro */
 }
 
-/* Cabeçalho da tabela dentro da .test-column */
-.test-column th {
+/* Cabeçalho */
+.test-column1 th {
     font-weight: bold;
-    background-color: #dcdde1; /* Cor mais neutra e sutil para o cabeçalho */
-    color: #2f3542; /* Contraste mais forte no cabeçalho */
+    background-color: #efefef; /* Cabeçalho suave */
+    color: #2a2a2a;
     text-transform: uppercase;
     padding: 0.6rem 0.8rem;
 }
 
-/* Efeito de hover */
-.test-column tr:hover td {
-    background-color: #f4f7f8; /* Cor mais clara de destaque */
-    color: #2c3e50;  /* Texto mais visível ao passar o mouse */
+/* Hover */
+.test-column1 tr:hover td {
+    background-color: #eaeaea; /* Leve destaque */
+    color: #222;
     cursor: pointer;
 }
 
-/* Coluna com largura personalizada */
+/* Largura específica */
 th.campo-alterado {
     width: 12px;
 }
@@ -426,10 +423,10 @@ th[scope="col"] {
     width: auto;
 }
 
-/* Valor antigo (preço ou destaque anterior) */
-.test-column td.valor-antigo {
-    background-color: #f8d7da; /* Fundo mais suave de rosa claro */
-    color: #e74c3c;  /* Vermelho mais suave e legível */
+/* Valor antigo (com destaque em vermelho mais vivo) */
+.test-column1 td.valor-antigo {
+    background-color: #fdecea; /* Vermelho claro vivo */
+    color: #c0392b; /* Vermelho forte */
     text-align: center;
     font-weight: 700;
     font-size: 1rem;
@@ -439,10 +436,10 @@ th[scope="col"] {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Valor novo (preço ou destaque atual) */
-.test-column td.valor-novo {
-    background-color: #d4edda; /* Verde suave para novo valor */
-    color: #28a745; /* Verde mais visível e agradável */
+/* Valor novo (com destaque em verde mais vivo) */
+.test-column1 td.valor-novo {
+    background-color: #e6f4ea; /* Verde claro vivo */
+    color: #2e7d32; /* Verde forte e vibrante */
     text-align: center;
     font-weight: 700;
     font-size: 1rem;
@@ -451,7 +448,6 @@ th[scope="col"] {
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 
 
 
@@ -494,6 +490,8 @@ th[scope="col"] {
   }
   
   
+
+
 
 /* Estilos para telas menores */
 @media (max-width: 768px) {
@@ -560,8 +558,12 @@ th[scope="col"] {
 }
 
 @media (max-width: 480px) {
-    .test-column table {
-        font-size: 0.75rem; /* Reduz tamanho da fonte para caber na tela */
+    .test-column1 table {
+        font-size: 0.01rem; /* Reduz tamanho da fonte para caber na tela */
+    }
+
+    .test-colum1 {
+        font-size:1px;
     }
 
     .test-column th, .test-column td {
@@ -1464,8 +1466,8 @@ body.offcanvas-open::before {
 
   /* Estilo para a imagem piscando */
   .imagem-piscando {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     animation: piscar 1s infinite;
     position: relative;
 }
@@ -1478,6 +1480,13 @@ body.offcanvas-open::before {
     50% {
         opacity: 0.5;
     }
+}
+
+  /* Estilo para a imagem piscando */
+  .imagem-status {
+    width: 22px;
+    height: 22px;
+    position: relative;
 }
 
 /* Contêiner do tooltip */
@@ -1524,3 +1533,125 @@ body.offcanvas-open::before {
     border-style: solid;
     border-color: #333 transparent transparent transparent;
 }
+
+
+/* Ajuste para garantir que o texto "Interno Ativo" tenha cor verde */
+.ativo-tooltip {
+    color: green; /* Aplica a cor verde ao texto */
+    background-color: #ffffff;
+    border: 1px solid #111111;
+}
+
+
+
+/* ===============================================
+      MODAL ALBERGADOS PAGINA INDEX
+================================================== */
+
+
+/* Modal - Estilo principal */
+.albergado-modal {
+    display: none; /* Inicialmente escondido */
+    position: fixed;
+    z-index: 1000; /* Fica sobre o conteúdo da página */
+    left: 0;
+    top: 0;
+    width: 100%; /* Largura total da tela */
+    height: 100%; /* Altura total da tela */
+    background-color: rgba(0, 0, 0, 0.4); /* Fundo semi-transparente */
+    overflow: auto; /* Permite rolagem se necessário */
+    padding-top: 60px;
+}
+
+/* Modal - Estilo principal (modificado para garantir o posicionamento correto do botão) */
+.albergado-modal-content {
+    background-color: #f7f7f7;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 30%;
+    position: relative; /* Garante que o botão "OK" será posicionado dentro deste container */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+/* Fechar o modal (botão de fechar) */
+.albergado-modal-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.albergado-modal-close:hover,
+.albergado-modal-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Título do modal */
+.albergado-modal-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #0056b3;
+    text-align: center;
+}
+
+/* Corpo do modal */
+.albergado-modal-body {
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left; /* Alinha o texto à esquerda */
+    overflow-y: auto; /* Caso o conteúdo seja maior, permite rolagem vertical */
+    max-height: 400px; /* Define uma altura máxima para o corpo do modal */
+    padding-right: 10px; /* Garante um espaçamento à direita para não ficar encostado */
+    
+}
+
+/* Botão "OK" */
+.albergado-modal-btn-close {
+    position: absolute; /* Posiciona o botão de forma absoluta dentro do modal */
+    bottom: 20px; /* Distância de 20px do fundo do modal */
+    right: 20px; /* Distância de 20px da borda direita do modal */
+    background-color: #0056b3;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+.albergado-modal-btn-close:hover {
+    background-color: #004085;
+}
+
+/* Estilo para o parágrafo de albergados */
+.albergado-container {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+/* Estilo para o título dos albergados */
+.albergado-title {
+    font-size: 14px;
+}
+
+/* Estilo para os textos de total albergados e internos */
+#totalAlbergadoText, #internosText {
+    cursor: pointer;
+    color: #555555;
+    font-size: 14px;
+}
+
+
+
+
+
+
+
+
+
