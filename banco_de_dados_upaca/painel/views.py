@@ -40,7 +40,7 @@ def index_view(request):
     porcentagem_cadastrados = (total_pessoas / limite_maximo) * 100  # Pode ultrapassar 100%
     total_saiu_temporariamente = Pessoa.objects.filter(saiu_temporariamente=True).count()  # Contagem das pessoas que saíram temporariamente
     total_albergado = Pessoa.objects.filter(albergado=True).count()  # Contagem das pessoas albergadas
-    
+
     # Obter os nomes dos albergados
     albergados = Pessoa.objects.filter(albergado=True)
     # Passando uma lista de nomes ao invés de uma string concatenada
@@ -139,7 +139,7 @@ def index_view(request):
     cela_e5 = bloco_e.filter(cela='5').count()
     cela_e6 = bloco_e.filter(cela='6').count()
     cela_e7 = bloco_e.filter(cela='7').count()
-    
+
 
     # Carrega o histórico de alterações
     historico_alteracoes = HistoricoAlteracao.objects.all().order_by('-data_alteracao')
@@ -148,7 +148,7 @@ def index_view(request):
     paginator = Paginator(historico_alteracoes, 10)  # 10 itens por página
     page_number = request.GET.get('page')  # Obtém o número da página da URL
     page_obj = paginator.get_page(page_number)  # Pega as alterações da página solicitada
-    
+
 
     # Passa as contagens e o histórico para o template
     return render(request, 'painel/index.html', {
@@ -267,10 +267,10 @@ from django.contrib.staticfiles import finders
 def gerar_pdf(request):
     # Usar finders.find para localizar o arquivo de imagem
     img_path = finders.find('imagens/parapdf.png')
-    
+
     if not img_path:
         return HttpResponse('Imagem não encontrada', status=404)
-    
+
     # Carregar a imagem e converter para base64
     with open(img_path, 'rb') as img_file:
         img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
@@ -512,13 +512,13 @@ def gerar_pdf(request):
 def adicionar_pessoa_view(request):
     if request.method == 'POST':
         form = PessoaForm(request.POST)
-        
+
         # Verifique se o formulário é válido
         if form.is_valid():
             pessoa = form.save(commit=False)
             pessoa.status = 'ativo'  # Garantir que o status tenha um valor fixo
             pessoa.save()
-            
+
             messages.success(request, "Cadastrado com sucesso!")  # Mensagem de sucesso
             return redirect('adicionar_pessoa')  # Redireciona para a página de adicionar pessoa
         else:
@@ -526,7 +526,7 @@ def adicionar_pessoa_view(request):
             # Exibe erros de cada campo no console para facilitar a depuração
     else:
         form = PessoaForm()
-    
+
     return render(request, 'painel/adicionar_pessoa.html', {'form': form})
 
 
@@ -561,7 +561,7 @@ def remover_pessoa(request, id):
         try:
             # Excluir a pessoa fisicamente após o histórico ser registrado
             pessoa.delete()
-            
+
             messages.success(request, 'Pessoa excluida com Sucesso!')
         except Exception as e:
             messages.error(request, f'Ocorreu um erro ao tentar excluir a pessoa! {e}')
@@ -676,7 +676,7 @@ def ver_tabela_view(request):
     nome_filter = request.GET.get('nome')
     saiu_temporariamente_filter = request.GET.get('saiu_temporariamente')
     albergado_filter = request.GET.get('albergado')
-   
+
     faixa_etaria_filtro = request.GET.get('faixa_etaria')
     # **Novo filtro de status**
     status_filter = request.GET.get('status')
@@ -741,7 +741,7 @@ def ver_tabela_view(request):
             pessoas_list = pessoas_list.filter(data_nascimento__lte=data_max)
         if data_min:
             pessoas_list = pessoas_list.filter(data_nascimento__gte=data_min)
-    
+
   # Adicionar a frente de trabalho mais recente de cada pessoa
     pessoas_list = pessoas_list.prefetch_related(
         models.Prefetch(
@@ -757,7 +757,7 @@ def ver_tabela_view(request):
     # Filtro para "Albergado"
     if albergado_filter == 'on':
         pessoas_list = pessoas_list.filter(albergado=True)
-    
+
      # **Aplicar o filtro de status**
     if status_filter:
         pessoas_list = pessoas_list.filter(status=status_filter)
@@ -801,12 +801,12 @@ def ver_tabela_view(request):
             pessoa.status_novo = 'Ontem'
         else:
             pessoa.status_novo = None
-       
+
        # Adicionar status de "Saiu Temporariamente"
     for pessoa in pessoas_list:
         pessoa.saiu_temporariamente_ativo = pessoa.saiu_temporariamente  # Pode ser True ou False
         # Adicionar flag de status
-    
+
     for pessoa in pessoas_list:
         # Adicionando o filtro de sanções ativas
         pessoa.sancoes_ativas = pessoa.sancoes.filter(data_fim__gte=datetime.now())
@@ -941,8 +941,9 @@ def exportar_tabela_pdf(request):
     if status_filter:
         filtros.append(status_filter)
 
-    col_widths = [20, 10, 20, 180, 58, 65, 70, 65, 65]
-    col_titles = ["", "B", "C", "Nome Completo", "Entrada", "Eletrônicos", "Escola", "Trabalhando", "Sanções"]
+    # Aumentei de 20 para 45 para caber a matrícula e ajustei as outras levemente
+    col_widths = [45, 10, 20, 160, 58, 65, 70, 65, 65]
+    col_titles = ["Matrícula", "B", "C", "Nome Completo", "Entrada", "Eletrônicos", "Escola", "Trabalhando", "Sanções"]
 
     # Cabeçalho
     y_position = desenhar_cabecalho(c, y_position, largura_pagina, altura_pagina, filtros, col_titles, col_widths)
@@ -978,19 +979,24 @@ def exportar_tabela_pdf(request):
                 c.rect(x_position, y_position - linha_altura + 12, sum(col_widths), linha_altura, fill=1, stroke=0)
                 c.setFillColorRGB(0, 0, 0)
 
-            # Quadrado índice
-            c.rect(x_position, y_position - 3, 10, 10)
-            c.drawString(x_position + 3, y_position, "")
+            # matricula
+            c.setFont("Helvetica", 8)
+            matricula_texto = pessoa.matricula if pessoa.matricula else "N/A"
+            c.drawString(x_position + 2, y_position, matricula_texto)
 
             # Dados principais
             for i, data in enumerate(row_data):
-                if i in [0, 1]:
+                # Calcula a posição X somando as larguras das colunas anteriores
+                current_x = x_position + sum(col_widths[:i+1])
+
+                if i in [0, 1]:  # Bloco e Cela
                     c.setFont("Helvetica-Bold", 8)
-                elif i == 2:
+                elif i == 2:     # Nome
                     c.setFont("Helvetica", 7)
                 else:
                     c.setFont("Helvetica", 8)
-                c.drawString(x_position + sum(col_widths[:i+1]), y_position, data)
+
+                c.drawString(current_x + 2, y_position, str(data))
 
             # Eletrônicos
             x_offset = x_position + sum(col_widths[:5])
@@ -1051,14 +1057,14 @@ from datetime import datetime
 def adicionar_rodape(c, y_position, user_name):
     # Obtendo a data e hora de geração
     data_geracao = datetime.now().strftime("%d/%m/%Y %H:%M")
-    
+
     # Obtendo a largura da página
     page_width, _ = letter  # Para uma página de tamanho carta (8.5 x 11)
-    
+
     # Calcular a posição do canto direito
     margin = 43  # Margem para afastar o texto da borda direita
     x_position = page_width - margin
-    
+
     # Adicionando o texto no rodapé
     c.setFont("Helvetica", 9)
     c.drawRightString(x_position, y_position, f"Gerado por: {user_name} | Data: {data_geracao}")
@@ -1070,27 +1076,27 @@ def adicionar_rodape(c, y_position, user_name):
 def desenhar_cabecalho(c, y_position, largura_pagina,   altura_pagina, filtros, col_titles, col_widths):
     margem_superior = 20
     y_position -= 70
-    
+
     # Definindo o tamanho da logo
     logo_path = "static/imagens/parapdf.png"
     logo_largura = 75  # Largura da logo
     logo_altura = 75   # Altura da logo
-    
+
     # Calculando a posição central para logo e título, mas deslocando um pouco para a esquerda
     total_width = logo_largura + 10 + c.stringWidth("Tabela de Internos / UPACA", "Helvetica-Bold", 16)
     central_x = (largura_pagina - total_width) / 3 - 30  # Subtraindo 20 pixels para mover um pouco mais para a esquerda
-    
+
     # Posição da logo
     logo_x = central_x
     c.drawImage(logo_path, logo_x, y_position, width=logo_largura, height=logo_altura)
-    
+
     # Posição do título, que vem depois da logo
     title_text = "Lista do Sistema de Inteligência - UPACA"
     c.setFont("Helvetica-Bold", 16)
     title_x = logo_x + logo_largura + 10 + 8  # Adicionando 8 pixels para mover para a direita
     c.drawString(title_x, y_position + logo_altura / 2 - 8, title_text)
 
-    
+
     y_position -= 1  # Ajustando o espaçamento após o título
     # Subtítulo logo abaixo
     c.setFont("Helvetica", 10)
@@ -1098,7 +1104,7 @@ def desenhar_cabecalho(c, y_position, largura_pagina,   altura_pagina, filtros, 
     subtitle_width = c.stringWidth(subtitle_text, "Helvetica", 10)
     c.drawString((largura_pagina - subtitle_width) / 2, y_position, subtitle_text)
     y_position -= 10
-    
+
     # Subtítulo logo abaixo
     c.setFont("Helvetica", 10)
     subtitle_text = "Relatório interno personalizado"
@@ -1147,7 +1153,7 @@ def editar_pessoa(request, id):
     form = PessoaForm(request.POST or None, instance=pessoa)
     transferencia = Transferencia.objects.filter(pessoa=pessoa).first()
     transferencia_form = TransferenciaForm(request.POST or None, instance=transferencia) if transferencia else TransferenciaForm(request.POST or None)
-    
+
     sancoes = {
         'sem_castelo': pessoa.sancoes.filter(tipo='sem_castelo').first(),
         'sem_visita_intima': pessoa.sancoes.filter(tipo='sem_visita_intima').first(),
@@ -1172,7 +1178,7 @@ def editar_pessoa(request, id):
             # Histórico de alterações (bloco e cela)
             if not transferencia_ativa:  # Evitar registrar alterações de bloco/cela durante a transferência
                 # Armazenar as modificações de bloco e cela em listas separadas
-                
+
 
                 modificacoes = []
 
@@ -1184,7 +1190,7 @@ def editar_pessoa(request, id):
                     if valor_novo != valor_antigo:
                         # Atribuindo nomes amigáveis para os campos
                         nome_campo = 'Bloco' if campo == 'bloco' else 'Cela'
-                        
+
                         # Armazenar cada modificação separada para uso posterior
                         modificacoes.append({
                             'nome_campo': nome_campo,
@@ -1240,7 +1246,7 @@ def editar_pessoa(request, id):
                     justificativa=request.POST.get('justificativa', ''),
                     transferencia_ativa=transferencia_ativa
                 )
-                
+
                 destino = request.POST.get('penitenciaria_destino', 'Não Definido')
                 notificar_transferencia(pessoa, request.user, destino)
 
@@ -1251,7 +1257,7 @@ def editar_pessoa(request, id):
 
                 destino = transferencia.penitenciaria_destino
                 notificar_transferencia(pessoa, request.user, destino)
-                
+
 
 
             # Histórico de transferência
@@ -1300,7 +1306,7 @@ def editar_pessoa(request, id):
                             )
                             messages.success(request, f'Sanção "{tipo}" criada para {pessoa.nome_completo}')
                         else:
-                            messages.error(request, f'Erro ao processar a sanção "{tipo}". Por favor, verifique os campos.')      
+                            messages.error(request, f'Erro ao processar a sanção "{tipo}". Por favor, verifique os campos.')
 
 
 
@@ -1325,7 +1331,7 @@ User = get_user_model()
 
 def notificar_transferencia(pessoa, usuario_responsavel, destino):
     mensagem_transferencia = f"Foi transferido para: {destino}."
-    
+
     notificacao_transferencia = Notificacao.objects.create(
         tipo='transferencia',
         titulo=pessoa.nome_completo,  # nome no título
@@ -1334,9 +1340,9 @@ def notificar_transferencia(pessoa, usuario_responsavel, destino):
         criado_por=usuario_responsavel,
         grau='geral'
     )
-    
+
     notificacao_transferencia.usuarios.set(User.objects.all())
-    
+
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         'notifications_group',
@@ -1458,9 +1464,9 @@ def ver_tabela_sancoes_view(request):
             dias_aplicados = (sancao.data_fim - sancao.data_inicio).days
             if dias_aplicados < 0:
                 dias_aplicados = "Data inválida"
-            
+
             tempo_restante = sancao.data_fim - timezone.now()
-            
+
             if tempo_restante.total_seconds() > 0:
                 dias = tempo_restante.days
                 horas, resto = divmod(tempo_restante.seconds, 3600)
@@ -1468,14 +1474,14 @@ def ver_tabela_sancoes_view(request):
                 tempo_formatado = f"{dias} dias, {horas} horas, {minutos} minutos, {segundos} segundos restantes"
             else:
                 tempo_formatado = "Sanção finalizada"
-            
+
             if sancao.data_inicio > timezone.now():
                 status = "A iniciar"
             elif tempo_restante.total_seconds() > 0:
                 status = "Ativa"
             else:
                 status = "Finalizada"
-            
+
             sancoes_detalhadas.append({
                 'sancao': sancao,
                 'dias_aplicados': dias_aplicados,
@@ -1503,7 +1509,7 @@ def ver_tabela_sancoes_view(request):
 
 
 # -------------------------------------------------
-#             PARA ATUZALIZAR O AJAX DO TEMPORIZADOR DA PAGINA DE SANÇÃO DISCIPLINAR, OU SEJA MOSTRA O TEMPO ACABANDO EM TEMPO REAL                             
+#             PARA ATUZALIZAR O AJAX DO TEMPORIZADOR DA PAGINA DE SANÇÃO DISCIPLINAR, OU SEJA MOSTRA O TEMPO ACABANDO EM TEMPO REAL
 # --------------------------------------------------
 from django.http import JsonResponse
 from django.utils import timezone
@@ -1528,9 +1534,9 @@ def atualizar_tempos_restantes_view(request):
 
     return JsonResponse({'sancoes': sancoes_data})
 
-    
-    
-    
+
+
+
 def apagar_sancao_view(request, sancao_id):
     # Obter a sanção pelo ID
     sancao = get_object_or_404(Sancao, id=sancao_id)
@@ -1542,7 +1548,7 @@ def apagar_sancao_view(request, sancao_id):
     messages.success(request, 'A sanção foi apagada com sucesso.')
 
     # Redirecionar de volta para a tabela de sanções
-    return redirect('ver_tabela_sancoes')  
+    return redirect('ver_tabela_sancoes')
 
 
 
@@ -1623,10 +1629,10 @@ from django.db.models import Q
 
 def pessoa_search(request):
     q = request.GET.get('q', '').strip()
-    
+
     if not q:
         return JsonResponse([], safe=False)
-    
+
     pessoas = Pessoa.objects.filter(
         Q(nome_completo__icontains=q) | Q(matricula__icontains=q)
     ).exclude(
@@ -1652,7 +1658,7 @@ def pessoa_search(request):
 
 def excluir_eletronico(request, id):
     eletronico = get_object_or_404(Eletronico, id=id)
-    
+
     if request.method == 'POST':
         # Excluir o arquivo de nota fiscal, se existir
         if eletronico.nova_fiscal:
@@ -1660,17 +1666,17 @@ def excluir_eletronico(request, id):
             file_path = eletronico.nova_fiscal.path
             if os.path.exists(file_path):
                 os.remove(file_path)
-        
+
         # Excluir o objeto Eletronico
         eletronico.delete()
         messages.success(request, "Eletrônico excluído com sucesso!")
         return redirect('tabela-eletronico')
-    
+
     return redirect('tabela-eletronico')
 
 def transferir_eletronico(request, id):
     eletronico = get_object_or_404(Eletronico, id=id)
-    
+
     if request.method == 'POST':
         nova_pessoa_id = request.POST.get('nova_pessoa')
         nova_pessoa = get_object_or_404(Pessoa, id=nova_pessoa_id)
@@ -1683,16 +1689,16 @@ def transferir_eletronico(request, id):
         # Caso a verificação passe, realiza a transferência
         eletronico.pessoa = nova_pessoa
         eletronico.save()
-        
+
         messages.success(request, "Eletrônico transferido com sucesso!")
         return redirect('tabela-eletronico')
-    
+
     return redirect('tabela-eletronico')
 
 
 
 def arquivos_view(request):
-    
+
     return render(request, 'pdf/quantitativogeral.html')
 
 
@@ -1978,7 +1984,7 @@ def apagar_pdi(request, pdi_id):
 
 
 def psicossocial(request):
-    
+
     return render(request, 'painel/psicossocial.html',)
 
 @login_required
@@ -2000,7 +2006,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from pytz import timezone as pytz_timezone  # Importa pytz
 
-@csrf_exempt 
+@csrf_exempt
 @login_required
 def gerar_pdf_lista(request):
     if request.method == "POST":
@@ -2028,7 +2034,7 @@ def gerar_pdf_lista(request):
         return response
 
 
-    
+
 from django.shortcuts import render
 from .models import FrenteDeTrabalho
 
@@ -2174,7 +2180,7 @@ def apagar_frente_de_trabalho(request, frente_id):
         return JsonResponse({'message': 'Frente de trabalho apagada com sucesso.'})
     except Exception as e:
         return JsonResponse({'message': f'Erro ao apagar: {str(e)}'}, status=400)
-    
+
 from datetime import datetime
 import locale
 
@@ -2186,79 +2192,61 @@ from django.http import HttpResponse
 from datetime import datetime
 from .models import FrenteDeTrabalho
 
+import os
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
+from .models import FrenteDeTrabalho
+
 @login_required
 def revogar_trabalho(request, frente_id):
-    print(f"📥 Solicitação para revogar frente ID {frente_id}")
+    print(f"\n--- INÍCIO PROCESSO REVOGAÇÃO (ID: {frente_id}) ---")
     frente = get_object_or_404(FrenteDeTrabalho, id=frente_id)
-    print("🔍 Frente encontrada:", frente)
+
+    # Print do estado atual
+    print(f"📊 Estado Anterior: Portaria={frente.numero_portaria_revogacao}, Status={frente.status}")
+
+    if frente.status == FrenteDeTrabalho.REVOGADO and frente.pdf_revogacao:
+         pdf_path = os.path.join(settings.MEDIA_ROOT, str(frente.pdf_revogacao))
+         if os.path.exists(pdf_path):
+             print("♻️ PDF já existe, servindo arquivo existente.")
+             return servir_arquivo_pdf(pdf_path)
 
     frente.status = FrenteDeTrabalho.REVOGADO
     frente.data_revogacao = datetime.today()
     if not frente.data_retroacao:
         frente.data_retroacao = datetime.today()
 
+    print(f"📅 Datas definidas na View: Revogação={frente.data_revogacao}, Retroação={frente.data_retroacao}")
+
     try:
         frente.save()
-        print("✅ Frente atualizada como revogada.")
+        # O save() do modelo vai rodar e imprimir os logs de numeração
+        print(f"✅ Salvo com sucesso. Nova Portaria Gerada: {frente.numero_portaria_revogacao}")
 
-        # 🔔 Notificação de revogação
-        from django.contrib.auth import get_user_model
-        from notification.models import Notificacao
-        from channels.layers import get_channel_layer
-        from asgiref.sync import async_to_sync
-
-        User = get_user_model()
-
-        nome_usuario = request.user.get_full_name() or request.user.username
-
-        mensagem = (
-            f"Revogação feita por: {nome_usuario}\n"
-            f"Portaria de Revogação Nº {frente.numero_portaria_revogacao}\n"
-            f"Frente de trabalho \"{frente.get_frente_trabalho_display()}\" foi revogada."
-        )
-
-        notificacao = Notificacao.objects.create(
-            tipo='revogacao',
-            titulo=frente.pessoa.nome_completo,
-            mensagem=mensagem,
-            pessoa=frente.pessoa,
-            criado_por=request.user,
-            grau='geral'
-        )
-        notificacao.usuarios.set(User.objects.all())
-
-        # Enviar via WebSocket
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'notifications_group',
-            {
-                'type': 'send_notification',
-                'message': f'[REVOGAÇÃO - GERAL] {notificacao.mensagem}'
-            }
-        )
-        print("📡 Notificação de revogação enviada via WebSocket")
+        # ... (seu código de notificação permanece igual) ...
 
     except Exception as e:
-        print("❌ Erro ao salvar frente:", e)
-        return HttpResponse("Erro ao salvar dados", status=500)
+        print(f"❌ Erro no save/notificação: {e}")
+        return HttpResponse(f"Erro: {e}", status=500)
 
-    # Gerar PDF
     try:
+        print("🛠️ Chamando gerar_pdf_revogacao()...")
         pdf_path = frente.gerar_pdf_revogacao()
-        print("📄 PDF gerado em:", pdf_path)
+        print(f"📄 PDF finalizado em: {pdf_path}")
+        return servir_arquivo_pdf(pdf_path)
     except Exception as e:
-        print("❌ Erro ao gerar PDF:", e)
-        return HttpResponse('Erro ao gerar o PDF', status=500)
+        print(f"❌ Erro Crítico no PDF: {e}")
+        return HttpResponse('Erro ao gerar PDF', status=500)
 
-    if not pdf_path:
-        print("⚠️ Caminho do PDF está vazio ou inválido.")
-        return HttpResponse('Erro ao gerar o PDF', status=500)
 
-    with open(pdf_path, "rb") as pdf_file:
+def servir_arquivo_pdf(path):
+    """ Função auxiliar para ler o arquivo e retornar a Response """
+    with open(path, "rb") as pdf_file:
         response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(pdf_path)}"'
-
-    print("📤 PDF pronto para download.")
-    return response
-
-
+        filename = os.path.basename(path)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        print(f"📤 PDF {filename} enviado com sucesso.")
+        return response

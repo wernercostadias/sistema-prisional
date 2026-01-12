@@ -40,7 +40,7 @@ class Pessoa(models.Model):
     cela = models.CharField(max_length=2, choices=[('1', 'Cela 1'), ('2', 'Cela 2'), ('3', 'Cela 3'), ('4', 'Cela 4'), ('5', 'Cela 5'), ('6', 'Cela 6'), ('7', 'Cela 7')], null=True)
     tem_transferencia_ativa = models.BooleanField(default=False)
     nome_completo = models.CharField(max_length=255, null=True)
-    data_nascimento = models.DateField(null=True, blank=True) 
+    data_nascimento = models.DateField(null=True, blank=True)
     data_entrada = models.DateField(null=True)
     escolaridade = models.CharField(max_length=1, choices=Escolaridade.choices, null=True)
     estudando = models.CharField(max_length=255, choices=Estudando.choices, null=True)
@@ -53,14 +53,14 @@ class Pessoa(models.Model):
         blank=True,  # Permite que o campo fique vazio
         validators=[RegexValidator(regex=r'^\d{1,30}$', message="A matrícula deve conter apenas números (até 10 dígitos).")]
     )
-    
+
 
 
     # Campo para indicar se o interno está fora
     saiu_temporariamente = models.BooleanField(default=False)  # Indica se o interno está fora da penitenciária
 
     albergado = models.BooleanField(default=False)  # Indica se o interno está albergado (em liberdade condicional ou outra situação)
-    
+
     # Novo campo de status
     status = models.CharField(
         max_length=10,
@@ -78,7 +78,7 @@ class Pessoa(models.Model):
         self.estudando = None
         self.eletronicos.all().delete()
         self.status = 'inativo'
-        self.saiu_temporariamente = False 
+        self.saiu_temporariamente = False
         self.albergado = False
 
         frentes_ativas = self.frentes_de_trabalho.filter(status='ativo')
@@ -104,7 +104,7 @@ class Pessoa(models.Model):
             self.bloco = None
             self.estudando = None
             self.eletronicos.all().delete()
-            self.saiu_temporariamente = False 
+            self.saiu_temporariamente = False
             self.albergado = False
 
         elif self.pd_is.filter(resultado__in=["andamento", "condenado"]).exists():
@@ -117,7 +117,7 @@ class Pessoa(models.Model):
         self.estudando = None
         if self.status not in ['foragido', 'ativo']:
             self.status = 'inativo'
-        self.saiu_temporariamente = False 
+        self.saiu_temporariamente = False
         self.albergado = False
         self.eletronicos.all().delete()
 
@@ -178,7 +178,7 @@ class Pessoa(models.Model):
     def save(self, *args, **kwargs):
         if self.nome_completo:
             self.nome_completo = unidecode(self.nome_completo)
-        
+
         ignorar_status_auto = kwargs.pop('ignorar_status_auto', False)
 
         if self.pk is None:
@@ -211,7 +211,7 @@ class PessoaForm(forms.ModelForm):
     class Meta:
         model = Pessoa
         fields = ['nome_completo']
-        
+
 class Transferencia(models.Model):
     pessoa = models.ForeignKey('Pessoa', on_delete=models.CASCADE)
     penitenciaria_destino = models.CharField(max_length=255, default='Não Definido')  # Definindo valor padrão
@@ -222,7 +222,7 @@ class Transferencia(models.Model):
 
     def __str__(self):
         return f"Transferência para {self.pessoa} - {self.penitenciaria_destino}"
-    
+
 
 from django.db import models
 from datetime import datetime
@@ -312,18 +312,24 @@ class FrenteDeTrabalho(models.Model):
     def gerar_pdf_revogacao(self):
         """ Gera e salva o PDF de revogação da frente de trabalho """
 
-        # Localizar e converter as imagens para base64
+        # 1. Tratamento robusto das imagens para evitar erro NoneType
+        img_seap_base64 = ""
+        img_logo_base64 = ""
+
+        img_seap_path = finders.find('imagens/seap.png')
+        img_logo_path = finders.find('imagens/logo_maranhao_seap.png')
+
         try:
-            img_seap_path = finders.find('imagens/seap.png')
-            with open(img_seap_path, 'rb') as img_file:
-                img_seap_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+            if img_seap_path:
+                with open(img_seap_path, 'rb') as img_file:
+                    img_seap_base64 = base64.b64encode(img_file.read()).decode('utf-8')
 
-            img_logo_path = finders.find('imagens/logo_maranhao_seap.png')
-            with open(img_logo_path, 'rb') as img_file:
-                img_logo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
-
-        except FileNotFoundError:
-            return None  # Ou levante uma exceção se necessário
+            if img_logo_path:
+                with open(img_logo_path, 'rb') as img_file:
+                    img_logo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+        except Exception as e:
+            print(f"⚠️ Aviso: Erro ao carregar imagens para o PDF: {e}")
+            # Prossegue mesmo sem imagem para não travar o sistema
 
         locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
 
@@ -344,48 +350,66 @@ class FrenteDeTrabalho(models.Model):
             'data_hoje': data_hoje_formatada,
         }
 
-        from datetime import datetime
-
         template_path = 'pdf/revogar_trabalho.html'
         template = get_template(template_path)
         html = template.render(context)
 
-        ano_atual = datetime.now().year
-        pdf_dir = os.path.join(settings.MEDIA_ROOT, f'Revogações no Ano de {ano_atual}')
+        # 2. Pasta baseada no ano da revogação (coerência com a portaria)
+        ano_doc = self.data_revogacao.year if self.data_revogacao else timezone.now().year
+        pdf_dir = os.path.join(settings.MEDIA_ROOT, f'Revogações no Ano de {ano_doc}')
         os.makedirs(pdf_dir, exist_ok=True)
 
-        pdf_filename = f"Revogação de {self.pessoa.nome_completo} {self.get_frente_trabalho_display()} {self.numero_portaria_admissao}".replace("/", "-") + ".pdf"
+        # Nome do arquivo limpo
+        pdf_filename = f"Revogação_{self.pessoa.nome_completo}_{self.numero_portaria_revogacao}".replace("/", "-").replace(" ", "_") + ".pdf"
         pdf_path = os.path.join(pdf_dir, pdf_filename)
 
+        # Gerar o PDF
         with open(pdf_path, "wb") as pdf_file:
             HTML(string=html).write_pdf(pdf_file)
 
-        self.pdf_revogacao = f"Revogações no Ano de {ano_atual}/{pdf_filename}"
-        self.save()
+        # 3. Atualizar apenas o campo do PDF sem disparar o save() completo novamente
+        # Isso evita que a lógica de numeração seja executada duas vezes
+        relative_path = f"Revogações no Ano de {ano_doc}/{pdf_filename}"
+        FrenteDeTrabalho.objects.filter(id=self.id).update(pdf_revogacao=relative_path)
 
         return pdf_path
 
-
     def save(self, *args, **kwargs):
-        numero_inicial = 34  # Número que deseja começar
+        # Agora não temos mais um número inicial fixo global.
+        # O sistema sempre buscará o maior do ano vigente ou começará do 0.
 
         if self.data_revogacao and not self.numero_portaria_revogacao:
+            # Pega o ano da data de revogação definida na View (ex: 2026)
             ano_atual = self.data_revogacao.year
+            print(f"🔍 [SAVE] Verificando numeração para o ciclo de {ano_atual}")
 
-            ultimo_registro = FrenteDeTrabalho.objects.filter(
-                numero_portaria_revogacao__endswith=f"/{ano_atual}"
-            ).order_by('-numero_portaria_revogacao').first()
+            # Filtra apenas registros que REALMENTE pertencem ao ano atual
+            # e que já possuem um número de portaria gerado
+            registros_do_ano = FrenteDeTrabalho.objects.filter(
+                data_revogacao__year=ano_atual,
+                numero_portaria_revogacao__isnull=False
+            ).exclude(numero_portaria_revogacao="")
 
-            if ultimo_registro:
-                ultimo_numero_str = ultimo_registro.numero_portaria_revogacao.split('/')[0]
-                try:
-                    ultimo_numero = int(ultimo_numero_str)
-                except ValueError:
-                    ultimo_numero = numero_inicial - 1
+            if registros_do_ano.exists():
+                maiores_numeros = []
+                for reg in registros_do_ano:
+                    try:
+                        # Extrai o número antes da barra (ex: de "005/2026" pega "005")
+                        num_str = reg.numero_portaria_revogacao.split('/')[0]
+                        maiores_numeros.append(int(num_str))
+                    except (ValueError, IndexError, AttributeError):
+                        continue
+
+                ultimo_numero = max(maiores_numeros) if maiores_numeros else 0
+                print(f"📈 [SAVE] Já existem registros em {ano_atual}. Maior atual: {ultimo_numero}")
             else:
-                ultimo_numero = numero_inicial - 1  # Aqui está o ajuste!
+                # Se cair aqui, é porque é o primeiro registro de 2026, ou 2027, etc.
+                print(f"✨ [SAVE] Nenhum registro encontrado para {ano_atual}. Reiniciando contagem para 001.")
+                ultimo_numero = 0
 
+            # Gera o novo número: ex 0 + 1 = "001/2026"
             self.numero_portaria_revogacao = f"{ultimo_numero + 1:03}/{ano_atual}"
+            print(f"🆔 [SAVE] Resultado final: {self.numero_portaria_revogacao}")
 
         if self.data_revogacao:
             self.status = self.REVOGADO
@@ -424,7 +448,7 @@ from django.conf import settings
 from weasyprint import HTML
 import locale
 import base64
-from django.contrib.staticfiles import finders 
+from django.contrib.staticfiles import finders
 from django.utils import timezone
 from django.db import models
 
@@ -450,12 +474,12 @@ class PDI(models.Model):
     data_fim = models.DateTimeField(blank=True, null=True)
     resultado = models.CharField(max_length=20, choices=RESULTADOS_CHOICES, blank=True, verbose_name="Resultado")
 
-    
+
     def save(self, *args, **kwargs):
         # Converte as datas para "aware" (com fuso horário)
         if self.data_inicio and timezone.is_naive(self.data_inicio):
             self.data_inicio = timezone.make_aware(self.data_inicio)
-        
+
         if self.data_fim and timezone.is_naive(self.data_fim):
             self.data_fim = timezone.make_aware(self.data_fim)
 
@@ -464,7 +488,7 @@ class PDI(models.Model):
             self.pessoa.status = 'foragido'  # Sobrestado = Foragido
         elif self.resultado in ['andamento', 'condenado']:
             self.pessoa.status = 'ativo'  # Andamento e Condenado = Ativo
-        
+
         self.pessoa.save()  # Salva a pessoa com o novo status
 
         super().save(*args, **kwargs)
